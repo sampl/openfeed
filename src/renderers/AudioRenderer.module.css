@@ -1,0 +1,18 @@
+.wrapper {
+  width: 100%;
+  padding: 1rem var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player {
+  width: 100%;
+  min-height: 44px;
+}
+
+@media (min-width: 768px) {
+  .wrapper {
+    padding: 2rem 0;
+  }
+}

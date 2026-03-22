@@ -1,0 +1,31 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.iframe {
+  width: 100%;
+  height: 60vh;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.fallback {
+  font-size: var(--sm);
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.fallback a {
+  color: var(--blue-600);
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .iframe {
+    height: 70vh;
+  }
+}

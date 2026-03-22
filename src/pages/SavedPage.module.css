@@ -1,0 +1,34 @@
+.page {
+  margin-top: 52px;
+  /* min-height fills the remaining viewport below the fixed header so the
+     empty state is centred without the page scrolling unnecessarily */
+  min-height: calc(100dvh - 52px);
+  padding-bottom: 2rem;
+}
+
+/* Full-viewport container for empty state — centres content in the space
+   below the fixed header */
+.pageEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100dvh - 52px);
+  padding: 2rem var(--gutter);
+  text-align: center;
+}
+
+.status {
+  color: var(--text-secondary);
+  padding: 1rem var(--gutter);
+  margin: 0;
+  font-size: var(--md);
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 720px;
+    margin: 52px auto 0;
+    padding-bottom: 2rem;
+  }
+}

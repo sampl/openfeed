@@ -1,0 +1,7 @@
+port: 3001
+schedule: "0 7 * * *"
+feeds:
+  - name: Main
+    sources:
+      - name: Hacker News
+        url: https://hnrss.org/frontpage

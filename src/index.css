@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* App-level styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* Allow vertical elastic scroll bounce on iOS, prevent horizontal */
+  overscroll-behavior-x: none;
+}
+
+#root {
+  min-height: 100%;
+}
+
+/* Ensure tap highlights are subtle on mobile */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  color: var(--text-secondary);
+  background: var(--background-primary);
+  font-size: var(--md);
+  font-family: var(--font-family-sans);
+  line-height: 1.6;
+}

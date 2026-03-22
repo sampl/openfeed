@@ -1,0 +1,27 @@
+.page {
+  margin-top: 52px;
+  padding: 1rem var(--gutter) 2rem;
+}
+
+.config {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  font-size: var(--xs);
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--surface-2, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  white-space: pre;
+  word-break: normal;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 720px;
+    margin: 52px auto 0;
+    padding: 2rem 0;
+  }
+}

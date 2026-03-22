@@ -1,0 +1,159 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Clock, ArrowsClockwise, ArrowClockwise, Plus, Globe, BookOpen, Warning, CheckCircle, ListBullets, FileText } from "@phosphor-icons/react";
+import { Copyright, SettingsSection, SettingsItem } from "../ui_components";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { triggerFetch, fetchSources } from "../apiClient";
+import { useLatestRun } from "../hooks/useLatestRun";
+import styles from "./SettingsPage.module.css";
+
+const showAddToHomeScreenInstructions = () => {
+  alert(
+    "Add to home screen\n\n" +
+      "1. Open this page in Safari\n" +
+      "2. Tap the share button (box with arrow pointing up)\n" +
+      "3. Scroll down and tap \u201cAdd to Home Screen\u201d\n" +
+      "4. Tap \u201cAdd\u201d to confirm"
+  );
+};
+
+const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+
+  if (diffSeconds < 60) return "just now";
+
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) {
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    return rtf.format(-diffMinutes, "minute");
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) {
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    return rtf.format(-diffHours, "hour");
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  return rtf.format(-diffDays, "day");
+};
+
+export const SettingsPage = () => {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const latestRun = useLatestRun();
+  const { data: sources } = useQuery({ queryKey: ["sources"], queryFn: fetchSources });
+
+  const fetchErrorCount = latestRun?.status === "error"
+    ? latestRun.sourceResults.filter((r) => r.status === "error").length
+    : 0;
+
+  const handleSync = () => {
+    setIsSyncing(true);
+    triggerFetch()
+      .then(() => {
+        // Invalidate the feed query so TanStack Query refetches from page 0
+        void queryClient.invalidateQueries({ queryKey: ["items"] });
+      })
+      .catch(() => {
+        // Non-fatal: user can try again
+      })
+      .finally(() => setIsSyncing(false));
+  };
+
+  // Determine last run status item props
+  const lastRunTitle = (() => {
+    if (!latestRun) return "No runs yet";
+    if (latestRun.status === "error") return `${fetchErrorCount} error${fetchErrorCount !== 1 ? "s" : ""} in last run`;
+    return `Last run ${formatRelativeTime(latestRun.startedAt)}`;
+  })();
+
+  const lastRunIcon = latestRun?.status === "error"
+    ? <Warning size={18} />
+    : latestRun?.status === "success"
+      ? <CheckCircle size={18} />
+      : <ArrowsClockwise size={18} />;
+
+  const lastRunOnClick = latestRun?.status === "error"
+    ? () => navigate(`/runs/${latestRun.id}`, { state: { run: latestRun } })
+    : undefined;
+
+  return (
+    <main className={styles.page}>
+      <div className={styles.content}>
+        <SettingsSection>
+          <SettingsItem
+            title={lastRunTitle}
+            icon={lastRunIcon}
+            onClick={lastRunOnClick}
+            showChevron={latestRun?.status === "error"}
+          />
+          <SettingsItem
+            title="Run now"
+            icon={<ArrowClockwise size={18} />}
+            onClick={handleSync}
+            disabled={isSyncing}
+          />
+          <SettingsItem
+            title="Run history"
+            icon={<ArrowsClockwise size={18} />}
+            onClick={() => navigate("/runs")}
+            showChevron={true}
+          />
+        </SettingsSection>
+        <SettingsSection>
+          <SettingsItem
+            title={sources != null ? `${sources.length} source${sources.length !== 1 ? "s" : ""}` : "Sources"}
+            icon={<ListBullets size={18} />}
+            onClick={() => navigate("/sources")}
+            showChevron={true}
+          />
+          <SettingsItem
+            title="Full config"
+            icon={<FileText size={18} />}
+            onClick={() => navigate("/config")}
+            showChevron={true}
+          />
+        </SettingsSection>
+        <SettingsSection>
+          <SettingsItem
+            title="History"
+            icon={<Clock size={18} />}
+            onClick={() => navigate("/history")}
+            showChevron={true}
+          />
+        </SettingsSection>
+        <SettingsSection>
+          <SettingsItem
+            title="Add to home screen"
+            icon={<Plus size={18} />}
+            onClick={showAddToHomeScreenInstructions}
+          />
+          <SettingsItem
+            title="About"
+            icon={<Globe size={18} />}
+            href="https://sampiercelolla.com"
+            target="_blank"
+          />
+          {/* href to be updated when documentation is published */}
+          <SettingsItem
+            title="Documentation"
+            icon={<BookOpen size={18} />}
+            href="#"
+            target="_blank"
+          />
+        </SettingsSection>
+      </div>
+      <footer className={styles.footer}>
+        <span className={styles.copyright}>
+          <Copyright />
+        </span>
+      </footer>
+    </main>
+  );
+};

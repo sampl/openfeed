@@ -1,0 +1,157 @@
+# open-feed kitchen sink example
+# Demonstrates every plugin and common configuration options.
+# Replace placeholder values (YOUR_*, example.*, etc.) with real ones.
+
+# Port to serve the web UI on
+port: 3000
+
+# Cron expression for the daily fetch schedule (7am UTC by default)
+schedule: "0 7 * * *"
+
+# Daily time limit for the whole feed (in minutes)
+timeLimit:
+  daily: 20
+
+feeds:
+  # A separate feed with its own schedule — runs Saturdays at 6am UTC
+  - name: Weekend edition
+    schedule: "0 6 * * 6"
+    sources:
+      # rss — generic RSS or Atom feed
+      - name: Example Blog
+        url: https://example.com/feed.xml
+
+      - name: Kottke
+        url: https://feeds.kottke.org/main
+
+  - name: Daily
+    sources:
+      # youtube-rss — YouTube channel by handle or channel ID
+      - name: Example Channel
+        url: https://www.youtube.com/@examplechannel
+
+      # substack-rss — Substack publication (custom domain also works)
+      - name: Example Substack
+        url: https://examplenewsletter.substack.com
+        maxAgeDays: 7
+
+      # rss — RSS feed with item limits and expiration
+      - name: New York Times
+        url: https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+        maxItems: 5
+        expirationDays: 2
+
+      # instagram-firecrawl — requires FIRECRAWL_API_KEY env var
+      - name: Example Museum
+        url: https://www.instagram.com/examplemuseum/
+
+      # open-meteo — weather data; fetchMode: replace overwrites the previous item each run
+      - name: City Weather
+        url: https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current=temperature_2m,wind_speed_10m,weather_code&hourly=temperature_2m,precipitation_probability
+        fetchMode: replace
+        options:
+          temperature_unit: fahrenheit
+
+      # reddit — subreddit feed
+      - name: r/programming
+        url: https://www.reddit.com/r/programming/
+
+      # reddit — with explicit sort/time/limit options
+      - name: r/worldnews
+        url: https://www.reddit.com/r/worldnews
+        options:
+          sort: top
+          time: day
+          limit: 5
+
+      # buttondown — newsletter archive
+      - name: Example Newsletter
+        url: https://buttondown.com/examplenewsletter/archive
+
+      # github — open issues from a repo
+      - name: Example Repo
+        url: https://github.com/example-org/example-repo
+
+      # hacker-news
+      - name: Hacker News
+        url: https://news.ycombinator.com
+
+      # bluesky — public profile feed
+      - name: Bluesky
+        url: https://bsky.app/profile/example.bsky.social
+
+      # dev-to — platform feed, or use https://dev.to/@username for a specific author
+      - name: Dev.to
+        url: https://dev.to
+
+      # medium — platform feed, or use https://medium.com/@username for a specific author
+      - name: Medium
+        url: https://medium.com/@exampleauthor
+
+      # cnn
+      - name: CNN
+        url: https://www.cnn.com
+
+      # washington-post
+      - name: Washington Post
+        url: https://www.washingtonpost.com
+
+      # wall-street-journal
+      - name: Wall Street Journal
+        url: https://www.wsj.com
+
+      # politico
+      - name: Politico
+        url: https://www.politico.com
+
+      # associated-press
+      - name: Associated Press
+        url: https://apnews.com
+
+      # reuters
+      - name: Reuters
+        url: https://www.reuters.com
+
+      # al-jazeera
+      - name: Al Jazeera
+        url: https://www.aljazeera.com
+
+      # the-new-yorker
+      - name: The New Yorker
+        url: https://www.newyorker.com
+
+      # espn — use options.feed for a sport-specific feed (e.g. /nfl/news or /nba/news)
+      - name: ESPN
+        url: https://www.espn.com
+
+      # centcom — US Central Command press releases
+      - name: CENTCOM
+        url: https://www.centcom.mil
+
+      # podcasts — Apple Podcasts URL; replace id with a real podcast ID
+      - name: My Podcast
+        url: https://podcasts.apple.com/us/podcast/my-show/id123456789
+
+      # tiktok — no public API; TikTok blocks scraping (see plugins/tiktok/readme.md)
+      - name: TikTok
+        url: https://www.tiktok.com/@exampleuser
+
+      # nyt-crossword — requires an NYT API key (see plugins/nyt-crossword/readme.md)
+      - name: NYT Crossword
+        url: https://www.nytimes.com/crosswords
+        options:
+          apiKey: YOUR_NYT_API_KEY_HERE
+
+      # google-calendar — requires a public ICS URL (see plugins/google-calendar/readme.md)
+      - name: My Calendar
+        url: https://calendar.google.com/calendar
+        options:
+          icsUrl: https://calendar.google.com/calendar/ical/YOUR_CALENDAR_ID/public/basic.ics
+
+      # gmail — OAuth setup required (see plugins/gmail/readme.md)
+      - name: Gmail
+        url: https://mail.google.com
+
+      # wordle — no public API available (see plugins/wordle/readme.md)
+      - name: Wordle
+        url: https://www.nytimes.com/games/wordle/index.html

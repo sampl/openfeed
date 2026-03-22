@@ -1,0 +1,147 @@
+/* Individual feed post — microblog style */
+.post {
+  border-bottom: 1px solid var(--border);
+  background: var(--background-primary);
+  transition: opacity 0.3s ease;
+}
+
+.postRead {
+  /* Read items stay full opacity — a checkmark is shown instead */
+}
+
+/* Clickable card body (opens article link) */
+.postBody {
+  display: block;
+  padding: 1rem var(--gutter) 0.75rem;
+  text-decoration: none;
+  border: none;
+  color: inherit;
+}
+
+.postBody:hover .title {
+  text-decoration: underline;
+}
+
+.sourceMeta {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sourceIcon {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.sourceName {
+  font-size: var(--xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metaSep {
+  font-size: var(--xs);
+  color: var(--text-tertiary);
+}
+
+.sourceUrl {
+  font-size: var(--xs);
+  color: var(--text-tertiary);
+}
+
+.publishedAt {
+  font-size: var(--xs);
+  color: var(--text-tertiary);
+}
+
+.title {
+  display: block;
+  font-size: var(--md);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  border: none;
+}
+
+/* Reset top margin on any headings rendered inside post content (e.g. rich-text renderer) */
+.post h1,
+.post h2,
+.post h3 {
+  margin-top: 0;
+}
+
+.description {
+  font-size: var(--sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.rendererArea {
+  padding: 0 var(--gutter) 0.75rem;
+}
+
+.toggleRow {
+  padding-bottom: 0.5rem;
+}
+
+/* Small checkmark shown when an item has been scrolled past (added to history) */
+.readIndicator {
+  display: flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+/* Small action buttons row */
+.postActions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem var(--gutter) 0.75rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  background: var(--background-item);
+  color: var(--text-primary);
+}
+
+.actionButtonActive {
+  color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+  .postBody {
+    padding: 1.25rem 0 0.75rem;
+  }
+
+  .rendererArea {
+    padding: 0 0 0.75rem;
+  }
+
+  .postActions {
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .title {
+    font-size: var(--lg);
+  }
+}

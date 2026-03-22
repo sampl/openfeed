@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenFeed — All your news and social media in one place</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f0f0f;
+      --bg-section: #161616;
+      --bg-card: #1e1e1e;
+      --text: #e8e8e8;
+      --text-muted: #888;
+      --border: #2a2a2a;
+      --max-width: 760px;
+      --btn-primary-bg: #ffffff;
+      --btn-primary-text: #0f0f0f;
+    }
+
+    .daytime {
+      --bg: #ffffff;
+      --bg-section: #f4f4f4;
+      --bg-card: #ebebeb;
+      --text: #111111;
+      --text-muted: #555555;
+      --border: #e0e0e0;
+      --btn-primary-bg: #222222;
+      --btn-primary-text: #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Nav */
+    nav {
+      padding: 12px 0;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: #555;
+      opacity: 1;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    .hero .tagline {
+      font-size: clamp(17px, 2.5vw, 22px);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+
+    .hero .tagline em {
+      color: var(--text);
+      font-style: normal;
+    }
+
+    .hero .sub-tagline {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Sections */
+    section {
+      padding: 48px 0;
+    }
+
+    h2 {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    h3 {
+      font-size: clamp(22px, 2.8vw, 30px);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      text-wrap: balance;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      max-width: 600px;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Graphic placeholder */
+    .graphic {
+      margin: 32px 0;
+      padding: 48px 24px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Algorithm list */
+    .algo-rules {
+      list-style: none;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .algo-rules li {
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .algo-rules li::before {
+      content: "— ";
+    }
+
+    /* Testimonials */
+    .testimonials {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    blockquote p {
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    blockquote cite {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-style: normal;
+    }
+
+    /* Links */
+    .text-link {
+      color: var(--text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+
+    .text-link:hover {
+      text-decoration: underline;
+    }
+
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    /* Closing CTA */
+    .closing {
+      text-align: center;
+      padding: 96px 0;
+    }
+
+    .closing h2 {
+      margin-bottom: 12px;
+    }
+
+    .closing p {
+      max-width: none;
+      margin: 0 auto 40px;
+    }
+
+    .closing .hero-ctas {
+      margin-bottom: 40px;
+    }
+
+    /* Footer */
+    footer {
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    .footer-brand-link {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer-brand-link:hover {
+      text-decoration: underline;
+    }
+
+    .cta-subtext {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .cta-subtext a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .cta-subtext a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 64px 0 56px;
+      }
+
+      section {
+        padding: 40px 0;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .btn-primary {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-logo" href="#">OpenFeed</a>
+      <ul class="nav-links">
+        <!-- <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li> -->
+        <li><a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary" style="padding: 8px 18px; font-size: 14px;">Install</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" style="border-top: none;">
+    <div class="container">
+      <h1>All your news and social media—in a feed <u>you</u> control</h1>
+      <p class="sub-tagline">Subscribe to any account on any platform. Keep up with the world, without the ads and slop.</p>
+      <div class="hero-ctas">
+        <a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary">Install</a>
+        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a> -->
+      </div>
+      <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section>
+    <div class="container">
+      <h2>Our feeds are toxic. It's time to fix it.</h2>
+      <p>Big tech is selling your attention. Our email inboxes are full of junk. Politicians are brewing hate. AI slop is getting shoved down our throats.</p>
+      <p>Our information diet is killing us. Something has to change.</p>
+    </div>
+  </section>
+
+  <!-- Real feed -->
+  <section>
+    <div class="container">
+      <h2>What if you could have a real feed without all the junk?</h2>
+      <p>What would a human-friendly news feed look like? The important news of the day, social updates from friends, local events, and maybe some stupid memes—but without the ads, the AI slop, and all the other junk.</p>
+    </div>
+  </section>
+
+  <!-- Solution overview -->
+  <section>
+    <div class="container">
+      <h2>OpenFeed gives you control over what you consume</h2>
+      <p>Who should decide what you read? Big tech? Advertisers? Or you?</p>
+    </div>
+  </section>
+
+  <!-- Curate sources -->
+  <section>
+    <div class="container">
+      <h2>Curate the sources that matter to you</h2>
+      <p>Curate your own personal feed. Podcasts, blogs, newsletters, social accounts. Anything with a URL.</p>
+      <p>Want to follow the news from the front lines? Follow your favorite independent writers? See local community events? Just want to see cat memes? You can do it with OpenFeed.</p>
+
+      <!-- GRAPHIC: Source logos — NYT, WSJ, YouTube, Substack, The Onion, New Yorker, Sam Harris, Adam Tooze, Ezra Klein, etc. -->
+      <!-- <div class="graphic">[ Graphic: source logos ]</div> -->
+    </div>
+  </section>
+
+  <!-- Algorithm -->
+  <section>
+    <div class="container">
+      <h2>Design your own algorithm</h2>
+      <p>You decide what matters and what doesn't. Describe your ultimate algorithm in plain English and let AI filter out the noise.</p>
+
+      <!-- GRAPHIC: A visual list of plain-English algorithm rules, e.g.:
+           - Summarize any new AI models
+           - Always show war stories first
+           - Ignore political news
+           - Don't show celebrity news
+           - Only one article per day about Ukraine
+           - Ignore articles that mention the Oscars
+      -->
+      <!--
+      <ul class="algo-rules">
+        <li>Summarize any new AI models</li>
+        <li>Always show war stories first</li>
+        <li>Ignore political news</li>
+        <li>Don't show celebrity news</li>
+        <li>Only one article per day about Ukraine</li>
+        <li>Ignore articles that mention the Oscars</li>
+      </ul>
+      -->
+    </div>
+  </section>
+
+  <!-- Read, watch, listen -->
+  <!--
+  <section>
+    <div class="container">
+      <h2>Read, watch, or listen</h2>
+      <p>Automatically convert media types. Auto-convert articles to podcasts. Summarize long reads. Listen to YouTube videos. Read podcast transcripts. You can even create a custom print feed.</p>
+
+      <!- - GRAPHIC: Illustration of media conversion — text to audio, audio to text, video to transcript, etc. - ->
+      <!- - <div class="graphic">[ Graphic: convert text to audio and vice versa ]</div> - ->
+    </div>
+  </section>
+  -->
+
+  <!-- Time limits -->
+  <section>
+    <div class="container">
+      <h2>Browse within healthy limits, then go touch grass</h2>
+      <p>Even feeds you control can be addictive. That's why OpenFeed lets you hard-code time limits so you never waste more time than you want. Once they're up, the app won't work.</p>
+    </div>
+  </section>
+
+  <!-- Open source -->
+  <section>
+    <div class="container">
+      <h2>Open source, self-hosted, and completely private.</h2>
+      <p>Run on your own server with your own API keys. Completely private. No tracking, no subscription, no BS.</p>
+      <div class="link-list">
+        <a href="https://openfeed-docs.pages.dev" class="text-link">Read the docs →</a>
+        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="text-link">Star on GitHub →</a> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section>
+    <div class="container">
+      <div class="testimonials">
+        <blockquote>
+          <p>"It's like OpenClaw and RSS had a weird baby."</p>
+          <cite>— Me, the guy who made this</cite>
+        </blockquote>
+        <blockquote>
+          <p>"It's like lurking on steroids! I love it."</p>
+          <cite>— Also me</cite>
+        </blockquote>
+        <blockquote>
+          <p>"I feel like I can finally keep up with the news without getting sucked into the algorithm."</p>
+          <cite>— Me again</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing CTA -->
+  <section class="closing" id="install">
+    <div class="container">
+      <h2>Keep up with the world—without going insane</h2>
+      <p>The internet is a crazy place. OpenFeed helps you make sense of it all. It's time to take back our attention.</p>
+      <div class="hero-ctas">
+        <a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary">Install now</a>
+        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a> -->
+      </div>
+      <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="https://openfeed-docs.pages.dev">Docs</a></li>
+        <li><a href="https://twitter.com/sampleite" target="_blank" rel="noopener">@sampleite</a></li>
+        <!-- <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li> -->
+      </ul>
+      <p style="margin-top: 16px; font-size: 13px; color: var(--text-muted); max-width: none;">
+        &copy; 2026 <a href="https://directedworks.com" class="footer-brand-link">Directed Works</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Apply light theme during daytime hours (6am–8pm)
+    var hour = new Date().getHours();
+    if (hour >= 6 && hour < 20) {
+      document.documentElement.classList.add('daytime');
+    }
+  </script>
+
+</body>
+</html>

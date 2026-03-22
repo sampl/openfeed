@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>News Feed</title>
+    <meta name="description" content="Personal news feed" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="News Feed" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <!-- On-screen error overlay: catches JS errors before React initializes, useful for iOS debugging without DevTools -->
+    <script>
+      window.onerror = function(msg, src, line) {
+        var d = document.createElement('div');
+        d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#fee;color:#900;padding:16px;font:14px monospace;word-break:break-all';
+        d.textContent = 'Error: ' + msg + (src ? ' at ' + src + ':' + line : '');
+        document.body.appendChild(d);
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        var d = document.createElement('div');
+        d.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:9999;background:#fee;color:#900;padding:16px;font:14px monospace;word-break:break-all';
+        d.textContent = 'Unhandled: ' + (e.reason && e.reason.message || String(e.reason));
+        document.body.appendChild(d);
+      });
+    </script>
+  </head>
+  <body>
+    <noscript>This site requires JavaScript</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

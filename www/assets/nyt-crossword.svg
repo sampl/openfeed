@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img">
+  <title>NYT Crossword</title>
+  <rect width="100" height="100" fill="#fff"/>
+  <!-- 5x5 crossword grid -->
+  <rect x="5" y="5" width="18" height="18" fill="#000"/>
+  <rect x="25" y="5" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="45" y="5" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="65" y="5" width="18" height="18" fill="#000"/>
+  <rect x="83" y="5" width="12" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+
+  <rect x="5" y="25" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="25" y="25" width="18" height="18" fill="#000"/>
+  <rect x="45" y="25" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="65" y="25" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="83" y="25" width="12" height="18" fill="#000"/>
+
+  <rect x="5" y="45" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="25" y="45" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="45" y="45" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="65" y="45" width="18" height="18" fill="#000"/>
+  <rect x="83" y="45" width="12" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+
+  <rect x="5" y="65" width="18" height="18" fill="#000"/>
+  <rect x="25" y="65" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="45" y="65" width="18" height="18" fill="#000"/>
+  <rect x="65" y="65" width="18" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="83" y="65" width="12" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+
+  <rect x="5" y="83" width="18" height="12" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="25" y="83" width="18" height="12" fill="#000"/>
+  <rect x="45" y="83" width="18" height="12" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="65" y="83" width="18" height="12" fill="#fff" stroke="#000" stroke-width="1.5"/>
+  <rect x="83" y="83" width="12" height="12" fill="#000"/>
+</svg>

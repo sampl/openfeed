@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img">
+  <title>CENTCOM</title>
+  <!-- Shield shape -->
+  <path d="M50 5 L90 20 L90 55 Q90 80 50 95 Q10 80 10 55 L10 20 Z" fill="#003087"/>
+  <path d="M50 12 L84 25 L84 55 Q84 76 50 89 Q16 76 16 55 L16 25 Z" fill="#fff"/>
+  <!-- Star -->
+  <polygon points="50,28 53.5,38.5 64.5,38.5 56,45 59.5,55.5 50,49 40.5,55.5 44,45 35.5,38.5 46.5,38.5" fill="#003087"/>
+  <!-- CENTCOM text -->
+  <text x="50" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#003087" font-weight="bold" letter-spacing="0.5">CENTCOM</text>
+</svg>
