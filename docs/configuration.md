@@ -2,6 +2,13 @@
 
 All configuration lives in an `open-feed.yaml` file in the directory where you run the server.
 
+## Examples
+
+See working examples in the GitHub repo:
+
+- [Basic example](https://github.com/sampl/openfeed/blob/main/examples/basic.yaml)
+- [Kitchen sink](https://github.com/sampl/openfeed/blob/main/examples/kitchen-sink.yaml)
+
 ## Sources
 
 Sources are the core of OpenFeed — everything you want to follow. Each source has a URL and an optional name.
@@ -46,7 +53,7 @@ Use `replace` for sources that represent current state, like weather or daily di
 | `name` | string | Display name for this source |
 | `url` | string | Source URL |
 | `fetchMode` | `append` \| `replace` | Default: `append` |
-| `plugin` | string | Force a specific plugin (optional) |
+| `plugin` | string | Force a specific connector (optional) |
 | `maxItems` | number | Max items to keep from this source |
 | `maxAgeDays` | number | Ignore items older than N days |
 | `expirationDays` | number | Auto-archive items after N days |
@@ -133,66 +140,3 @@ feeds:
 
 When the daily limit is reached, the feed is blocked until the next day.
 
-## Examples
-
-### Basic example
-
-```yaml
-port: 3000
-schedule: "0 7 * * *"
-
-feeds:
-  - name: Main
-    sources:
-      # YouTube — use the @handle URL
-      - name: My Favorite YouTuber
-        url: https://www.youtube.com/@channelhandle
-
-      # Substack newsletter
-      - name: Interesting Newsletter
-        url: https://authorname.substack.com
-
-      # Any RSS or Atom feed
-      - name: My Blog
-        url: https://example.com/feed.xml
-
-      # Reddit subreddit
-      - name: Today I Learned
-        url: https://www.reddit.com/r/todayilearned/
-
-      # Weather — replace mode so only today's forecast is in the queue
-      - name: New York Weather
-        url: https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&current_weather=true
-        fetchMode: replace
-```
-
-### Example with multiple feeds
-
-```yaml
-port: 3000
-schedule: "0 7 * * *"
-
-feeds:
-  - name: News
-    schedule: "0 7 * * 1-5"  # weekdays only
-    timeLimit:
-      daily: 20
-    sources:
-      - name: Associated Press
-        url: https://apnews.com/
-      - name: Reuters
-        url: https://www.reuters.com/
-      - name: Hacker News
-        url: https://hnrss.org/frontpage
-        maxItems: 20
-
-  - name: Leisure
-    schedule: "0 9 * * 6,0"  # weekends
-    sources:
-      - name: Today I Learned
-        url: https://www.reddit.com/r/todayilearned/
-      - name: The New Yorker
-        url: https://www.newyorker.com/
-      - name: My Podcast
-        url: https://feeds.example.com/my-podcast.xml
-```

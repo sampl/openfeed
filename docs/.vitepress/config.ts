@@ -13,16 +13,14 @@ export default defineConfig({
       { text: 'Installation', link: '/installation' },
       { text: 'Configuration', link: '/configuration' },
       {
-        text: 'Plugins',
+        text: 'Connectors',
         items: [
-          { text: 'Overview', link: '/plugins/' },
-          { text: 'Supported plugins', link: '/plugins/supported' },
-          { text: 'Writing a plugin', link: '/plugins/custom' },
-          { text: 'Error handling', link: '/plugins/errors' },
+          { text: 'Overview', link: '/connectors/' },
+          { text: 'Supported connectors', link: '/connectors/supported' },
+          { text: 'Writing a connector', link: '/connectors/custom' },
         ],
       },
       { text: 'API', link: '/api' },
-      { text: 'For agents', link: '/agents' },
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/sampl/openfeed' },
