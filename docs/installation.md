@@ -124,6 +124,32 @@ sudo systemctl enable open-feed
 sudo systemctl start open-feed
 ```
 
+### GitHub Actions auto-deploy
+
+To automatically redeploy when you push changes to your config:
+
+```yaml
+# .github/workflows/deploy-open-feed.yml
+name: Deploy open-feed
+
+on:
+  push:
+    paths:
+      - 'open-feed/**'
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Railway
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: open-feed
+```
+
 ### Cloudflare Pages (docs only)
 
 The OpenFeed docs site can be hosted on Cloudflare Pages. In your Cloudflare Pages project settings, configure:
@@ -148,3 +174,21 @@ The SQLite database schema is backwards-compatible across patch and minor versio
 Once the server is running, navigate to its URL in Safari or Chrome. To install as a PWA on iOS: tap Share → "Add to Home Screen".
 
 For local access on the same network, find your computer's local IP (`ipconfig getifaddr en0` on macOS, `hostname -I` on Linux) and open `http://192.168.x.x:3000`.
+
+## Troubleshooting
+
+**Server starts but no items appear**
+Run a manual fetch: `curl -X POST http://localhost:3000/api/fetch`
+Or visit the Runs page in the UI to see fetch history and any errors.
+
+**YouTube sources return no items**
+YouTube `@handle` URLs require the handle to exist. Verify the handle is correct by visiting the URL in a browser.
+
+**Instagram sources are skipped**
+Set `FIRECRAWL_API_KEY` in your `.env` file. The key is available at [firecrawl.dev](https://firecrawl.dev).
+
+**Port already in use**
+Change the `port` in `open-feed.yaml` or pass `--port 3001`.
+
+**Database file grows large**
+The `open-feed.db` file grows as items accumulate. Archived items are kept for the archive view but are not automatically deleted. To reset: stop the server, delete `open-feed.db`, and restart.

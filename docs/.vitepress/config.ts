@@ -6,7 +6,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/' },
-      { text: 'GitHub', link: 'https://github.com/TODO' },
+      { text: 'GitHub', link: 'https://github.com/sampl/openfeed' },
     ],
     sidebar: [
       { text: 'Overview', link: '/' },
@@ -22,9 +22,10 @@ export default defineConfig({
         ],
       },
       { text: 'API', link: '/api' },
+      { text: 'For agents', link: '/agents' },
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/TODO' },
+      { icon: 'github', link: 'https://github.com/sampl/openfeed' },
     ],
   },
 })

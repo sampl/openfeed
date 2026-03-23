@@ -23,15 +23,17 @@
       --btn-primary-text: #0f0f0f;
     }
 
-    .daytime {
-      --bg: #ffffff;
-      --bg-section: #f4f4f4;
-      --bg-card: #ebebeb;
-      --text: #111111;
-      --text-muted: #555555;
-      --border: #e0e0e0;
-      --btn-primary-bg: #222222;
-      --btn-primary-text: #ffffff;
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #ffffff;
+        --bg-section: #f4f4f4;
+        --bg-card: #ebebeb;
+        --text: #111111;
+        --text-muted: #555555;
+        --border: #e0e0e0;
+        --btn-primary-bg: #222222;
+        --btn-primary-text: #ffffff;
+      }
     }
 
     body {
@@ -355,7 +357,7 @@
     <div class="container">
       <a class="nav-logo" href="#">OpenFeed</a>
       <ul class="nav-links">
-        <!-- <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li> -->
+        <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li>
         <li><a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary" style="padding: 8px 18px; font-size: 14px;">Install</a></li>
       </ul>
     </div>
@@ -368,7 +370,7 @@
       <p class="sub-tagline">Subscribe to any account on any platform. Keep up with the world, without the ads and slop.</p>
       <div class="hero-ctas">
         <a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary">Install</a>
-        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a> -->
+        <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a>
       </div>
       <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
     </div>
@@ -466,7 +468,7 @@
       <p>Run on your own server with your own API keys. Completely private. No tracking, no subscription, no BS.</p>
       <div class="link-list">
         <a href="https://openfeed-docs.pages.dev" class="text-link">Read the docs →</a>
-        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="text-link">Star on GitHub →</a> -->
+        <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="text-link">Star on GitHub →</a>
       </div>
     </div>
   </section>
@@ -498,7 +500,7 @@
       <p>The internet is a crazy place. OpenFeed helps you make sense of it all. It's time to take back our attention.</p>
       <div class="hero-ctas">
         <a href="https://openfeed-docs.pages.dev/installation" class="btn btn-primary">Install now</a>
-        <!-- <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a> -->
+        <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary">Star on GitHub</a>
       </div>
       <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
     </div>
@@ -509,7 +511,7 @@
       <ul class="footer-links">
         <li><a href="https://openfeed-docs.pages.dev">Docs</a></li>
         <li><a href="https://twitter.com/sampleite" target="_blank" rel="noopener">@sampleite</a></li>
-        <!-- <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li> -->
+        <li><a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener">GitHub</a></li>
       </ul>
       <p style="margin-top: 16px; font-size: 13px; color: var(--text-muted); max-width: none;">
         &copy; 2026 <a href="https://directedworks.com" class="footer-brand-link">Directed Works</a>
@@ -517,13 +519,6 @@
     </div>
   </footer>
 
-  <script>
-    // Apply light theme during daytime hours (6am–8pm)
-    var hour = new Date().getHours();
-    if (hour >= 6 && hour < 20) {
-      document.documentElement.classList.add('daytime');
-    }
-  </script>
 
 </body>
 </html>
