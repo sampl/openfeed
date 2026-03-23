@@ -86,7 +86,6 @@ export const useTimeTracking = (feedName: string | null): { heartbeatCount: numb
         recordTimeSession(feedName, durationMs, dateRef.current).catch(() => {});
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedName]);
 
   return { heartbeatCount };

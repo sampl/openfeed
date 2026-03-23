@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import { globalIgnores } from "eslint/config";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default tseslint.config([
   globalIgnores(["dist"]),
@@ -11,6 +12,9 @@ export default tseslint.config([
       js.configs.recommended,
       tseslint.configs.recommended,
     ],
+    plugins: {
+      "react-hooks": reactHooks,
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -27,6 +31,7 @@ export default tseslint.config([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      "react-hooks/exhaustive-deps": "warn",
     },
   },
 ]);
