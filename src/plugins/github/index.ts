@@ -41,7 +41,7 @@ const githubPlugin: BackendFeedPlugin = {
     const response = await fetchFn(fetchUrl, {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": "open-feed/1.0",
+        "User-Agent": "openfeed/1.0",
         "X-GitHub-Api-Version": "2022-11-28",
       },
     } as RequestInit);

@@ -85,7 +85,7 @@ export const runFetch = async (
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorCode = error instanceof FeedError ? error.code : "unknown";
-        console.error(`[open-feed] Failed to fetch ${source.name} [${errorCode}]: ${errorMessage}`);
+        console.error(`[openfeed] Failed to fetch ${source.name} [${errorCode}]: ${errorMessage}`);
         sourceResults.push({
           sourceName: source.name,
           sourceUrl: source.url,

@@ -4,7 +4,7 @@ import { resolveDbPathArg } from "./cliArgs.js";
 
 describe("resolveDbPathArg", () => {
   it("uses default db path when --db is absent", () => {
-    expect(resolveDbPathArg(["--config", "custom.yaml"])).toBe("open-feed.db");
+    expect(resolveDbPathArg(["--config", "custom.yaml"])).toBe("openfeed.db");
   });
 
   it("uses provided db path when --db is present", () => {

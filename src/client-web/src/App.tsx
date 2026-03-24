@@ -70,7 +70,7 @@ export const App = () => (
         <Route path="/config" element={<ConfigPage />} />
         <Route path="/item/:id" element={<ItemDetailPage />} />
       </Routes>
-      <Debug persistenceId="open-feed" />
+      <Debug persistenceId="openfeed" />
       <Toaster />
     </BrowserRouter>
   </ErrorBoundary>

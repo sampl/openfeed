@@ -59,7 +59,7 @@ const redditPlugin: BackendFeedPlugin = {
     const response = await fetchFn(fetchUrl, {
       headers: {
         // Reddit requires a User-Agent to avoid 429/403 errors
-        "User-Agent": "open-feed/1.0",
+        "User-Agent": "openfeed/1.0",
       },
     } as RequestInit);
 

@@ -11,15 +11,15 @@ import path from "path";
 
 const args = process.argv.slice(2);
 
-// Support: open-feed fetch (manual trigger, no server)
+// Support: openfeed fetch (manual trigger, no server)
 if (args[0] === "fetch") {
-  const configPath = args[args.indexOf("--config") + 1] ?? "open-feed.yaml";
+  const configPath = args[args.indexOf("--config") + 1] ?? "openfeed.yaml";
   const config = loadConfig(configPath);
   const dbPath = resolveDbPathArg(args);
   const db = createSqliteDb(path.resolve(dbPath));
-  console.log("[open-feed] Running manual fetch...");
+  console.log("[openfeed] Running manual fetch...");
   runFetch(config, db, "manual").then((runId) => {
-    console.log(`[open-feed] Fetch complete (run: ${runId})`);
+    console.log(`[openfeed] Fetch complete (run: ${runId})`);
     process.exit(0);
   });
 } else {
@@ -27,7 +27,7 @@ if (args[0] === "fetch") {
   const portArgIndex = args.indexOf("--port");
   const portArg = portArgIndex >= 0 ? parseInt(args[portArgIndex + 1], 10) : undefined;
   const configArgIndex = args.indexOf("--config");
-  const configPath = configArgIndex >= 0 ? args[configArgIndex + 1] : "open-feed.yaml";
+  const configPath = configArgIndex >= 0 ? args[configArgIndex + 1] : "openfeed.yaml";
   const dbPath = resolveDbPathArg(args);
 
   const config = loadConfig(configPath);
@@ -37,8 +37,8 @@ if (args[0] === "fetch") {
   const app = createServer(config, db, path.resolve(configPath));
 
   app.listen(port, () => {
-    console.log(`[open-feed] Server running at http://localhost:${port}`);
-    console.log(`[open-feed] Fetch schedule: ${config.schedule}`);
+    console.log(`[openfeed] Server running at http://localhost:${port}`);
+    console.log(`[openfeed] Fetch schedule: ${config.schedule}`);
   });
 
   startScheduler(config, db);

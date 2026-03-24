@@ -26,7 +26,7 @@ export const createTimeRouter = (config: UserConfig, db: DbInterface): Router =>
   router.get("/usage", (req, res) => {
     const date = typeof req.query.date === "string" ? req.query.date : "";
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      console.error(`[open-feed] GET /api/time/usage — invalid date: ${JSON.stringify(date)}`);
+      console.error(`[openfeed] GET /api/time/usage — invalid date: ${JSON.stringify(date)}`);
       res.status(400).json({ error: "Please provide a date in YYYY-MM-DD format (e.g. 2024-01-15)." });
       return;
     }
@@ -51,12 +51,12 @@ export const createTimeRouter = (config: UserConfig, db: DbInterface): Router =>
     };
 
     if (typeof durationMs !== "number" || durationMs <= 0) {
-      console.error(`[open-feed] POST /api/time/sessions — invalid durationMs: ${JSON.stringify(durationMs)}`);
+      console.error(`[openfeed] POST /api/time/sessions — invalid durationMs: ${JSON.stringify(durationMs)}`);
       res.status(400).json({ error: "Reading duration must be a positive number of milliseconds." });
       return;
     }
     if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      console.error(`[open-feed] POST /api/time/sessions — invalid date: ${JSON.stringify(date)}`);
+      console.error(`[openfeed] POST /api/time/sessions — invalid date: ${JSON.stringify(date)}`);
       res.status(400).json({ error: "Please provide a date in YYYY-MM-DD format (e.g. 2024-01-15)." });
       return;
     }

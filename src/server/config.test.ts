@@ -6,7 +6,7 @@ import { join } from "path";
 import { loadConfig } from "./config.js";
 
 const writeTempConfig = (content: string): string => {
-  const dir = join(tmpdir(), "open-feed-config-tests");
+  const dir = join(tmpdir(), "openfeed-config-tests");
   mkdirSync(dir, { recursive: true });
   const filePath = join(dir, `config-${Date.now()}-${Math.random().toString(36).slice(2)}.yaml`);
   writeFileSync(filePath, content, "utf-8");
@@ -55,7 +55,7 @@ port: 3000
 
     try {
       expect(() => loadConfig(filePath)).toThrow(
-        '[open-feed] Config must include a non-empty "feeds" array'
+        '[openfeed] Config must include a non-empty "feeds" array'
       );
     } finally {
       cleanupFile(filePath);

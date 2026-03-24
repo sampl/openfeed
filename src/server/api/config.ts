@@ -11,7 +11,7 @@ export const createConfigRouter = (configPath: string): Router => {
       res.send(raw);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[open-feed] GET /api/config — could not read config file: ${message}`);
+      console.error(`[openfeed] GET /api/config — could not read config file: ${message}`);
       res.status(500).json({ error: "Could not read the config file." });
     }
   });

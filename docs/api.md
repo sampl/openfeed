@@ -84,7 +84,7 @@ Runs a fetch cycle immediately and returns when complete.
 GET /api/feeds
 ```
 
-Returns the list of configured feeds from `open-feed.yaml`.
+Returns the list of configured feeds from `openfeed.yaml`.
 
 **Response:**
 
@@ -143,7 +143,7 @@ GET /api/runs
 GET /api/time/limits
 ```
 
-Returns configured time limits from `open-feed.yaml`.
+Returns configured time limits from `openfeed.yaml`.
 
 **Response:**
 

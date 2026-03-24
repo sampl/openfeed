@@ -10,7 +10,7 @@ const defaultPlugin: BackendFeedPlugin = {
 
   listItems: async (sourceUrl, _fetchFn) => {
     console.warn(
-      `[open-feed] No plugin found for source: ${sourceUrl}. No items will be fetched.`
+      `[openfeed] No plugin found for source: ${sourceUrl}. No items will be fetched.`
     );
     return [];
   },
