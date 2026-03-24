@@ -8,11 +8,11 @@ export default defineConfig({
     globals: true,
     // Default to jsdom for frontend tests
     environment: "jsdom",
-    setupFiles: ["./app/client-web/src/test-setup.ts"],
+    setupFiles: ["./src/client-web/src/test-setup.ts"],
     // Use node environment for server and plugin tests
     environmentMatchPatterns: [
-      ["app/server/**/*.test.ts", "node"],
-      ["app/plugins/**/*.test.ts", "node"],
+      ["src/server/**/*.test.ts", "node"],
+      ["src/plugins/**/*.test.ts", "node"],
     ],
   },
 });

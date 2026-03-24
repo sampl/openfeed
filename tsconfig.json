@@ -12,7 +12,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "plugins/*": ["./app/plugins/*"]
+      "plugins/*": ["./src/plugins/*"]
     },
     "isolatedModules": true,
     "noEmit": true,
@@ -23,10 +23,10 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "app/client-web/src/**/*.ts",
-    "app/client-web/src/**/*.tsx",
-    "app/client-web/src/vite-env.d.ts",
-    "app/plugins/types.ts"
+    "src/client-web/src/**/*.ts",
+    "src/client-web/src/**/*.tsx",
+    "src/client-web/src/vite-env.d.ts",
+    "src/plugins/types.ts"
   ],
-  "exclude": ["dist", "node_modules", "app/server"]
+  "exclude": ["dist", "node_modules", "src/server"]
 }
