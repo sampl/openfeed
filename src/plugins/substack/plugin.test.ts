@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import substackRssPlugin from "./index.ts";
+import { SAMPLE_RSS2_XML } from "../__fixtures__/index.ts";
 
 const SAMPLE_RSS_XML = `<?xml version="1.0"?>
 <rss version="2.0">
@@ -77,5 +78,33 @@ describe("substack listItems", () => {
     expect(items[0]?.renderData).toMatchObject({
       richText: { html: "<p>First post content.</p>", text: "First post content." },
     });
+  });
+});
+
+describe("substack listItems — edge cases", () => {
+  it("returns empty array when feed has no items", async () => {
+    const emptyFeed = `<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Empty Feed</title></channel></rss>`;
+    const fetchFn = vi.fn().mockResolvedValueOnce({ text: async () => emptyFeed } as unknown as Response);
+    const items = await substackRssPlugin.listItems("https://someblog.substack.com", fetchFn);
+    expect(items).toHaveLength(0);
+  });
+
+  it("uses shared RSS 2.0 fixture and parses correctly", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce({ text: async () => SAMPLE_RSS2_XML } as unknown as Response);
+    const items = await substackRssPlugin.listItems("https://someblog.substack.com", fetchFn);
+    expect(items).toHaveLength(1);
+    expect(items[0]!.title).toBe("Test Article");
+    expect(items[0]!.sourceName).toBe("Test Feed");
+  });
+
+  it("falls back to hostname as sourceName when channel title is missing", async () => {
+    const feedNoTitle = `<?xml version="1.0"?>
+<rss version="2.0"><channel>
+  <item><title>Post</title><link>https://someblog.substack.com/p/post</link></item>
+</channel></rss>`;
+    const fetchFn = vi.fn().mockResolvedValueOnce({ text: async () => feedNoTitle } as unknown as Response);
+    const items = await substackRssPlugin.listItems("https://someblog.substack.com", fetchFn);
+    expect(items[0]!.sourceName).toBe("someblog.substack.com");
   });
 });
