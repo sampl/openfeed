@@ -5,7 +5,7 @@ import { FeedError } from "../types.js";
 const makeResponse = (body: unknown) =>
   ({ json: async () => body, ok: true }) as unknown as Response;
 
-describe("instagram-firecrawl plugin", () => {
+describe("instagram plugin", () => {
   describe("canHandle", () => {
     it("returns true for instagram.com URLs", () => {
       expect(plugin.canHandle("https://www.instagram.com/nasa/")).toBe(true);

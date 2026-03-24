@@ -17,7 +17,7 @@ const extractUsername = (sourceUrl: string): string => {
 };
 
 const instagramFirecrawlPlugin: BackendFeedPlugin = {
-  name: "instagram-firecrawl",
+  name: "instagram",
 
   canHandle: (sourceUrl) => sourceUrl.includes("instagram.com"),
 

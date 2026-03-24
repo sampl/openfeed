@@ -33,7 +33,7 @@ interface RssFeed {
 }
 
 const substackRssPlugin: BackendFeedPlugin = {
-  name: "substack-rss",
+  name: "substack",
 
   // Handle both native substack.com domains. Custom Substack domains that expose
   // a /feed endpoint are caught by canHandle checking for a bare domain (no path).

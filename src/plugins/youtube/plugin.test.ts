@@ -21,7 +21,7 @@ const SAMPLE_CHANNEL_PAGE_CANONICAL_HTML = `<html><head>
   <link rel="canonical" href="https://www.youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw">
 </head><body></body></html>`;
 
-describe("youtube-rss canHandle", () => {
+describe("youtube canHandle", () => {
   it("returns true for youtube.com URLs", () => {
     expect(youtubeRssPlugin.canHandle("https://www.youtube.com/@SomeChannel")).toBe(true);
     expect(youtubeRssPlugin.canHandle("https://www.youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw")).toBe(true);
@@ -38,7 +38,7 @@ describe("youtube-rss canHandle", () => {
   });
 });
 
-describe("youtube-rss listItems", () => {
+describe("youtube listItems", () => {
   it("resolves a channel ID from an @handle URL and returns feed items", async () => {
     const fetchFn = vi.fn()
       // First call: fetch the channel page HTML to resolve the channel ID

@@ -1,4 +1,4 @@
-# youtube-rss plugin
+# youtube plugin
 
 Fetches the latest videos from a YouTube channel via its Atom RSS feed.
 

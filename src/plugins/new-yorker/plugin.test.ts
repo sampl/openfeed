@@ -17,7 +17,7 @@ const SAMPLE_RSS_XML = `<?xml version="1.0"?>
 const makeFetch = (xml: string) =>
   vi.fn().mockResolvedValue({ ok: true, text: async () => xml } as unknown as Response);
 
-describe("the-new-yorker canHandle", () => {
+describe("new-yorker canHandle", () => {
   it("returns true for newyorker.com URLs", () => {
     expect(plugin.canHandle("https://www.newyorker.com")).toBe(true);
     expect(plugin.canHandle("https://www.newyorker.com/magazine")).toBe(true);
@@ -29,7 +29,7 @@ describe("the-new-yorker canHandle", () => {
   });
 });
 
-describe("the-new-yorker listItems", () => {
+describe("new-yorker listItems", () => {
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 

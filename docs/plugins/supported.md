@@ -2,9 +2,9 @@
 
 The following plugins ship as part of OpenFeed and do not need to be installed:
 
-- [`youtube-rss`](#youtube-rss)
+- [`youtube`](#youtube)
 - [`reddit`](#reddit)
-- [`substack-rss`](#substack-rss)
+- [`substack`](#substack)
 - [`buttondown`](#buttondown)
 - [`bluesky`](#bluesky)
 - [`hacker-news`](#hacker-news)
@@ -21,13 +21,13 @@ The following plugins ship as part of OpenFeed and do not need to be installed:
 - [`associated-press`](#associated-press)
 - [`reuters`](#reuters)
 - [`al-jazeera`](#al-jazeera)
-- [`the-new-yorker`](#the-new-yorker)
+- [`new-yorker`](#new-yorker)
 - [`espn`](#espn)
 - [`centcom`](#centcom)
 - [`nyt-crossword`](#nyt-crossword)
 - [`wordle`](#wordle)
 - [`tiktok`](#tiktok)
-- [`instagram-firecrawl`](#instagram-firecrawl)
+- [`instagram`](#instagram)
 - [`google-calendar`](#google-calendar)
 - [`gmail`](#gmail)
 
@@ -35,7 +35,7 @@ If no plugin matches a URL, OpenFeed falls back to the `default` plugin which sk
 
 ---
 
-## youtube-rss
+## youtube
 
 Fetches videos from a [YouTube](https://youtube.com) channel or a specific video URL via the public RSS feed.
 
@@ -51,7 +51,7 @@ Fetches posts from a [Reddit](https://reddit.com) subreddit or thread URL.
 | `time` | string | `"week"` | Time period for sorting (`"day"`, `"week"`, `"month"`, `"year"`, `"all"`) |
 | `limit` | number | `5` | Number of posts to fetch |
 
-## substack-rss
+## substack
 
 Fetches posts from a [Substack](https://substack.com) publication URL via RSS.
 
@@ -163,7 +163,7 @@ Fetches articles from [Al Jazeera](https://aljazeera.com).
 
 No options.
 
-## the-new-yorker
+## new-yorker
 
 Fetches articles from [The New Yorker](https://newyorker.com).
 
@@ -202,7 +202,7 @@ TikTok profile URLs are not supported due to the lack of a public API; this plug
 
 No options.
 
-## instagram-firecrawl
+## instagram
 
 Fetches posts from an [Instagram](https://instagram.com) profile URL via the [Firecrawl](https://firecrawl.dev) API. Requires the `FIRECRAWL_API_KEY` environment variable to be set.
 

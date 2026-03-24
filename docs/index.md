@@ -13,29 +13,18 @@ Things you can do with OpenFeed:
 
 ## Quick start
 
-1. Create a directory for your project
-2. Add an `open-feed.yaml` with your sources (see [configuration](/configuration))
-3. Install:
-
-```bash
-npm install -g open-feed
-```
-
-4. Run:
-
-```bash
-open-feed
-```
-
-5. Open `http://localhost:3000`
+1. Install: `npm install -g open-feed`
+2. Add an `open-feed.yaml` config file (see [configuration](/configuration))
+3. Run: `open-feed`
+4. Visit your server at `http://localhost:3000`
 
 See [full installation instructions](/installation).
 
 ## How it works
 
-- Define your sources in a config file
-- OpenFeed fetches content on a daily schedule
-- Browse your feed in a mobile-first web UI from any device
+Install OpenFeed and configure it with an `open-feed.yaml` file listing your sources and a schedule.
+
+OpenFeed runs as a server that periodically fetches content from each source and compiles it into a feed. Browse your feed from any device by visiting your personal server's URL.
 
 ### Server
 

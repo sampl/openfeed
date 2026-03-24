@@ -141,7 +141,7 @@ describe("runFetch", () => {
 
   it("captures 'missing_credential' code from FeedError", async () => {
     const plugin = {
-      name: "instagram-firecrawl",
+      name: "instagram",
       canHandle: vi.fn(() => true),
       listItems: vi.fn(async () => { throw new FeedError("API key missing", "missing_credential"); }),
     };

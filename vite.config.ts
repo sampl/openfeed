@@ -7,6 +7,7 @@ import path from "path";
 const SERVER_DEV_PORT = 3001;
 
 export default defineConfig({
+  root: "src/client-web",
   plugins: [tailwindcss(), react()],
   server: {
     port: 3000,
@@ -20,11 +21,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      plugins: path.resolve(__dirname, "./plugins"),
+      plugins: path.resolve(__dirname, "./src/plugins"),
     },
   },
   build: {
-    outDir: "dist/client",
+    outDir: path.resolve(__dirname, "dist/client"),
+    emptyOutDir: true,
   },
   css: {
     modules: {

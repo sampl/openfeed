@@ -2,7 +2,7 @@ import type { BackendFeedPlugin } from "../types.js";
 import { fetchAndParseRss } from "../rssParser.js";
 
 const plugin: BackendFeedPlugin = {
-  name: "the-new-yorker",
+  name: "new-yorker",
   canHandle: (url) => url.includes("newyorker.com"),
   listItems: async (sourceUrl, fetchFn, options = {}) => {
     const feedUrl =
