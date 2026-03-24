@@ -1,4 +1,4 @@
-# substack-rss plugin
+# substack plugin
 
 Fetches posts from Substack newsletters via their RSS feed.
 

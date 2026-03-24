@@ -58,7 +58,7 @@ interface YoutubeAtomFeed {
 }
 
 const youtubRssPlugin: BackendFeedPlugin = {
-  name: "youtube-rss",
+  name: "youtube",
   // Red rounded rectangle with white play triangle — YouTube brand colours
   icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#FF0000"/><polygon points="8,5 8,15 16,10" fill="white"/></svg>`,
 

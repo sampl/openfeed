@@ -1,4 +1,4 @@
-# instagram-firecrawl plugin
+# instagram plugin
 
 Fetches recent posts from an Instagram profile using the [Firecrawl](https://firecrawl.dev) web scraping API.
 

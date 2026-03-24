@@ -17,7 +17,7 @@ const SAMPLE_RSS_XML = `<?xml version="1.0"?>
 const makeFetch = (xml: string) =>
   vi.fn().mockResolvedValue({ text: async () => xml } as unknown as Response);
 
-describe("substack-rss canHandle", () => {
+describe("substack canHandle", () => {
   it("returns true for substack.com URLs", () => {
     expect(substackRssPlugin.canHandle("https://someblog.substack.com")).toBe(true);
     expect(substackRssPlugin.canHandle("https://someblog.substack.com/feed")).toBe(true);
@@ -34,7 +34,7 @@ describe("substack-rss canHandle", () => {
   });
 });
 
-describe("substack-rss listItems", () => {
+describe("substack listItems", () => {
   it("appends /feed to bare domain URLs before fetching", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 

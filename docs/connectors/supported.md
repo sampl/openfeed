@@ -2,64 +2,52 @@
 
 The following connectors ship as part of OpenFeed and do not need to be installed:
 
-- [`youtube-rss`](#youtube-rss)
-- [`reddit`](#reddit)
-- [`substack-rss`](#substack-rss)
-- [`buttondown`](#buttondown)
-- [`bluesky`](#bluesky)
-- [`hacker-news`](#hacker-news)
-- [`dev-to`](#dev-to)
-- [`medium`](#medium)
-- [`rss`](#rss)
-- [`podcasts`](#podcasts)
-- [`open-meteo`](#open-meteo)
-- [`github`](#github)
-- [`cnn`](#cnn)
-- [`washington-post`](#washington-post)
-- [`wall-street-journal`](#wall-street-journal)
-- [`politico`](#politico)
-- [`associated-press`](#associated-press)
-- [`reuters`](#reuters)
 - [`al-jazeera`](#al-jazeera)
-- [`the-new-yorker`](#the-new-yorker)
-- [`espn`](#espn)
+- [`associated-press`](#associated-press)
+- [`bluesky`](#bluesky)
+- [`buttondown`](#buttondown)
 - [`centcom`](#centcom)
-- [`nyt-crossword`](#nyt-crossword)
-- [`wordle`](#wordle)
-- [`tiktok`](#tiktok)
-- [`instagram-firecrawl`](#instagram-firecrawl)
-- [`google-calendar`](#google-calendar)
+- [`cnn`](#cnn)
+- [`dev-to`](#dev-to)
+- [`espn`](#espn)
+- [`github`](#github)
 - [`gmail`](#gmail)
+- [`google-calendar`](#google-calendar)
+- [`hacker-news`](#hacker-news)
+- [`instagram`](#instagram)
+- [`medium`](#medium)
+- [`new-yorker`](#new-yorker)
+- [`nyt-crossword`](#nyt-crossword)
+- [`open-meteo`](#open-meteo)
+- [`podcasts`](#podcasts)
+- [`politico`](#politico)
+- [`reddit`](#reddit)
+- [`reuters`](#reuters)
+- [`rss`](#rss)
+- [`substack`](#substack)
+- [`tiktok`](#tiktok)
+- [`wall-street-journal`](#wall-street-journal)
+- [`washington-post`](#washington-post)
+- [`wordle`](#wordle)
+- [`youtube`](#youtube)
 
 If no connector matches a URL, OpenFeed falls back to the `default` connector which skips the source with a warning.
 
 ---
 
-## youtube-rss
+## al-jazeera
 
-Fetches videos from a [YouTube](https://youtube.com) channel or a specific video URL via the public RSS feed.
+Fetches articles from [Al Jazeera](https://aljazeera.com).
 
-No options.
-
-## reddit
-
-Fetches posts from a [Reddit](https://reddit.com) subreddit or thread URL.
-
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `sort` | string | `"top"` | Sort order for posts (`"top"`, `"new"`, `"hot"`) |
-| `time` | string | `"week"` | Time period for sorting (`"day"`, `"week"`, `"month"`, `"year"`, `"all"`) |
-| `limit` | number | `5` | Number of posts to fetch |
-
-## substack-rss
-
-Fetches posts from a [Substack](https://substack.com) publication URL via RSS.
+**Example URL:** `https://www.aljazeera.com`
 
 No options.
 
-## buttondown
+## associated-press
 
-Fetches newsletters from a [Buttondown](https://buttondown.com) newsletter URL.
+Fetches articles from [AP News](https://apnews.com).
+
+**Example URL:** `https://apnews.com`
 
 No options.
 
@@ -67,13 +55,33 @@ No options.
 
 Fetches posts from a [Bluesky](https://bsky.app) profile URL.
 
+**Example URL:** `https://bsky.app/profile/example.bsky.social`
+
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `limit` | number | `10` | Number of posts to fetch |
 
-## hacker-news
+## buttondown
 
-Fetches top stories from [Hacker News](https://news.ycombinator.com).
+Fetches newsletters from a [Buttondown](https://buttondown.com) newsletter URL.
+
+**Example URL:** `https://buttondown.com/examplenewsletter/archive`
+
+No options.
+
+## centcom
+
+Fetches press releases from [CENTCOM](https://centcom.mil).
+
+**Example URL:** `https://www.centcom.mil`
+
+No options.
+
+## cnn
+
+Fetches articles from [CNN](https://cnn.com).
+
+**Example URL:** `https://www.cnn.com`
 
 No options.
 
@@ -81,29 +89,95 @@ No options.
 
 Fetches articles from [dev.to](https://dev.to).
 
+**Example URL:** `https://dev.to` (or `https://dev.to/@username` for a specific author)
+
+No options.
+
+## espn
+
+Fetches articles from [ESPN](https://espn.com).
+
+**Example URL:** `https://www.espn.com`
+
+No options.
+
+## github
+
+Fetches open issues and activity from a [GitHub](https://github.com) repo or user URL.
+
+**Example URL:** `https://github.com/example-org/example-repo`
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `limit` | number | `10` | Max number of open issues to fetch per run |
+
+## gmail
+
+Fetches emails from [Gmail](https://gmail.com) via OAuth. Requires a valid OAuth token.
+
+**Example URL:** `https://mail.google.com`
+
+No options.
+
+## google-calendar
+
+Fetches events from a public [Google Calendar](https://calendar.google.com) feed.
+
+**Example URL:** `https://calendar.google.com/calendar`
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `icsUrl` | string | — | Public iCal URL from Google Calendar settings (required) |
+| `calendarUrl` | string | source URL | URL to use for items that don't have their own event URL |
+
+## hacker-news
+
+Fetches top stories from [Hacker News](https://news.ycombinator.com).
+
+**Example URL:** `https://news.ycombinator.com`
+
+No options.
+
+## instagram
+
+Fetches posts from an [Instagram](https://instagram.com) profile URL via the [Firecrawl](https://firecrawl.dev) API. Requires the `FIRECRAWL_API_KEY` environment variable to be set.
+
+**Example URL:** `https://www.instagram.com/examplemuseum/`
+
 No options.
 
 ## medium
 
 Fetches posts from a [Medium](https://medium.com) publication URL via RSS.
 
-No options.
-
-## rss
-
-Fetches items from any [RSS or Atom](https://en.wikipedia.org/wiki/RSS) feed URL.
+**Example URL:** `https://medium.com/@exampleauthor`
 
 No options.
 
-## podcasts
+## new-yorker
 
-Fetches episodes from a podcast RSS feed URL, resolving feed details via the iTunes lookup API.
+Fetches articles from [The New Yorker](https://newyorker.com).
+
+**Example URL:** `https://www.newyorker.com`
 
 No options.
+
+## nyt-crossword
+
+Fetches daily puzzles from the [NYT Crossword](https://nytimes.com/crosswords). Requires an NYT API key.
+
+**Example URL:** `https://www.nytimes.com/crosswords`
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `apiKey` | string | — | NYT API key from [developer.nytimes.com](https://developer.nytimes.com) (required) |
+| `limit` | number | `7` | Number of recent puzzles to fetch |
 
 ## open-meteo
 
 Fetches weather forecasts from the [Open-Meteo](https://open-meteo.com) weather API.
+
+**Example URL:** `https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current=temperature_2m,wind_speed_10m,weather_code`
 
 Options are passed as query parameters to the API URL. Common options include:
 
@@ -113,29 +187,11 @@ Options are passed as query parameters to the API URL. Common options include:
 | `wind_speed_unit` | string | `"kmh"` | Wind speed unit (`"kmh"`, `"mph"`, `"kn"`) |
 | `precipitation_unit` | string | `"mm"` | Precipitation unit (`"mm"` or `"inch"`) |
 
-## github
+## podcasts
 
-Fetches open issues and activity from a [GitHub](https://github.com) repo or user URL.
+Fetches episodes from a podcast RSS feed URL, resolving feed details via the iTunes lookup API.
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `limit` | number | `10` | Max number of open issues to fetch per run |
-
-## cnn
-
-Fetches articles from [CNN](https://cnn.com).
-
-No options.
-
-## washington-post
-
-Fetches articles from [The Washington Post](https://washingtonpost.com).
-
-No options.
-
-## wall-street-journal
-
-Fetches articles from [The Wall Street Journal](https://wsj.com).
+**Example URL:** `https://podcasts.apple.com/us/podcast/my-show/id123456789`
 
 No options.
 
@@ -143,56 +199,43 @@ No options.
 
 Fetches articles from [Politico](https://politico.com).
 
-No options.
-
-## associated-press
-
-Fetches articles from [AP News](https://apnews.com).
+**Example URL:** `https://www.politico.com`
 
 No options.
+
+## reddit
+
+Fetches posts from a [Reddit](https://reddit.com) subreddit or thread URL.
+
+**Example URL:** `https://www.reddit.com/r/programming/`
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `sort` | string | `"top"` | Sort order for posts (`"top"`, `"new"`, `"hot"`) |
+| `time` | string | `"week"` | Time period for sorting (`"day"`, `"week"`, `"month"`, `"year"`, `"all"`) |
+| `limit` | number | `5` | Number of posts to fetch |
 
 ## reuters
 
 Fetches articles from [Reuters](https://reuters.com).
 
-No options.
-
-## al-jazeera
-
-Fetches articles from [Al Jazeera](https://aljazeera.com).
+**Example URL:** `https://www.reuters.com`
 
 No options.
 
-## the-new-yorker
+## rss
 
-Fetches articles from [The New Yorker](https://newyorker.com).
+Fetches items from any [RSS or Atom](https://en.wikipedia.org/wiki/RSS) feed URL.
 
-No options.
-
-## espn
-
-Fetches articles from [ESPN](https://espn.com).
+**Example URL:** `https://feeds.kottke.org/main`
 
 No options.
 
-## centcom
+## substack
 
-Fetches press releases from [CENTCOM](https://centcom.mil).
+Fetches posts from a [Substack](https://substack.com) publication URL via RSS.
 
-No options.
-
-## nyt-crossword
-
-Fetches daily puzzles from the [NYT Crossword](https://nytimes.com/crosswords). Requires an NYT API key.
-
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `apiKey` | string | — | NYT API key from [developer.nytimes.com](https://developer.nytimes.com) (required) |
-| `limit` | number | `7` | Number of recent puzzles to fetch |
-
-## wordle
-
-Fetches the daily [Wordle](https://nytimes.com/games/wordle) puzzle.
+**Example URL:** `https://examplenewsletter.substack.com`
 
 No options.
 
@@ -200,25 +243,38 @@ No options.
 
 TikTok profile URLs are not supported due to the lack of a public API; this connector throws an error when used.
 
-No options.
-
-## instagram-firecrawl
-
-Fetches posts from an [Instagram](https://instagram.com) profile URL via the [Firecrawl](https://firecrawl.dev) API. Requires the `FIRECRAWL_API_KEY` environment variable to be set.
+**Example URL:** `https://www.tiktok.com/@exampleuser`
 
 No options.
 
-## google-calendar
+## wall-street-journal
 
-Fetches events from a public [Google Calendar](https://calendar.google.com) feed.
+Fetches articles from [The Wall Street Journal](https://wsj.com).
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `icsUrl` | string | — | Public iCal URL from Google Calendar settings (required) |
-| `calendarUrl` | string | source URL | URL to use for items that don't have their own event URL |
+**Example URL:** `https://www.wsj.com`
 
-## gmail
+No options.
 
-Fetches emails from [Gmail](https://gmail.com) via OAuth. Requires a valid OAuth token.
+## washington-post
+
+Fetches articles from [The Washington Post](https://washingtonpost.com).
+
+**Example URL:** `https://www.washingtonpost.com`
+
+No options.
+
+## wordle
+
+Fetches the daily [Wordle](https://nytimes.com/games/wordle) puzzle.
+
+**Example URL:** `https://www.nytimes.com/games/wordle/index.html`
+
+No options.
+
+## youtube
+
+Fetches videos from a [YouTube](https://youtube.com) channel or a specific video URL via the public RSS feed.
+
+**Example URL:** `https://www.youtube.com/@examplechannel`
 
 No options.

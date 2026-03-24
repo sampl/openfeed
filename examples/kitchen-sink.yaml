@@ -26,11 +26,11 @@ feeds:
 
   - name: Daily
     sources:
-      # youtube-rss — YouTube channel by handle or channel ID
+      # youtube — YouTube channel by handle or channel ID
       - name: Example Channel
         url: https://www.youtube.com/@examplechannel
 
-      # substack-rss — Substack publication (custom domain also works)
+      # substack — Substack publication (custom domain also works)
       - name: Example Substack
         url: https://examplenewsletter.substack.com
         maxAgeDays: 7
@@ -41,7 +41,7 @@ feeds:
         maxItems: 5
         expirationDays: 2
 
-      # instagram-firecrawl — requires FIRECRAWL_API_KEY env var
+      # instagram — requires FIRECRAWL_API_KEY env var
       - name: Example Museum
         url: https://www.instagram.com/examplemuseum/
 
@@ -116,7 +116,7 @@ feeds:
       - name: Al Jazeera
         url: https://www.aljazeera.com
 
-      # the-new-yorker
+      # new-yorker
       - name: The New Yorker
         url: https://www.newyorker.com
 
