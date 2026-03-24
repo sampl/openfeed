@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import podcastsPlugin from "./index.ts";
 import { FeedError } from "../types.js";
+import { makeErrorResponse, MALFORMED_XML } from "../__fixtures__/index.ts";
 
 const SAMPLE_RSS_FEED = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -68,6 +69,57 @@ describe("podcasts listItems", () => {
     const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
     expect((error as FeedError).code).toBe("item_not_found");
+  });
+
+  it("throws network_error on 429 from iTunes lookup", async () => {
+    // The podcasts plugin maps non-404 iTunes errors to network_error.
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(429));
+    const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("network_error");
+  });
+
+  it("throws network_error on 500 from iTunes lookup", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(500));
+    const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("network_error");
+  });
+
+  it("throws source_not_found when RSS feed returns 404 after successful iTunes lookup", async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ feedUrl: "https://feeds.example.com/my-show.rss" }] }),
+      } as unknown as Response)
+      .mockResolvedValueOnce(makeErrorResponse(404));
+    const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("source_not_found");
+  });
+
+  it("throws rate_limited when RSS feed returns 429 after successful iTunes lookup", async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ feedUrl: "https://feeds.example.com/my-show.rss" }] }),
+      } as unknown as Response)
+      .mockResolvedValueOnce(makeErrorResponse(429));
+    const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("rate_limited");
+  });
+
+  it("throws parse_error when RSS feed returns malformed XML after successful iTunes lookup", async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ feedUrl: "https://feeds.example.com/my-show.rss" }] }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({ ok: true, text: async () => MALFORMED_XML } as unknown as Response);
+    const error = await podcastsPlugin.listItems(APPLE_PODCASTS_URL, fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("parse_error");
   });
 
   it("fetches iTunes lookup then RSS feed for Apple Podcasts URLs", async () => {

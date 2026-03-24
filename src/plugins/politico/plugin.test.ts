@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import plugin from "./index.ts";
+import { FeedError } from "../types.js";
+import { makeErrorResponse, MALFORMED_XML } from "../__fixtures__/index.ts";
 
 const SAMPLE_RSS_XML = `<?xml version="1.0"?>
 <rss version="2.0">
@@ -53,5 +55,42 @@ describe("politico listItems", () => {
     await plugin.listItems("https://www.politico.com", fetchFn, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
+  });
+});
+
+describe("politico listItems — HTTP errors", () => {
+  it("throws source_not_found on 404", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(404));
+    const err = await plugin.listItems("https://www.politico.com", fetchFn).catch((e) => e);
+    expect(err).toBeInstanceOf(FeedError);
+    expect((err as FeedError).code).toBe("source_not_found");
+  });
+
+  it("throws auth_error on 401", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(401));
+    const err = await plugin.listItems("https://www.politico.com", fetchFn).catch((e) => e);
+    expect(err).toBeInstanceOf(FeedError);
+    expect((err as FeedError).code).toBe("auth_error");
+  });
+
+  it("throws rate_limited on 429", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(429));
+    const err = await plugin.listItems("https://www.politico.com", fetchFn).catch((e) => e);
+    expect(err).toBeInstanceOf(FeedError);
+    expect((err as FeedError).code).toBe("rate_limited");
+  });
+
+  it("throws network_error on 500", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(500));
+    const err = await plugin.listItems("https://www.politico.com", fetchFn).catch((e) => e);
+    expect(err).toBeInstanceOf(FeedError);
+    expect((err as FeedError).code).toBe("network_error");
+  });
+
+  it("throws parse_error on malformed XML response", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce({ ok: true, text: async () => MALFORMED_XML } as unknown as Response);
+    const err = await plugin.listItems("https://www.politico.com", fetchFn).catch((e) => e);
+    expect(err).toBeInstanceOf(FeedError);
+    expect((err as FeedError).code).toBe("parse_error");
   });
 });

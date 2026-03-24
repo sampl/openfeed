@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import plugin from "./index.ts";
+import { makeErrorResponse } from "../__fixtures__/index.ts";
 
 const SAMPLE_RESPONSE = {
   current: {
@@ -103,6 +104,24 @@ describe("open-meteo plugin", () => {
       const items = await plugin.listItems(BROOKLYN_URL, fetchFn);
 
       expect(items[0]!.url).toMatch(/#\d{4}-\d{2}-\d{2}$/);
+    });
+
+    it("throws on 500 server error (json returns empty object, data.current is undefined)", async () => {
+      const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(500));
+      const err = await plugin.listItems(BROOKLYN_URL, fetchFn).catch((e) => e);
+      expect(err).toBeInstanceOf(Error);
+    });
+
+    it("throws on 429 rate limit response (json returns empty object, data.current is undefined)", async () => {
+      const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(429));
+      const err = await plugin.listItems(BROOKLYN_URL, fetchFn).catch((e) => e);
+      expect(err).toBeInstanceOf(Error);
+    });
+
+    it("throws on 404 not found response (json returns empty object, data.current is undefined)", async () => {
+      const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(404));
+      const err = await plugin.listItems(BROOKLYN_URL, fetchFn).catch((e) => e);
+      expect(err).toBeInstanceOf(Error);
     });
   });
 });

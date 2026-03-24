@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import nytCrosswordPlugin from "./index.ts";
 import { FeedError } from "../types.js";
+import { makeErrorResponse } from "../__fixtures__/index.ts";
 
 const SAMPLE_PUZZLES_RESPONSE = {
   results: [
@@ -66,6 +67,30 @@ describe("nyt-crossword listItems", () => {
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
     expect((error as FeedError).code).toBe("rate_limited");
+  });
+
+  it("throws a FeedError with network_error on 404 response", async () => {
+    // The NYT Crossword plugin maps 404 → network_error (it uses a fixed API URL,
+    // so a 404 indicates a server-side problem rather than a missing source).
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(404));
+    const error = await nytCrosswordPlugin.listItems(
+      "https://www.nytimes.com/crosswords",
+      fetchFn,
+      { apiKey: "test-key" }
+    ).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("network_error");
+  });
+
+  it("throws a FeedError with network_error on 500 response", async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(makeErrorResponse(500));
+    const error = await nytCrosswordPlugin.listItems(
+      "https://www.nytimes.com/crosswords",
+      fetchFn,
+      { apiKey: "test-key" }
+    ).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("network_error");
   });
 
   it("returns items with correct URLs and titles from mocked API response", async () => {
