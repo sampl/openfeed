@@ -17,7 +17,7 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/connectors/' },
           { text: 'Supported connectors', link: '/connectors/supported' },
-          { text: 'Writing a connector', link: '/connectors/custom' },
+          { text: 'Writing a custom connector', link: '/connectors/custom' },
         ],
       },
       { text: 'API', link: '/api' },

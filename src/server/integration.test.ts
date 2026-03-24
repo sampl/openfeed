@@ -23,7 +23,6 @@ import { createServer as createExpressApp } from "./server.js";
 import type { NewFeedItem } from "../plugins/types.js";
 import { FeedError } from "../plugins/types.js";
 import {
-  SAMPLE_RSS2_XML,
   SAMPLE_HN_RESPONSE,
   SAMPLE_GITHUB_ISSUES_RESPONSE,
   SAMPLE_BLUESKY_RESPONSE,
