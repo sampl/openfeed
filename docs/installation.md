@@ -11,13 +11,13 @@ OpenFeed is **not compatible** with serverless/edge runtimes (Cloudflare Workers
 ## Install
 
 ```bash
-npm install -g open-feed
+npm install -g openfeed
 ```
 
-Create an `open-feed.yaml` config file (see [configuration](/configuration)), then start the server:
+Create an `openfeed.yaml` config file (see [configuration](/configuration)), then start the server:
 
 ```bash
-open-feed
+openfeed
 ```
 
 Open `http://localhost:3000` to browse your feed.
@@ -25,21 +25,21 @@ Open `http://localhost:3000` to browse your feed.
 ## CLI options
 
 ```bash
-open-feed                                # start server (default port 3000)
-open-feed --port 8080                    # override port
-open-feed --config /path/to/config.yaml  # custom config path
-open-feed --db /path/to/data.db          # custom database path
-open-feed fetch                          # run a manual fetch and exit
+openfeed                                # start server (default port 3000)
+openfeed --port 8080                    # override port
+openfeed --config /path/to/config.yaml  # custom config path
+openfeed --db /path/to/data.db          # custom database path
+openfeed fetch                          # run a manual fetch and exit
 ```
 
 ## Deployment
 
 ### Railway (recommended)
 
-1. Push your project (with `open-feed.yaml`, without `.env`) to GitHub
+1. Push your project (with `openfeed.yaml`, without `.env`) to GitHub
 2. Create a new project at [railway.app](https://railway.app) and connect your repo
 3. Set environment variables in Settings → Variables (e.g. `FIRECRAWL_API_KEY`)
-4. Set start command: `open-feed`
+4. Set start command: `openfeed`
 
 Railway auto-deploys on every push. Note: Railway's filesystem is ephemeral — use a persistent volume if you want to preserve read history across redeploys.
 
@@ -51,10 +51,10 @@ Railway auto-deploys on every push. Note: Railway's filesystem is ephemeral — 
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
-RUN npm install -g open-feed
-COPY open-feed.yaml .
+RUN npm install -g openfeed
+COPY openfeed.yaml .
 EXPOSE 3000
-CMD ["open-feed"]
+CMD ["openfeed"]
 ```
 
 3. Deploy:
@@ -71,13 +71,13 @@ fly deploy
 fly volumes create open_feed_data --size 1
 ```
 
-Then use `open-feed --db /data/open-feed.db` and mount the volume at `/data`.
+Then use `openfeed --db /data/openfeed.db` and mount the volume at `/data`.
 
 ### DigitalOcean App Platform
 
 1. Push to GitHub
 2. Create a new App at [cloud.digitalocean.com/apps](https://cloud.digitalocean.com/apps)
-3. Connect your repo, set run command: `open-feed`
+3. Connect your repo, set run command: `openfeed`
 4. Add environment variables and deploy
 
 ### VPS (Ubuntu/Debian)
@@ -87,12 +87,12 @@ Then use `open-feed --db /data/open-feed.db` and mount the volume at `/data`.
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Install open-feed
-npm install -g open-feed
-mkdir ~/open-feed && cd ~/open-feed
+# Install openfeed
+npm install -g openfeed
+mkdir ~/openfeed && cd ~/openfeed
 
 # Create config (edit as needed)
-cat > open-feed.yaml << 'EOF'
+cat > openfeed.yaml << 'EOF'
 port: 3000
 schedule: "0 7 * * *"
 feeds:
@@ -103,16 +103,16 @@ feeds:
 EOF
 
 # Create a systemd service
-sudo tee /etc/systemd/system/open-feed.service << 'EOF'
+sudo tee /etc/systemd/system/openfeed.service << 'EOF'
 [Unit]
-Description=open-feed
+Description=openfeed
 After=network.target
 
 [Service]
 Type=simple
 User=YOUR_USERNAME
-WorkingDirectory=/home/YOUR_USERNAME/open-feed
-ExecStart=/usr/bin/open-feed
+WorkingDirectory=/home/YOUR_USERNAME/openfeed
+ExecStart=/usr/bin/openfeed
 Restart=on-failure
 RestartSec=5
 
@@ -120,8 +120,8 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-sudo systemctl enable open-feed
-sudo systemctl start open-feed
+sudo systemctl enable openfeed
+sudo systemctl start openfeed
 ```
 
 ### GitHub Actions auto-deploy
@@ -129,13 +129,13 @@ sudo systemctl start open-feed
 To automatically redeploy when you push changes to your config:
 
 ```yaml
-# .github/workflows/deploy-open-feed.yml
-name: Deploy open-feed
+# .github/workflows/deploy-openfeed.yml
+name: Deploy openfeed
 
 on:
   push:
     paths:
-      - 'open-feed/**'
+      - 'openfeed/**'
     branches: [main]
 
 jobs:
@@ -147,13 +147,13 @@ jobs:
         uses: bervProject/railway-deploy@main
         with:
           railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: open-feed
+          service: openfeed
 ```
 
 ## Version updates
 
 ```bash
-npm update -g open-feed
+npm update -g openfeed
 ```
 
 The SQLite database schema is backwards-compatible across patch and minor versions.

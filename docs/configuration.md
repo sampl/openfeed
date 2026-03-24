@@ -1,6 +1,6 @@
 # Configuration
 
-All configuration lives in an `open-feed.yaml` file in the directory where you run the server.
+All configuration lives in an `openfeed.yaml` file in the directory where you run the server.
 
 ## Examples
 
@@ -77,7 +77,7 @@ Common examples:
 
 ## Auth
 
-Some sources require API keys. Add them as environment variables in a `.env` file alongside `open-feed.yaml`:
+Some sources require API keys. Add them as environment variables in a `.env` file alongside `openfeed.yaml`:
 
 ```bash
 FIRECRAWL_API_KEY=your_firecrawl_api_key_here

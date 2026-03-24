@@ -44,44 +44,44 @@ export const loadConfig = (configPath: string): UserConfig => {
   try {
     raw = readFileSync(configPath, "utf-8");
   } catch (error) {
-    throw new Error(`[open-feed] Could not read config file at "${configPath}": ${String(error)}`);
+    throw new Error(`[openfeed] Could not read config file at "${configPath}": ${String(error)}`);
   }
 
   const parsed = yaml.load(raw) as Record<string, unknown>;
 
   if (parsed == null || typeof parsed !== "object") {
-    throw new Error(`[open-feed] Config file "${configPath}" must be a YAML object`);
+    throw new Error(`[openfeed] Config file "${configPath}" must be a YAML object`);
   }
 
   if (!Array.isArray(parsed.feeds) || parsed.feeds.length === 0) {
-    throw new Error(`[open-feed] Config must include a non-empty "feeds" array`);
+    throw new Error(`[openfeed] Config must include a non-empty "feeds" array`);
   }
 
   const parseSource = (source: unknown, index: number, feedIndex: number): SourceConfig => {
     if (source == null || typeof source !== "object") {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}] must be an object`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}] must be an object`);
     }
     const s = source as Record<string, unknown>;
     if (typeof s.name !== "string" || s.name.trim() === "") {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}] must have a non-empty "name" string`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}] must have a non-empty "name" string`);
     }
     if (typeof s.url !== "string" || s.url.trim() === "") {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}] must have a non-empty "url" string`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}] must have a non-empty "url" string`);
     }
     if (s.fetchMode !== undefined && s.fetchMode !== "append" && s.fetchMode !== "replace") {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}].fetchMode must be "append" or "replace"`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].fetchMode must be "append" or "replace"`);
     }
     if (s.plugin !== undefined && typeof s.plugin !== "string") {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}].plugin must be a string`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].plugin must be a string`);
     }
     if (s.maxItems !== undefined && (typeof s.maxItems !== "number" || s.maxItems < 1)) {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}].maxItems must be a positive number`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].maxItems must be a positive number`);
     }
     if (s.maxAgeDays !== undefined && (typeof s.maxAgeDays !== "number" || s.maxAgeDays < 1)) {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}].maxAgeDays must be a positive number`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].maxAgeDays must be a positive number`);
     }
     if (s.expirationDays !== undefined && (typeof s.expirationDays !== "number" || s.expirationDays <= 0)) {
-      throw new Error(`[open-feed] feeds[${feedIndex}].sources[${index}].expirationDays must be a positive number`);
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].expirationDays must be a positive number`);
     }
     return {
       name: s.name,
@@ -106,14 +106,14 @@ export const loadConfig = (configPath: string): UserConfig => {
 
   const feeds: FeedConfig[] = parsed.feeds.map((feed: unknown, feedIndex: number) => {
     if (feed == null || typeof feed !== "object") {
-      throw new Error(`[open-feed] feeds[${feedIndex}] must be an object`);
+      throw new Error(`[openfeed] feeds[${feedIndex}] must be an object`);
     }
     const f = feed as Record<string, unknown>;
     if (typeof f.name !== "string" || f.name.trim() === "") {
-      throw new Error(`[open-feed] feeds[${feedIndex}] must have a non-empty "name" string`);
+      throw new Error(`[openfeed] feeds[${feedIndex}] must have a non-empty "name" string`);
     }
     if (!Array.isArray(f.sources)) {
-      throw new Error(`[open-feed] feeds[${feedIndex}] must have a "sources" array`);
+      throw new Error(`[openfeed] feeds[${feedIndex}] must have a "sources" array`);
     }
     const feedMaxItems = typeof f.maxItems === "number" && f.maxItems >= 1 ? Math.floor(f.maxItems) : undefined;
     const feedMaxAgeDays = typeof f.maxAgeDays === "number" && f.maxAgeDays >= 1 ? Math.floor(f.maxAgeDays) : undefined;

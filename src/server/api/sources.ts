@@ -52,7 +52,7 @@ export const createSourcesRouter = (config: UserConfig, db: DbInterface): Router
       res.json(allSources);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[open-feed] GET /api/sources — error: ${message}`);
+      console.error(`[openfeed] GET /api/sources — error: ${message}`);
       res.status(500).json({ error: "Could not load sources." });
     }
   });

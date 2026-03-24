@@ -30,7 +30,7 @@ describe("config router", () => {
   let close: () => Promise<void>;
 
   beforeEach(async () => {
-    ({ baseUrl, close } = await startTestServer("/etc/open-feed.yaml"));
+    ({ baseUrl, close } = await startTestServer("/etc/openfeed.yaml"));
   });
 
   afterEach(async () => {
@@ -48,7 +48,7 @@ describe("config router", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/plain");
     expect(body).toBe(yaml);
-    expect(readFileSync).toHaveBeenCalledWith("/etc/open-feed.yaml", "utf-8");
+    expect(readFileSync).toHaveBeenCalledWith("/etc/openfeed.yaml", "utf-8");
   });
 
   it("returns 500 when the config file cannot be read", async () => {

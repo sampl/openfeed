@@ -20,7 +20,7 @@ You can install additional connectors from npm:
 npm install openfeed-connector-example
 ```
 
-Then register the connector in your `open-feed.yaml`:
+Then register the connector in your `openfeed.yaml`:
 
 ```yaml
 connectors:

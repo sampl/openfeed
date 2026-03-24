@@ -12,7 +12,7 @@ export const createFetchRouter = (config: UserConfig, db: DbInterface): Router =
       res.json({ success: true, runId });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[open-feed] POST /api/fetch — fetch failed: ${message}`);
+      console.error(`[openfeed] POST /api/fetch — fetch failed: ${message}`);
       res.status(500).json({ error: `The fetch could not be started. ${message}` });
     }
   });

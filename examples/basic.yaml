@@ -1,4 +1,4 @@
-# Basic open-feed example
+# Basic openfeed example
 # Start here, then see kitchen-sink.yaml for all available options.
 
 port: 3000

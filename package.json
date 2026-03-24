@@ -1,10 +1,10 @@
 {
-  "name": "open-feed",
+  "name": "openfeed",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "open-feed": "./dist/server/main.js"
+    "openfeed": "./dist/server/main.js"
   },
   "scripts": {
     "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\"",

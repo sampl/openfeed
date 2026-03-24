@@ -7,7 +7,7 @@ You can create and share your own connectors to pull custom sources into OpenFee
 An OpenFeed connector is a TypeScript module that exports a `BackendFeedPlugin` object with the following shape:
 
 ```typescript
-import type { BackendFeedPlugin, FetchFn, NewFeedItem } from 'open-feed/plugins/types'
+import type { BackendFeedPlugin, FetchFn, NewFeedItem } from 'openfeed/plugins/types'
 
 const myConnector: BackendFeedPlugin = {
   name: 'my-connector',
@@ -56,7 +56,7 @@ Throw `FeedError` instead of plain `Error` so OpenFeed can record a structured e
 Import `FeedError` from the types module:
 
 ```typescript
-import { FeedError } from 'open-feed/plugins/types'
+import { FeedError } from 'openfeed/plugins/types'
 ```
 
 | Code | When to use |

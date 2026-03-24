@@ -13,16 +13,16 @@ Things you can do with OpenFeed:
 
 ## Quick start
 
-1. Install: `npm install -g open-feed`
-2. Add an `open-feed.yaml` config file (see [configuration](/configuration))
-3. Run: `open-feed`
+1. Install: `npm install -g openfeed`
+2. Add an `openfeed.yaml` config file (see [configuration](/configuration))
+3. Run: `openfeed`
 4. Visit your server at `http://localhost:3000`
 
 See [full installation instructions](/installation).
 
 ## How it works
 
-Install OpenFeed and configure it with an `open-feed.yaml` file listing your sources and a schedule.
+Install OpenFeed and configure it with an `openfeed.yaml` file listing your sources and a schedule.
 
 OpenFeed runs as a server that periodically fetches content from each source and compiles it into a feed. Browse your feed from any device by visiting your personal server's URL.
 
@@ -30,7 +30,7 @@ OpenFeed runs as a server that periodically fetches content from each source and
 
 The OpenFeed server is an open-source Node.js server that you run on your own hardware. The server intermittently queries various content sources on your behalf, filters content according to your preferences, and compiles the posts into a custom feed.
 
-The OpenFeed server uses [connectors](/connectors/) to download and format content from various sources. You can configure your OpenFeed server with various sources and feeds with an [`open-feed.yaml` file](/configuration).
+The OpenFeed server uses [connectors](/connectors/) to download and format content from various sources. You can configure your OpenFeed server with various sources and feeds with an [`openfeed.yaml` file](/configuration).
 
 ### Clients
 

@@ -31,7 +31,7 @@ export const createItemsRouter = (db: DbInterface): Router => {
     const { status } = req.body as { status?: string };
 
     if (status !== "unread" && status !== "archived" && status !== "read-later") {
-      console.error(`[open-feed] PATCH /api/items/${id} — invalid status: ${JSON.stringify(status)}`);
+      console.error(`[openfeed] PATCH /api/items/${id} — invalid status: ${JSON.stringify(status)}`);
       res.status(400).json({ error: `"${status}" is not a valid item status. Use "unread", "archived", or "read-later".` });
       return;
     }

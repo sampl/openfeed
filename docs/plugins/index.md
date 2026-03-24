@@ -17,14 +17,14 @@ Plugins are matched using a `canHandle(url)` function. The first plugin that cla
 You can install additional plugins from npm:
 
 ```bash
-npm install open-feed-plugin-example
+npm install openfeed-plugin-example
 ```
 
-Then register the plugin in your `open-feed.yaml`:
+Then register the plugin in your `openfeed.yaml`:
 
 ```yaml
 plugins:
-  - open-feed-plugin-example
+  - openfeed-plugin-example
 ```
 
 ## Configuring plugins

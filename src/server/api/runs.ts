@@ -12,7 +12,7 @@ export const createRunsRouter = (db: DbInterface): Router => {
       res.json(runs);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[open-feed] GET /api/runs — database error: ${message}`);
+      console.error(`[openfeed] GET /api/runs — database error: ${message}`);
       res.status(500).json({ error: "Could not load fetch history. Please try again." });
     }
   });
