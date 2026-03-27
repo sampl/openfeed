@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "files": [
-    "dist/"
+    "dist/",
+    "src/",
+    "vite.config.ts",
+    "tsconfig.json",
+    "tsconfig.server.json"
   ],
   "bin": {
     "openfeed": "./dist/server/main.js"
