@@ -96,6 +96,9 @@
   display: flex;
   align-items: center;
   color: var(--text-tertiary);
+}
+
+.actionButtonRight {
   margin-left: auto;
 }
 
