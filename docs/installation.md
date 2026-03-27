@@ -10,14 +10,20 @@ OpenFeed is **not compatible** with serverless/edge runtimes (Cloudflare Workers
 
 ## Install
 
+### Build from source
+
+Clone the repository and run the setup script:
+
 ```bash
-npm install -g openfeed
+git clone https://github.com/sampl/openfeed.git
+cd openfeed
+bash scripts/setup.sh
 ```
 
-Create an `openfeed.yaml` config file (see [configuration](/configuration)), then start the server:
+This installs dependencies and produces a production build in `dist/`. Then create an `openfeed.yaml` config file (see [configuration](/configuration)) and start the server:
 
 ```bash
-openfeed
+node dist/server/main.js
 ```
 
 Open `http://localhost:3000` to browse your feed.
@@ -85,11 +91,12 @@ Then use `openfeed --db /data/openfeed.db` and mount the volume at `/data`.
 ```bash
 # Install Node.js
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+sudo apt-get install -y nodejs git
 
-# Install openfeed
-npm install -g openfeed
-mkdir ~/openfeed && cd ~/openfeed
+# Clone and build openfeed
+git clone https://github.com/sampl/openfeed.git ~/openfeed
+cd ~/openfeed
+bash scripts/setup.sh
 
 # Create config (edit as needed)
 cat > openfeed.yaml << 'EOF'
@@ -112,7 +119,7 @@ After=network.target
 Type=simple
 User=YOUR_USERNAME
 WorkingDirectory=/home/YOUR_USERNAME/openfeed
-ExecStart=/usr/bin/openfeed
+ExecStart=/usr/bin/node /home/YOUR_USERNAME/openfeed/dist/server/main.js
 Restart=on-failure
 RestartSec=5
 
@@ -152,11 +159,13 @@ jobs:
 
 ## Version updates
 
+From inside the cloned repo:
+
 ```bash
-npm update -g openfeed
+bash scripts/setup.sh
 ```
 
-The SQLite database schema is backwards-compatible across patch and minor versions.
+The script pulls the latest commits, reinstalls dependencies if they changed, and rebuilds. The SQLite database schema is backwards-compatible across patch and minor versions.
 
 ## Accessing from your phone
 
