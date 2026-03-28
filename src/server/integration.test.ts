@@ -20,13 +20,13 @@ import { createServer as createHttpServer } from "http";
 import type { AddressInfo } from "net";
 import { createSqliteDb } from "./db/sqlite.js";
 import { createServer as createExpressApp } from "./server.js";
-import type { NewFeedItem } from "../plugins/types.js";
-import { FeedError } from "../plugins/types.js";
+import type { NewFeedItem } from "../connectors/types.js";
+import { FeedError } from "../connectors/types.js";
 import {
   SAMPLE_HN_RESPONSE,
   SAMPLE_GITHUB_ISSUES_RESPONSE,
   SAMPLE_BLUESKY_RESPONSE,
-} from "../plugins/__fixtures__/index.ts";
+} from "../connectors/__fixtures__/index.ts";
 
 // ─── Plugin registry mock ─────────────────────────────────────────────────────
 

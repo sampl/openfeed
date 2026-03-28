@@ -2,7 +2,7 @@ import { Router } from "express";
 import { randomUUID } from "crypto";
 import type { DbInterface } from "../db/interface.js";
 import type { UserConfig } from "../config.js";
-import type { TimeLimitsResponse, TimeUsageResponse } from "../../plugins/types.js";
+import type { TimeLimitsResponse, TimeUsageResponse } from "../../connectors/types.js";
 
 export const createTimeRouter = (config: UserConfig, db: DbInterface): Router => {
   const router = Router();

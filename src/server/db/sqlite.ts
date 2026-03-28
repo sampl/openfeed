@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import type { FeedItem, FeedItemRenderData } from "../../plugins/types.js";
+import type { FeedItem, FeedItemRenderData } from "../../connectors/types.js";
 import type { DbInterface, NewDbItem, NewRun, NewTimeSession, PaginatedItems, Run, SourceResult, TimeUsage } from "./interface.js";
 
 const createSchema = (db: Database.Database): void => {
