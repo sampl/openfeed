@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import type { DbInterface, NewDbItem, SourceResult } from "./db/interface.js";
 import type { FeedConfig, SourceConfig, UserConfig } from "./config.js";
 import { resolvePlugin } from "./pluginRegistry.js";
-import { FeedError } from "../plugins/types.js";
+import { FeedError } from "../connectors/types.js";
 
 const resolveExpirationDays = (
   source: SourceConfig,

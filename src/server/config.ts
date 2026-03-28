@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import yaml from "js-yaml";
-import type { TimeLimitEntry } from "../plugins/types.js";
+import type { TimeLimitEntry } from "../connectors/types.js";
 
 export type FetchMode = "append" | "replace";
 

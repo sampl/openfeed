@@ -1,4 +1,4 @@
-import type { FeedItem, NewFeedItem, SourceResult, PaginatedItemsResponse } from "../../plugins/types.js";
+import type { FeedItem, NewFeedItem, SourceResult, PaginatedItemsResponse } from "../../connectors/types.js";
 
 export type { SourceResult };
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { DbInterface } from "../db/interface.js";
 import type { UserConfig } from "../config.js";
-import type { FeedErrorCode } from "../../plugins/types.js";
+import type { FeedErrorCode } from "../../connectors/types.js";
 
 export interface SourceSummary {
   readonly name: string;

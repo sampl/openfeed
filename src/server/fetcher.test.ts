@@ -2,8 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { DbInterface } from "./db/interface.js";
 import type { UserConfig } from "./config.js";
-import type { NewFeedItem } from "../plugins/types.js";
-import { FeedError } from "../plugins/types.js";
+import type { NewFeedItem } from "../connectors/types.js";
+import { FeedError } from "../connectors/types.js";
 
 vi.mock("./pluginRegistry.js", () => ({
   resolvePlugin: vi.fn(),
