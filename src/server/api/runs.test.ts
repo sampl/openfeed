@@ -9,6 +9,7 @@ import { createRunsRouter } from "./runs.js";
 const createMockDb = (): DbInterface => ({
   getItems: vi.fn(),
   upsertItems: vi.fn(),
+  replaceSourceItems: vi.fn(),
   updateItemStatus: vi.fn(),
   createRun: vi.fn(),
   updateRun: vi.fn(),

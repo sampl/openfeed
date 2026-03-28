@@ -15,6 +15,7 @@ import { runFetch } from "./fetcher.js";
 const createMockDb = (): DbInterface => ({
   getItems: vi.fn(),
   upsertItems: vi.fn(() => 2),
+  replaceSourceItems: vi.fn(() => 1),
   updateItemStatus: vi.fn(),
   createRun: vi.fn(() => "run-123"),
   updateRun: vi.fn(),
@@ -67,6 +68,28 @@ describe("runFetch", () => {
     await runFetch(config, db, "manual");
 
     expect(plugin.listItems).toHaveBeenCalledTimes(2);
+  });
+
+  it("uses upsertItems for append mode sources", async () => {
+    const plugin = makePlugin("rss");
+    mockResolvePlugin.mockReturnValue(plugin);
+
+    const config = makeConfig([makeSource({ fetchMode: "append" })]);
+    await runFetch(config, db, "manual");
+
+    expect(db.upsertItems).toHaveBeenCalledOnce();
+    expect(db.replaceSourceItems).not.toHaveBeenCalled();
+  });
+
+  it("uses replaceSourceItems for replace mode sources", async () => {
+    const plugin = makePlugin("rss");
+    mockResolvePlugin.mockReturnValue(plugin);
+
+    const config = makeConfig([makeSource({ fetchMode: "replace" })]);
+    await runFetch(config, db, "manual");
+
+    expect(db.replaceSourceItems).toHaveBeenCalledOnce();
+    expect(db.upsertItems).not.toHaveBeenCalled();
   });
 
   it("records error in sourceResults when plugin.listItems throws", async () => {
@@ -183,6 +206,7 @@ describe("runFetch", () => {
 
     expect(defaultPlugin.listItems).not.toHaveBeenCalled();
     expect(db.upsertItems).not.toHaveBeenCalled();
+    expect(db.replaceSourceItems).not.toHaveBeenCalled();
 
     const updateRunCall = (db.updateRun as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(updateRunCall[1].sourceResults[0].status).toBe("skipped");
