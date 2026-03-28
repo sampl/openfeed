@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "@phosphor-icons/react";
 import { fetchItems } from "../apiClient";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import { EmptyState, ErrorState, PageSpinner } from "../ui_components";
 import { CompactFeedList } from "../components/CompactFeedList";
 import styles from "./HistoryPage.module.css";

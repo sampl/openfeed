@@ -1,4 +1,4 @@
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import styles from "./CompactFeedList.module.css";
 
 interface Props {

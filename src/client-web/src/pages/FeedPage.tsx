@@ -7,7 +7,7 @@ import { useTimeTracking } from "../hooks/useTimeTracking";
 import { useTimeLimits } from "../hooks/useTimeLimits";
 import { FeedPostCard } from "../components/FeedPostCard";
 import { FeedTabs } from "../components/FeedTabs";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import styles from "./FeedPage.module.css";
 
 const EMPTY_EMOJIS = ["🎉", "🌟", "✨", "🎊", "🌈", "🦋", "🌸", "🌊", "🎵", "🚀"];

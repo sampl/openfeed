@@ -1,4 +1,4 @@
-import type { EmbedRenderData } from "plugins/types";
+import type { EmbedRenderData } from "connectors/types";
 import styles from "./EmbedRenderer.module.css";
 
 interface Props {

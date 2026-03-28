@@ -21,7 +21,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      plugins: path.resolve(__dirname, "./src/plugins"),
+      connectors: path.resolve(__dirname, "./src/connectors"),
     },
   },
   build: {

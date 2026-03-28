@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
@@ -64,7 +64,7 @@ const youtubRssPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("youtube.com"),
 
-  listItems: async (sourceUrl, fetchFn): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginFeedItem[]> => {
     const channelId = await getChannelId(sourceUrl, fetchFn);
     const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
@@ -76,7 +76,7 @@ const youtubRssPlugin: BackendFeedPlugin = {
     // fast-xml-parser returns a single object instead of an array when there is only one entry
     const entries: YoutubeAtomEntry[] = Array.isArray(rawEntries) ? rawEntries : [rawEntries];
 
-    return entries.map((entry): NewFeedItem => {
+    return entries.map((entry): PluginFeedItem => {
       const videoId = entry["yt:videoId"] ?? "";
       const title = entry.title ?? "";
       const description =

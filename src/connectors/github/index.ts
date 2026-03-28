@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface GitHubIssue {
@@ -24,7 +24,7 @@ const githubPlugin: BackendFeedPlugin = {
   // Matches github.com/{owner}/{repo} — requires at least two path segments
   canHandle: (sourceUrl) => /github\.com\/[^/?#]+\/[^/?#]+/.test(sourceUrl),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const { owner, repo } = extractOwnerRepo(sourceUrl);
 
     const limit = typeof options.limit === "number" ? options.limit : 10;
@@ -54,7 +54,7 @@ const githubPlugin: BackendFeedPlugin = {
     const issues = (await response.json()) as GitHubIssue[];
     const sourceName = `${owner}/${repo}`;
 
-    return issues.map((issue): NewFeedItem => ({
+    return issues.map((issue): PluginFeedItem => ({
       sourceName,
       sourceUrl,
       title: `#${issue.number}: ${issue.title}`,

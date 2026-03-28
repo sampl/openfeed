@@ -1,6 +1,6 @@
 import { useEffect, useRef, memo, type MouseEvent } from "react";
 import { BookmarkSimple, Export, Check } from "@phosphor-icons/react";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import type { RenderMethodKey } from "../state/feedState";
 import { getAvailableMethods } from "../state/feedState";
 import { MethodToggle } from "./MethodToggle";

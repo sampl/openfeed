@@ -1,14 +1,15 @@
 import type {
   FetchRun,
   FeedErrorCode,
+  ItemStatus,
   PaginatedItemsResponse,
   SourceResult,
   TimeLimitEntry,
   TimeLimitsResponse,
   TimeUsageResponse,
-} from "plugins/types";
+} from "connectors/types";
 
-export type { FetchRun, FeedErrorCode, PaginatedItemsResponse, SourceResult, TimeLimitEntry, TimeLimitsResponse, TimeUsageResponse };
+export type { FetchRun, FeedErrorCode, ItemStatus, PaginatedItemsResponse, SourceResult, TimeLimitEntry, TimeLimitsResponse, TimeUsageResponse };
 
 export interface SourceSummary {
   readonly name: string;
@@ -34,7 +35,7 @@ const getErrorMessage = async (res: Response, fallback: string): Promise<string>
 };
 
 export const fetchItems = async (
-  status: "unread" | "archived" | "read-later",
+  status: ItemStatus,
   feedName?: string,
   limit = 30,
   offset = 0,
@@ -46,7 +47,7 @@ export const fetchItems = async (
   return res.json();
 };
 
-export const updateItemStatus = async (id: string, status: "unread" | "archived" | "read-later"): Promise<void> => {
+export const updateItemStatus = async (id: string, status: ItemStatus): Promise<void> => {
   const res = await fetch(`/api/items/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

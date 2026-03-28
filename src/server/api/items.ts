@@ -1,22 +1,21 @@
 import { Router } from "express";
 import type { DbInterface } from "../db/interface.js";
+import type { ItemStatus } from "../../connectors/types.js";
 import { resolvePlugin } from "../pluginRegistry.js";
+import { parsePagination } from "./utils.js";
+
+const ITEM_STATUSES: readonly ItemStatus[] = ["unread", "archived", "read-later"];
 
 export const createItemsRouter = (db: DbInterface): Router => {
   const router = Router();
 
   router.get("/", (req, res) => {
-    const validStatuses = ["unread", "archived", "read-later"] as const;
-    type ValidStatus = typeof validStatuses[number];
     const requestedStatus = req.query.status as string;
-    const status: ValidStatus = (validStatuses as readonly string[]).includes(requestedStatus)
-      ? (requestedStatus as ValidStatus)
+    const status: ItemStatus = (ITEM_STATUSES as readonly string[]).includes(requestedStatus)
+      ? (requestedStatus as ItemStatus)
       : "unread";
     const feedName = typeof req.query.feed === "string" ? req.query.feed : undefined;
-    const limitParam = parseInt(String(req.query.limit ?? ""), 10);
-    const limit = !isNaN(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : 30;
-    const offsetParam = parseInt(String(req.query.offset ?? ""), 10);
-    const offset = !isNaN(offsetParam) && offsetParam >= 0 ? offsetParam : 0;
+    const { limit, offset } = parsePagination(req, { defaultLimit: 30, maxLimit: 100 });
     const result = db.getItems(status, feedName, limit, offset);
     const items = result.items.map((item) => {
       const plugin = resolvePlugin(item.sourceUrl);
@@ -30,13 +29,13 @@ export const createItemsRouter = (db: DbInterface): Router => {
     const { id } = req.params;
     const { status } = req.body as { status?: string };
 
-    if (status !== "unread" && status !== "archived" && status !== "read-later") {
+    if (status == null || !(ITEM_STATUSES as readonly string[]).includes(status)) {
       console.error(`[openfeed] PATCH /api/items/${id} — invalid status: ${JSON.stringify(status)}`);
       res.status(400).json({ error: `"${status}" is not a valid item status. Use "unread", "archived", or "read-later".` });
       return;
     }
 
-    db.updateItemStatus(id, status);
+    db.updateItemStatus(id, status as ItemStatus);
     res.json({ success: true });
   });
 

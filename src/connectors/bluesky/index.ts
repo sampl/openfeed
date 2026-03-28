@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface BskyPost {
@@ -34,7 +34,7 @@ const blueskyPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("bsky.app"),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const handle = extractHandle(sourceUrl);
     if (!handle) {
       throw new FeedError(`Could not extract Bluesky handle from URL: ${sourceUrl}`, "invalid_config");
@@ -52,7 +52,7 @@ const blueskyPlugin: BackendFeedPlugin = {
 
     const json = (await response.json()) as BskyResponse;
 
-    return json.feed.map((entry): NewFeedItem => {
+    return json.feed.map((entry): PluginFeedItem => {
       const { post } = entry;
       const text = post.record.text;
       // The rkey is the last path segment of the AT URI (e.g. at://did:plc:.../app.bsky.feed.post/RKEY)

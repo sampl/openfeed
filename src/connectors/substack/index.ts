@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
@@ -49,7 +49,7 @@ const substackRssPlugin: BackendFeedPlugin = {
     }
   },
 
-  listItems: async (sourceUrl, fetchFn): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginFeedItem[]> => {
     const feedUrl = resolveFeedUrl(sourceUrl);
     const response = await fetchFn(feedUrl);
     const xml = await response.text();
@@ -61,7 +61,7 @@ const substackRssPlugin: BackendFeedPlugin = {
     // fast-xml-parser returns a single object when there is only one item
     const items: RssItem[] = Array.isArray(rawItems) ? rawItems : [rawItems];
 
-    return items.map((item): NewFeedItem => {
+    return items.map((item): PluginFeedItem => {
       const title = item.title ?? "";
       const rawHtml = item.description ?? "";
       const plainText = stripHtml(rawHtml);

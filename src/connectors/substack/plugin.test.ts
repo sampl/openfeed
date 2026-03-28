@@ -52,7 +52,7 @@ describe("substack listItems", () => {
     expect(fetchFn.mock.calls[0]?.[0]).toBe("https://someblog.substack.com/feed");
   });
 
-  it("parses RSS items and returns NewFeedItem array", async () => {
+  it("parses RSS items and returns PluginFeedItem array", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
     const items = await substackRssPlugin.listItems(

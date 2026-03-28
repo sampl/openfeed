@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface FirecrawlResponse {
@@ -21,7 +21,7 @@ const instagramFirecrawlPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("instagram.com"),
 
-  listItems: async (sourceUrl, fetchFn): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginFeedItem[]> => {
     const apiKey = process.env["FIRECRAWL_API_KEY"];
     if (!apiKey) {
       throw new FeedError(
@@ -47,7 +47,7 @@ const instagramFirecrawlPlugin: BackendFeedPlugin = {
     // One item per day — date suffix acts as the dedup key
     const dateStamp = new Date().toISOString().slice(0, 10);
 
-    const item: NewFeedItem = {
+    const item: PluginFeedItem = {
       sourceName,
       sourceUrl,
       title: `Recent posts from ${sourceName}`,
