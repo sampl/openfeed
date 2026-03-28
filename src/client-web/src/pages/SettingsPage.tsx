@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, ArrowsClockwise, ArrowClockwise, Plus, Globe, BookOpen, Warning, CheckCircle, ListBullets, FileText } from "@phosphor-icons/react";
+import { Clock, ArrowsClockwise, ArrowClockwise, Plus, GlobeSimple, BookOpen, Warning, CheckCircle, ListBullets, Code, Package } from "@phosphor-icons/react";
 import { Copyright, SettingsSection, SettingsItem } from "../ui_components";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { triggerFetch, fetchSources } from "../apiClient";
@@ -92,6 +92,7 @@ export const SettingsPage = () => {
             icon={lastRunIcon}
             onClick={lastRunOnClick}
             showChevron={latestRun?.status === "error"}
+            error={latestRun?.status === "error"}
           />
           <SettingsItem
             title="Run now"
@@ -101,7 +102,7 @@ export const SettingsPage = () => {
           />
           <SettingsItem
             title="Run history"
-            icon={<ArrowsClockwise size={18} />}
+            icon={<Clock size={18} />}
             onClick={() => navigate("/runs")}
             showChevron={true}
           />
@@ -115,7 +116,7 @@ export const SettingsPage = () => {
           />
           <SettingsItem
             title="Full config"
-            icon={<FileText size={18} />}
+            icon={<Code size={18} />}
             onClick={() => navigate("/config")}
             showChevron={true}
           />
@@ -123,7 +124,7 @@ export const SettingsPage = () => {
         <SettingsSection>
           <SettingsItem
             title="History"
-            icon={<Clock size={18} />}
+            icon={<Package size={18} />}
             onClick={() => navigate("/history")}
             showChevron={true}
           />
@@ -135,16 +136,15 @@ export const SettingsPage = () => {
             onClick={showAddToHomeScreenInstructions}
           />
           <SettingsItem
-            title="About"
-            icon={<Globe size={18} />}
-            href="https://sampiercelolla.com"
+            title="Website"
+            icon={<GlobeSimple size={18} />}
+            href="https://openfeed-www.pages.dev"
             target="_blank"
           />
-          {/* href to be updated when documentation is published */}
           <SettingsItem
             title="Documentation"
             icon={<BookOpen size={18} />}
-            href="#"
+            href="https://openfeed-docs.pages.dev"
             target="_blank"
           />
         </SettingsSection>

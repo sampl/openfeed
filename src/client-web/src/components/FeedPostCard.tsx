@@ -1,5 +1,5 @@
 import { useEffect, useRef, memo, type MouseEvent } from "react";
-import { BookmarkSimple, ShareNetwork, Check } from "@phosphor-icons/react";
+import { BookmarkSimple, Export, Check } from "@phosphor-icons/react";
 import type { ApiFeedItem } from "plugins/types";
 import type { RenderMethodKey } from "../state/feedState";
 import { getAvailableMethods } from "../state/feedState";
@@ -8,7 +8,7 @@ import { VideoRenderer } from "../renderers/VideoRenderer";
 import { RichTextRenderer } from "../renderers/RichTextRenderer";
 import { AudioRenderer } from "../renderers/AudioRenderer";
 import { EmbedRenderer } from "../renderers/EmbedRenderer";
-import { formatDate, getDomain } from "../utils/format";
+import { formatRelativeDate, getDomain } from "../utils/format";
 import styles from "./FeedPostCard.module.css";
 
 export interface FeedPostCardProps {
@@ -101,7 +101,7 @@ export const FeedPostCard = memo(({
           <span className={styles.metaSep}>·</span>
           <span className={styles.sourceUrl}>{getDomain(item.sourceUrl || item.url)}</span>
           <span className={styles.metaSep}>·</span>
-          <span className={styles.publishedAt}>{formatDate(item.publishedAt)}</span>
+          <span className={styles.publishedAt}>{formatRelativeDate(item.publishedAt)}</span>
         </div>
 
         <h2 className={styles.title}>{item.title}</h2>
@@ -139,8 +139,13 @@ export const FeedPostCard = memo(({
       )}
 
       <div className={styles.postActions}>
+        {isRead && (
+          <span className={styles.readIndicator}>
+            <Check size={13} weight="bold" />
+          </span>
+        )}
         <button
-          className={[styles.actionButton, isSaved ? styles.actionButtonActive : ""].join(" ")}
+          className={[styles.actionButton, styles.actionButtonRight, isSaved ? styles.actionButtonActive : ""].join(" ")}
           onClick={handleBookmark}
           aria-label="Save for later"
         >
@@ -152,13 +157,8 @@ export const FeedPostCard = memo(({
           onClick={handleShare}
           aria-label="Share"
         >
-          <ShareNetwork size={20} />
+          <Export size={20} />
         </button>
-        {isRead && (
-          <span className={styles.readIndicator}>
-            <Check size={13} weight="bold" />
-          </span>
-        )}
       </div>
     </article>
   );

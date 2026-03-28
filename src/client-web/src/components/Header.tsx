@@ -8,7 +8,7 @@ import styles from "./Header.module.css";
 // Map known routes to their back-navigation targets
 const getBackPath = (pathname: string): string | null => {
   if (pathname.startsWith("/runs/")) return "/runs";
-  if (pathname === "/history" || pathname === "/runs") return "/settings";
+  if (pathname === "/history" || pathname === "/runs" || pathname === "/config" || pathname === "/sources") return "/settings";
   if (pathname === "/saved" || pathname === "/settings") return "/";
   return null;
 };
@@ -19,6 +19,8 @@ const getPageTitle = (pathname: string): string => {
   if (pathname === "/runs") return "Runs";
   if (pathname.startsWith("/runs/")) return "Run detail";
   if (pathname === "/settings") return "Settings";
+  if (pathname === "/config") return "Full config";
+  if (pathname === "/sources") return "Sources";
   return "";
 };
 

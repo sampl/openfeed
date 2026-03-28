@@ -10,6 +10,7 @@ export interface SettingsItemProps {
   showChevron?: boolean;
   disabled?: boolean;
   badge?: number;
+  error?: boolean;
 }
 
 const itemClasses =
@@ -24,6 +25,7 @@ export default function SettingsItem({
   showChevron,
   disabled = false,
   badge,
+  error = false,
 }: SettingsItemProps) {
   const isExternalLink = target === "_blank";
   // Show chevron for internal links/hrefs by default; not for plain buttons or external links
@@ -32,7 +34,7 @@ export default function SettingsItem({
   const content = (
     <>
       {icon && (
-        <span className="flex-shrink-0 text-[var(--text-tertiary)]">{icon}</span>
+        <span className={`flex-shrink-0 ${error ? "text-[var(--text-error)]" : "text-[var(--text-tertiary)]"}`}>{icon}</span>
       )}
       <span className="flex-1">{title}</span>
       {isExternalLink && (
