@@ -14,7 +14,6 @@ import { createItemsRouter } from "./items.js";
 const createMockDb = (): DbInterface => ({
   getItems: vi.fn(() => ({ items: [], hasMore: false, total: 0 })),
   upsertItems: vi.fn(() => 0),
-  replaceSourceItems: vi.fn(() => 0),
   updateItemStatus: vi.fn(),
   createRun: vi.fn(),
   updateRun: vi.fn(),

@@ -15,10 +15,10 @@ Any URL containing `instagram.com`.
 ```yaml
 - name: Brooklyn Academy of Music
   url: https://www.instagram.com/brooklynacademy/
-  fetchMode: replace
+  expirationDays: 1
 ```
 
-Using `fetchMode: replace` is recommended so only the latest snapshot of the profile is kept.
+Using `expirationDays: 1` ensures only the latest snapshot of the profile is kept (older items are expired on the next fetch).
 
 ## Render output
 
