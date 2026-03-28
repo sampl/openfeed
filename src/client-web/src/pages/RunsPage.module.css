@@ -3,6 +3,37 @@
   padding-bottom: 2rem;
 }
 
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem var(--gutter);
+  border-bottom: 1px solid var(--border);
+}
+
+.runButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  font-size: var(--sm);
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--background-input);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.runButton:hover {
+  border-color: var(--border-hover);
+}
+
+.runButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .status {
   color: var(--text-secondary);
   padding: 1rem var(--gutter);

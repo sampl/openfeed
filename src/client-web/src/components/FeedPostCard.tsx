@@ -98,10 +98,6 @@ export const FeedPostCard = memo(({
             <img src={item.sourceIconUrl} alt="" className={styles.sourceIcon} width={8} height={8} />
           )}
           <span className={styles.sourceName}>{item.sourceName}</span>
-          <span className={styles.metaSep}>·</span>
-          <span className={styles.sourceUrl}>{getDomain(item.sourceUrl || item.url)}</span>
-          <span className={styles.metaSep}>·</span>
-          <span className={styles.publishedAt}>{formatRelativeDate(item.publishedAt)}</span>
         </div>
 
         <h2 className={styles.title}>{item.title}</h2>
@@ -137,6 +133,12 @@ export const FeedPostCard = memo(({
           )}
         </div>
       )}
+
+      <div className={styles.postItemMeta}>
+        <span className={styles.sourceUrl}>{getDomain(item.sourceUrl || item.url)}</span>
+        <span className={styles.metaSep}>·</span>
+        <span className={styles.publishedAt}>{formatRelativeDate(item.publishedAt)}</span>
+      </div>
 
       <div className={styles.postActions}>
         {isRead && (

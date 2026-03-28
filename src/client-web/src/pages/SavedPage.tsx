@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { BookmarkSimple } from "@phosphor-icons/react";
-import { fetchItems } from "../apiClient";
+import { fetchItems, updateItemStatus } from "../apiClient";
 import type { ApiFeedItem } from "plugins/types";
-import { EmptyState, ErrorState, PageSpinner } from "../ui_components";
-import { CompactFeedList } from "../components/CompactFeedList";
+import type { RenderMethodKey } from "../state/feedState";
+import { EmptyState, ErrorState, PageSpinner, toast } from "../ui_components";
+import { FeedPostCard } from "../components/FeedPostCard";
 import styles from "./SavedPage.module.css";
 
 export const SavedPage = () => {
   const [items, setItems] = useState<ApiFeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [selectedMethod, setSelectedMethod] = useState<RenderMethodKey | null>(null);
 
   console.log(`🔖 SavedPage render — items=${items.length} isLoading=${isLoading}`);
 
@@ -31,9 +31,24 @@ export const SavedPage = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const handleSelectItem = (item: ApiFeedItem) => {
-    navigate(`/item/${item.id}`, { state: { item } });
-  };
+  const handleUnsave = useCallback(async (id: string) => {
+    console.log(`🔖 SavedPage handleUnsave — id=${id}`);
+    await updateItemStatus(id, "archived").catch(() => {});
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  const handleShare = useCallback(async (item: ApiFeedItem) => {
+    try {
+      await navigator.clipboard.writeText(item.url);
+      toast("Link copied");
+    } catch {
+      // Fallback: clipboard API unavailable
+    }
+  }, []);
+
+  const handleRead = useCallback((_id: string) => {
+    // No-op: saved items page doesn't auto-archive on scroll
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -50,7 +65,21 @@ export const SavedPage = () => {
         </div>
       )}
       {!isLoading && !error && items.length > 0 && (
-        <CompactFeedList items={items} onSelect={handleSelectItem} />
+        <div className={styles.feed}>
+          {items.map((item) => (
+            <FeedPostCard
+              key={item.id}
+              item={item}
+              isRead={false}
+              isSaved={true}
+              onRead={handleRead}
+              onBookmark={handleUnsave}
+              onShare={handleShare}
+              selectedMethod={selectedMethod}
+              onSelectMethod={setSelectedMethod}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

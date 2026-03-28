@@ -18,6 +18,10 @@
   text-align: center;
 }
 
+.feed {
+  /* Feed cards fill the full width; individual cards handle their own borders */
+}
+
 .status {
   color: var(--text-secondary);
   padding: 1rem var(--gutter);

@@ -12,6 +12,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { SourcesPage } from "./pages/SourcesPage";
 import { ConfigPage } from "./pages/ConfigPage";
 import { ItemDetailPage } from "./pages/ItemDetailPage";
+import { UIComponentsPage } from "./pages/UIComponentsPage";
 import { useLatestRun } from "./hooks/useLatestRun";
 
 // Routes that use the bottom nav (primary destinations) — no shared header on these
@@ -69,6 +70,7 @@ export const App = () => (
         <Route path="/sources" element={<SourcesPage />} />
         <Route path="/config" element={<ConfigPage />} />
         <Route path="/item/:id" element={<ItemDetailPage />} />
+        <Route path="/ui-components" element={<UIComponentsPage />} />
       </Routes>
       <Debug persistenceId="openfeed" />
       <Toaster />

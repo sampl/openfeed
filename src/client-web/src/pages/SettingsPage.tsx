@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, ArrowsClockwise, ArrowClockwise, Plus, GlobeSimple, BookOpen, Warning, CheckCircle, ListBullets, Code, Package } from "@phosphor-icons/react";
+import { Clock, ArrowsClockwise, Plus, GlobeSimple, BookOpen, Warning, CheckCircle, ListBullets, Code, Package, Swatches } from "@phosphor-icons/react";
 import { Copyright, SettingsSection, SettingsItem } from "../ui_components";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { triggerFetch, fetchSources } from "../apiClient";
+import { useQuery } from "@tanstack/react-query";
+import { fetchSources } from "../apiClient";
 import { useLatestRun } from "../hooks/useLatestRun";
 import styles from "./SettingsPage.module.css";
 
@@ -43,8 +42,6 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 export const SettingsPage = () => {
-  const [isSyncing, setIsSyncing] = useState(false);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const latestRun = useLatestRun();
   const { data: sources } = useQuery({ queryKey: ["sources"], queryFn: fetchSources });
@@ -52,19 +49,6 @@ export const SettingsPage = () => {
   const fetchErrorCount = latestRun?.status === "error"
     ? latestRun.sourceResults.filter((r) => r.status === "error").length
     : 0;
-
-  const handleSync = () => {
-    setIsSyncing(true);
-    triggerFetch()
-      .then(() => {
-        // Invalidate the feed query so TanStack Query refetches from page 0
-        void queryClient.invalidateQueries({ queryKey: ["items"] });
-      })
-      .catch(() => {
-        // Non-fatal: user can try again
-      })
-      .finally(() => setIsSyncing(false));
-  };
 
   // Determine last run status item props
   const lastRunTitle = (() => {
@@ -95,12 +79,6 @@ export const SettingsPage = () => {
             error={latestRun?.status === "error"}
           />
           <SettingsItem
-            title="Run now"
-            icon={<ArrowClockwise size={18} />}
-            onClick={handleSync}
-            disabled={isSyncing}
-          />
-          <SettingsItem
             title="Run history"
             icon={<Clock size={18} />}
             onClick={() => navigate("/runs")}
@@ -118,6 +96,12 @@ export const SettingsPage = () => {
             title="Full config"
             icon={<Code size={18} />}
             onClick={() => navigate("/config")}
+            showChevron={true}
+          />
+          <SettingsItem
+            title="UI components"
+            icon={<Swatches size={18} />}
+            onClick={() => navigate("/ui-components")}
             showChevron={true}
           />
         </SettingsSection>
