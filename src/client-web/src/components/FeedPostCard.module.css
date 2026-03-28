@@ -91,6 +91,14 @@
   padding-bottom: 0.5rem;
 }
 
+/* URL and date shown below content, above action buttons */
+.postItemMeta {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0 var(--gutter) 0.25rem;
+}
+
 /* Small checkmark shown when an item has been scrolled past (added to history) */
 .readIndicator {
   display: flex;
@@ -146,5 +154,9 @@
 
   .title {
     font-size: var(--lg);
+  }
+
+  .postItemMeta {
+    padding: 0 0 0.25rem;
   }
 }

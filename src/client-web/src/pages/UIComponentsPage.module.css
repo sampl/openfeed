@@ -1,0 +1,109 @@
+.page {
+  margin-top: 52px;
+  padding: 1.5rem var(--gutter) 4rem;
+}
+
+.pageTitle {
+  font-size: var(--lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: var(--sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rowLabel {
+  font-size: var(--xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.rowItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bannerStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* BottomNav preview — contained box so it doesn't escape the page */
+.bottomNavContainer {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  height: 64px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bottomNavContainer nav {
+  position: absolute !important;
+}
+
+.settingsItemContainer {
+  width: 100%;
+  max-width: 480px;
+}
+
+.note {
+  font-size: var(--xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.toastButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  font-size: var(--sm);
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--background-input);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.toastButton:hover {
+  border-color: var(--border-hover);
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 720px;
+    margin: 52px auto 0;
+  }
+}
