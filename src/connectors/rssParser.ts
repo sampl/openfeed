@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import type { NewFeedItem } from "./types.js";
+import type { PluginFeedItem } from "./types.js";
 import { FeedError } from "./types.js";
 
 // Map HTTP status codes to structured error codes
@@ -71,12 +71,12 @@ const parseRss2Items = (
   channel: NonNullable<NonNullable<RssFeed["rss"]>["channel"]>,
   sourceUrl: string,
   sourceName?: string
-): readonly NewFeedItem[] => {
+): readonly PluginFeedItem[] => {
   const name = sourceName ?? extractString(channel.title) ?? new URL(sourceUrl).hostname;
   const rawItems = channel.item ?? [];
   const items: RssItem[] = Array.isArray(rawItems) ? rawItems : [rawItems];
 
-  return items.map((item): NewFeedItem => {
+  return items.map((item): PluginFeedItem => {
     const title = extractString(item.title);
     const rawHtml = extractString(item.description);
     const plainText = stripHtml(rawHtml);
@@ -101,12 +101,12 @@ const parseAtomItems = (
   feed: NonNullable<AtomFeed["feed"]>,
   sourceUrl: string,
   sourceName?: string
-): readonly NewFeedItem[] => {
+): readonly PluginFeedItem[] => {
   const name = sourceName ?? extractString(feed.title) ?? new URL(sourceUrl).hostname;
   const rawEntries = feed.entry ?? [];
   const entries: AtomEntry[] = Array.isArray(rawEntries) ? rawEntries : [rawEntries];
 
-  return entries.map((entry): NewFeedItem => {
+  return entries.map((entry): PluginFeedItem => {
     const title = extractString(entry.title);
     const rawHtml = extractString(entry.content ?? entry.summary);
     const plainText = stripHtml(rawHtml);
@@ -133,7 +133,7 @@ export const parseRssFeed = (
   xml: string,
   sourceUrl: string,
   sourceName?: string
-): readonly NewFeedItem[] => {
+): readonly PluginFeedItem[] => {
   const parsed = parser.parse(xml) as RssFeed & AtomFeed;
 
   if (parsed.rss?.channel) {
@@ -153,7 +153,7 @@ export const fetchAndParseRss = async (
   sourceUrl: string,
   fetchFn: typeof fetch,
   sourceName?: string
-): Promise<readonly NewFeedItem[]> => {
+): Promise<readonly PluginFeedItem[]> => {
   const response = await fetchFn(feedUrl);
   if (!response.ok) {
     throw new FeedError(`Failed to fetch feed: HTTP ${response.status}`, httpErrorCode(response.status));

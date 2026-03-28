@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface HnHit {
@@ -21,7 +21,7 @@ const hackerNewsPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("news.ycombinator.com"),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const limit = typeof options.limit === "number" ? options.limit : 10;
 
     const fetchUrl = `https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=${limit}`;
@@ -34,7 +34,7 @@ const hackerNewsPlugin: BackendFeedPlugin = {
 
     const json = (await response.json()) as HnResponse;
 
-    return json.hits.map((hit): NewFeedItem => {
+    return json.hits.map((hit): PluginFeedItem => {
       // Ask HN and similar posts have no external URL — fall back to HN item page
       const itemUrl = hit.url ?? `https://news.ycombinator.com/item?id=${hit.objectID}`;
 

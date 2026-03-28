@@ -1,4 +1,4 @@
-import type { AudioRenderData } from "plugins/types";
+import type { AudioRenderData } from "connectors/types";
 import styles from "./AudioRenderer.module.css";
 
 interface Props {

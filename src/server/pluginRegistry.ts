@@ -29,10 +29,14 @@ import github from "../connectors/github/index.js";
 import defaultPlugin from "../connectors/default/index.js";
 import type { BackendFeedPlugin } from "../connectors/types.js";
 
-// Plugins are checked in order — first match wins.
-// More specific domain matchers must come before broader ones.
-// default plugin always matches, so it must be last.
+// Plugins are checked in order — the first plugin whose canHandle() returns true wins.
+// ORDER IS SIGNIFICANT: more specific matchers must precede broader/generic ones.
+//   • Platform plugins (youtube, reddit, …) must precede the generic `rss` parser.
+//   • Within nytimes.com, `wordle` must precede `nyt-crossword` (both match the domain).
+//   • `rss` must precede `default` — it catches any valid RSS/Atom feed URL.
+//   • `default` always matches and must be last; it acts as the 404-fallback.
 const PLUGINS: readonly BackendFeedPlugin[] = [
+  // --- Platform / service-specific plugins ---
   youtubeRss,
   buttondown,
   substackRss,
@@ -42,7 +46,12 @@ const PLUGINS: readonly BackendFeedPlugin[] = [
   hackerNews,
   devTo,
   bluesky,
-  // Specific news sites before the generic rss plugin
+  tiktok,
+  github,
+  googleCalendar,
+  gmail,
+
+  // --- Specific news-site plugins (before the generic RSS parser) ---
   cnn,
   washingtonPost,
   wallStreetJournal,
@@ -55,18 +64,21 @@ const PLUGINS: readonly BackendFeedPlugin[] = [
   medium,
   centcom,
   podcasts,
-  // nytimes.com — wordle must come before nyt-crossword (both check nytimes.com)
+
+  // --- nytimes.com (wordle first — both plugins match the same domain) ---
   wordle,
   nytCrossword,
-  googleCalendar,
-  gmail,
-  tiktok,
-  github,
-  // Generic RSS parser — catches feed URLs that don't match a specific plugin
-  rss,
-  defaultPlugin,
+
+  // --- Generic fallbacks (most specific first) ---
+  rss,           // handles any valid RSS/Atom feed URL
+  defaultPlugin, // always matches; signals the source cannot be handled
 ];
 
+/**
+ * Returns the plugin that should handle `sourceUrl`.
+ * If `pluginName` is provided (from the user's YAML config) the named plugin is used directly;
+ * otherwise the first plugin in PLUGINS whose canHandle() returns true is used.
+ */
 export const resolvePlugin = (sourceUrl: string, pluginName?: string): BackendFeedPlugin => {
   if (pluginName != null) {
     const forced = PLUGINS.find((p) => p.name === pluginName);

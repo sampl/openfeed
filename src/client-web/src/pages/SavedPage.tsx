@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { BookmarkSimple } from "@phosphor-icons/react";
 import { fetchItems, updateItemStatus } from "../apiClient";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import type { RenderMethodKey } from "../state/feedState";
 import { EmptyState, ErrorState, PageSpinner, toast } from "../ui_components";
 import { FeedPostCard } from "../components/FeedPostCard";

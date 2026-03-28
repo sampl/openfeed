@@ -1,4 +1,4 @@
-import type { RichTextRenderData } from "plugins/types";
+import type { RichTextRenderData } from "connectors/types";
 import styles from "./RichTextRenderer.module.css";
 
 interface Props {

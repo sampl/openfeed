@@ -1,8 +1,8 @@
-import type { FeedItem, NewFeedItem, SourceResult, PaginatedItemsResponse } from "../../connectors/types.js";
+import type { FeedItem, PluginFeedItem, ItemStatus, SourceResult, PaginatedItemsResponse } from "../../connectors/types.js";
 
 export type { SourceResult };
 
-export interface NewDbItem extends NewFeedItem {
+export interface NewDbItem extends PluginFeedItem {
   readonly id: string;
   readonly createdAt: Date;
 }
@@ -47,18 +47,31 @@ export type { PaginatedItemsResponse };
 
 export interface DbInterface {
   // Items
-  getItems: (status: "unread" | "archived" | "read-later", feedName?: string, limit?: number, offset?: number) => PaginatedItems;
-  upsertItems: (items: NewDbItem[]) => number; // returns count inserted
+
+  /** Returns a paginated, status-filtered list of items, optionally scoped to a feed. */
+  getItems: (status: ItemStatus, feedName?: string, limit?: number, offset?: number) => PaginatedItems;
+  /** Inserts new items, skipping duplicates by URL. Returns the count actually inserted. */
+  upsertItems: (items: NewDbItem[]) => number;
+  /** Deletes all existing items for `sourceUrl`, then inserts `items`. Returns the count inserted. */
   replaceSourceItems: (sourceUrl: string, items: NewDbItem[]) => number;
-  updateItemStatus: (id: string, status: "unread" | "archived" | "read-later") => void;
-  expireItems: (sourceUrl: string, olderThan: Date) => number; // returns count expired
+  /** Updates a single item's status. No-ops silently if the id does not exist. */
+  updateItemStatus: (id: string, status: ItemStatus) => void;
+  /** Marks items for `sourceUrl` that were published before `olderThan` as "expired". Returns the count expired. */
+  expireItems: (sourceUrl: string, olderThan: Date) => number;
 
   // Runs
-  createRun: (run: NewRun) => string; // returns run id
+
+  /** Persists a new run record in "running" state and returns its id. */
+  createRun: (run: NewRun) => string;
+  /** Applies a partial update to an existing run (e.g. to mark it completed or errored). */
   updateRun: (id: string, update: Partial<Pick<Run, "status" | "completedAt" | "errorMessage" | "sourceResults">>) => void;
+  /** Returns the most recent runs, newest first, up to `limit`. */
   getRuns: (limit?: number) => Run[];
 
   // Time tracking
+
+  /** Persists a reading session duration for a given feed and date. */
   recordTimeSession: (session: NewTimeSession) => void;
+  /** Returns aggregated reading time in milliseconds for the given YYYY-MM-DD date. */
   getTimeUsage: (date: string) => TimeUsage;
 }

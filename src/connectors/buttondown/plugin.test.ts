@@ -48,7 +48,7 @@ describe("buttondown listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://buttondown.com/hacker-newsletter/rss");
   });
 
-  it("parses feed items and returns NewFeedItem array", async () => {
+  it("parses feed items and returns PluginFeedItem array", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
     const items = await buttondownPlugin.listItems(

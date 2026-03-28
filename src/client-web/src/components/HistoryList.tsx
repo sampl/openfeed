@@ -1,4 +1,4 @@
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import { formatDate } from "../utils/format";
 import styles from "./HistoryList.module.css";
 

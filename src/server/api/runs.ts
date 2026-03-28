@@ -1,12 +1,12 @@
 import { Router } from "express";
 import type { DbInterface } from "../db/interface.js";
+import { parsePagination } from "./utils.js";
 
 export const createRunsRouter = (db: DbInterface): Router => {
   const router = Router();
 
   router.get("/", (req, res) => {
-    const limitParam = parseInt(String(req.query.limit ?? ""), 10);
-    const limit = !isNaN(limitParam) && limitParam > 0 ? Math.min(limitParam, 200) : 50;
+    const { limit } = parsePagination(req, { defaultLimit: 50, maxLimit: 200 });
     try {
       const runs = db.getRuns(limit);
       res.json(runs);

@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface RedditPost {
@@ -47,7 +47,7 @@ const redditPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("reddit.com"),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const subreddit = extractSubreddit(sourceUrl);
 
     const sort = typeof options.sort === "string" ? options.sort : "top";
@@ -75,7 +75,7 @@ const redditPlugin: BackendFeedPlugin = {
     const json = (await response.json()) as RedditResponse;
     const posts = json.data.children;
 
-    return posts.map((post): NewFeedItem => {
+    return posts.map((post): PluginFeedItem => {
       const { data } = post;
       const postUrl = `https://www.reddit.com${data.permalink}`;
       const description = data.selftext.slice(0, 300) || undefined;

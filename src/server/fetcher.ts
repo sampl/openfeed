@@ -4,6 +4,7 @@ import type { FeedConfig, SourceConfig, UserConfig } from "./config.js";
 import { resolvePlugin } from "./pluginRegistry.js";
 import { FeedError } from "../connectors/types.js";
 
+/** Returns the effective expiration window by walking source → feed → global config. */
 const resolveExpirationDays = (
   source: SourceConfig,
   feed: FeedConfig,
@@ -11,6 +12,16 @@ const resolveExpirationDays = (
 ): number | undefined =>
   source.expirationDays ?? feed.expirationDays ?? config.expirationDays;
 
+/**
+ * Executes a full fetch cycle: iterates every configured source, calls the matching
+ * plugin, filters and deduplicates items, persists them, and records a run entry.
+ *
+ * @param config - Parsed user configuration (feeds, limits, schedule).
+ * @param db - Database interface used for persistence.
+ * @param triggeredBy - Whether this run was started by the scheduler or a manual API call.
+ * @param feedNames - When provided, only the named feeds are fetched (per-feed scheduler use).
+ * @returns The UUID of the completed run record.
+ */
 export const runFetch = async (
   config: UserConfig,
   db: DbInterface,

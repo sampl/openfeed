@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 import type { RenderMethodKey } from "../state/feedState";
 import { getAvailableMethods } from "../state/feedState";
 import { MethodToggle } from "../components/MethodToggle";

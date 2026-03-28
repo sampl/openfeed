@@ -12,7 +12,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "plugins/*": ["./src/plugins/*"]
+      "connectors/*": ["./src/connectors/*"]
     },
     "isolatedModules": true,
     "noEmit": true,
@@ -26,7 +26,7 @@
     "src/client-web/src/**/*.ts",
     "src/client-web/src/**/*.tsx",
     "src/client-web/src/vite-env.d.ts",
-    "src/plugins/types.ts"
+    "src/connectors/types.ts"
   ],
   "exclude": ["dist", "node_modules", "src/server"]
 }

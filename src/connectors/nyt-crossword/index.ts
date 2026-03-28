@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface NytPuzzle {
@@ -42,7 +42,7 @@ const nytCrosswordPlugin: BackendFeedPlugin = {
 
     const data = (await response.json()) as NytPuzzlesResponse;
 
-    return data.results.map((puzzle): NewFeedItem => {
+    return data.results.map((puzzle): PluginFeedItem => {
       const title = puzzle.title ?? `NYT Crossword - ${puzzle.print_date}`;
       const url = `https://www.nytimes.com/crosswords/game/daily/${puzzle.print_date}`;
 

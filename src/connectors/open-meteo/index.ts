@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 
 // Open-Meteo API uses the "current" object (new API format)
 interface CurrentWeather {
@@ -119,7 +119,7 @@ const openMeteoPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("api.open-meteo.com"),
 
-  listItems: async (sourceUrl, fetchFn, options): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options): Promise<readonly PluginFeedItem[]> => {
     // Apply options as additional query params (e.g. temperature_unit=fahrenheit)
     const fetchUrl = applyOptions(sourceUrl, options);
     const response = await fetchFn(fetchUrl);
@@ -130,7 +130,7 @@ const openMeteoPlugin: BackendFeedPlugin = {
     const locationName = deriveLocationName(sourceUrl);
     const dateStamp = new Date().toISOString().slice(0, 10);
 
-    const item: NewFeedItem = {
+    const item: PluginFeedItem = {
       sourceName: locationName,
       sourceUrl,
       title: locationName,

@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { DbInterface } from "./db/interface.js";
 import type { UserConfig } from "./config.js";
-import type { NewFeedItem } from "../connectors/types.js";
+import type { PluginFeedItem } from "../connectors/types.js";
 import { FeedError } from "../connectors/types.js";
 
 vi.mock("./pluginRegistry.js", () => ({
@@ -28,7 +28,7 @@ const makeSource = (overrides = {}) => ({
   ...overrides,
 });
 
-const makeFeedItem = (overrides: Partial<NewFeedItem> = {}): NewFeedItem => ({
+const makeFeedItem = (overrides: Partial<PluginFeedItem> = {}): PluginFeedItem => ({
   sourceName: "Test Source",
   sourceUrl: "https://example.com/feed",
   title: "Test Item",
@@ -38,7 +38,7 @@ const makeFeedItem = (overrides: Partial<NewFeedItem> = {}): NewFeedItem => ({
   ...overrides,
 });
 
-const makePlugin = (name: string, items: NewFeedItem[] = [makeFeedItem()]) => ({
+const makePlugin = (name: string, items: PluginFeedItem[] = [makeFeedItem()]) => ({
   name,
   canHandle: vi.fn(() => true),
   listItems: vi.fn(async () => items),

@@ -1,5 +1,5 @@
 import { proxy } from "valtio";
-import type { ApiFeedItem } from "plugins/types";
+import type { ApiFeedItem } from "connectors/types";
 
 export type RenderMethodKey = "video" | "richText" | "audio" | "embed";
 

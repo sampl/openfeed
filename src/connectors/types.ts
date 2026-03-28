@@ -46,7 +46,7 @@ export type FeedItemRenderData =
     };
 
 // Shape returned by plugin.listItems — does not include DB-managed fields
-export interface NewFeedItem {
+export interface PluginFeedItem {
   readonly sourceName: string;
   readonly sourceUrl: string;
   readonly feedName?: string;
@@ -57,11 +57,17 @@ export interface NewFeedItem {
   readonly renderData: FeedItemRenderData;
 }
 
+// Writable item statuses — the values a user or API can set on an item.
+export type ItemStatus = "unread" | "archived" | "read-later";
+
+// All statuses an item can hold in the DB, including system-managed ones.
+export type StoredItemStatus = ItemStatus | "expired";
+
 // Shape stored in DB and served to the frontend.
 // sourceIconUrl is not stored in DB — it is attached by the items API at response time.
-export interface FeedItem extends NewFeedItem {
+export interface FeedItem extends PluginFeedItem {
   readonly id: string;
-  readonly status: "unread" | "archived" | "read-later" | "expired";
+  readonly status: StoredItemStatus;
   readonly createdAt: Date;
   readonly sourceIconUrl?: string;
 }
@@ -128,7 +134,24 @@ export type FeedErrorCode =
   | "network_error"      // Network-level failure (timeout, DNS, connection refused)
   | "unknown";           // Catch-all for unexpected errors
 
-// Plugins should throw this instead of plain Error so the fetcher can record a structured code.
+// Runtime-iterable list of all valid FeedErrorCode values.
+// Useful for validation and exhaustive checks without duplicating the union.
+export const FEED_ERROR_CODES: readonly FeedErrorCode[] = [
+  "source_not_found",
+  "item_not_found",
+  "parse_error",
+  "invalid_config",
+  "missing_credential",
+  "auth_error",
+  "rate_limited",
+  "network_error",
+  "unknown",
+];
+
+/**
+ * Plugins should throw this instead of a plain `Error` so the fetcher can
+ * store a structured error code on the run's `SourceResult` for UI display.
+ */
 export class FeedError extends Error {
   readonly code: FeedErrorCode;
   constructor(message: string, code: FeedErrorCode) {
@@ -138,19 +161,28 @@ export class FeedError extends Error {
   }
 }
 
-// Inject fetch so plugins are unit-testable without hitting the network
+/** Inject fetch so plugins are unit-testable without hitting the network. */
 export type FetchFn = typeof fetch;
 
-// Every plugin must implement this interface.
-// TypeScript errors at compile time if canHandle or listItems have wrong signatures.
+/**
+ * Every content-source plugin must implement this interface.
+ * Plugins are registered in `pluginRegistry.ts`; the first plugin whose
+ * `canHandle` returns true for a given source URL is used.
+ */
 export interface BackendFeedPlugin {
   readonly name: string;
-  // Raw SVG string for this source's icon. The server converts it to a data URI.
+  /** Raw SVG markup for this source's icon. The server encodes it as a data URI at response time. */
   readonly icon?: string;
+  /** Returns true if this plugin knows how to fetch `sourceUrl`. */
   readonly canHandle: (sourceUrl: string) => boolean;
+  /**
+   * Fetches and returns items for `sourceUrl`.
+   * @param fetchFn - Injected fetch function, allowing unit tests to mock network calls.
+   * @param options - Plugin-specific options declared in the user's YAML config.
+   */
   readonly listItems: (
     sourceUrl: string,
     fetchFn: FetchFn,
     options?: Record<string, unknown>
-  ) => Promise<readonly NewFeedItem[]>;
+  ) => Promise<readonly PluginFeedItem[]>;
 }

@@ -51,7 +51,7 @@ describe("rss canHandle", () => {
 });
 
 describe("rss listItems — RSS 2.0", () => {
-  it("parses RSS 2.0 and returns NewFeedItem array", async () => {
+  it("parses RSS 2.0 and returns PluginFeedItem array", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS2_XML);
 
     const items = await genericRssPlugin.listItems("https://example.com/feed", fetchFn);
@@ -69,7 +69,7 @@ describe("rss listItems — RSS 2.0", () => {
 });
 
 describe("rss listItems — Atom", () => {
-  it("parses Atom feeds and returns NewFeedItem array", async () => {
+  it("parses Atom feeds and returns PluginFeedItem array", async () => {
     const fetchFn = makeFetch(SAMPLE_ATOM_XML);
 
     const items = await genericRssPlugin.listItems("https://example.com/atom", fetchFn);

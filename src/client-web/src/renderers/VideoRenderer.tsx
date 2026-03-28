@@ -1,4 +1,4 @@
-import type { VideoRenderData } from "plugins/types";
+import type { VideoRenderData } from "connectors/types";
 import styles from "./VideoRenderer.module.css";
 
 interface Props {

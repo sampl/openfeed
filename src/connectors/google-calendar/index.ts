@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface CalendarEvent {
@@ -82,7 +82,7 @@ const googleCalendarPlugin: BackendFeedPlugin = {
     const calendarUrl =
       typeof options?.calendarUrl === "string" ? options.calendarUrl : sourceUrl;
 
-    return events.map((event): NewFeedItem => {
+    return events.map((event): PluginFeedItem => {
       const text = event.description
         ? `${event.summary}\n\n${event.description}`
         : event.summary;

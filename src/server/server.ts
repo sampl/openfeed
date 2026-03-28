@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
 import type { DbInterface } from "./db/interface.js";
 import type { UserConfig } from "./config.js";
 import { createItemsRouter } from "./api/items.js";
@@ -16,7 +17,27 @@ export const createServer = (config: UserConfig, db: DbInterface, configPath: st
 
   app.use(express.json());
 
+  // General API rate limit: generous ceiling to protect against runaway scripts
+  const apiLimiter = rateLimit({
+    windowMs: 60_000, // 1 minute
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests — please wait a moment and try again." },
+  });
+
+  // Stricter limit for the manual fetch trigger to avoid hammering sources
+  const fetchLimiter = rateLimit({
+    windowMs: 60_000, // 1 minute
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many fetch requests — please wait before triggering another fetch." },
+  });
+
   // API routes
+  app.use("/api/fetch", fetchLimiter);
+  app.use("/api", apiLimiter);
   app.use("/api/items", createItemsRouter(db));
   app.use("/api/fetch", createFetchRouter(config, db));
   app.use("/api/runs", createRunsRouter(db));

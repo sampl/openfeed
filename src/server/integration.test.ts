@@ -20,7 +20,7 @@ import { createServer as createHttpServer } from "http";
 import type { AddressInfo } from "net";
 import { createSqliteDb } from "./db/sqlite.js";
 import { createServer as createExpressApp } from "./server.js";
-import type { NewFeedItem } from "../connectors/types.js";
+import type { PluginFeedItem } from "../connectors/types.js";
 import { FeedError } from "../connectors/types.js";
 import {
   SAMPLE_HN_RESPONSE,
@@ -58,9 +58,9 @@ const makeConfig = () => ({
   ],
 });
 
-/** Build a fake NewFeedItem with sensible defaults.
+/** Build a fake PluginFeedItem with sensible defaults.
  * Uses a recent publishedAt so items are not filtered by the default maxAgeDays=30. */
-const makeFeedItem = (overrides: Partial<NewFeedItem> = {}): NewFeedItem => ({
+const makeFeedItem = (overrides: Partial<PluginFeedItem> = {}): PluginFeedItem => ({
   sourceName: "Hacker News",
   sourceUrl: "https://news.ycombinator.com",
   title: "Test Item",
@@ -71,7 +71,7 @@ const makeFeedItem = (overrides: Partial<NewFeedItem> = {}): NewFeedItem => ({
 });
 
 /** Build a fake plugin whose listItems resolves with the supplied items. */
-const makePlugin = (name: string, items: NewFeedItem[]) => ({
+const makePlugin = (name: string, items: PluginFeedItem[]) => ({
   name,
   canHandle: vi.fn(() => true),
   listItems: vi.fn(async () => items),
@@ -487,7 +487,7 @@ describe("Integration: fixture-driven fetch scenarios", () => {
   it("items from SAMPLE_HN_RESPONSE fixture are stored and retrievable", async () => {
     // Build items that mirror what the real HN plugin would return from SAMPLE_HN_RESPONSE.
     // Use new Date() for publishedAt so items pass the default maxAgeDays=30 filter.
-    const hnItems: NewFeedItem[] = SAMPLE_HN_RESPONSE.hits.map((hit) => ({
+    const hnItems: PluginFeedItem[] = SAMPLE_HN_RESPONSE.hits.map((hit) => ({
       sourceName: "Hacker News",
       sourceUrl: "https://news.ycombinator.com",
       title: hit.title,
@@ -511,7 +511,7 @@ describe("Integration: fixture-driven fetch scenarios", () => {
   });
 
   it("items from SAMPLE_GITHUB_ISSUES_RESPONSE fixture are stored and retrievable", async () => {
-    const ghItems: NewFeedItem[] = SAMPLE_GITHUB_ISSUES_RESPONSE.map((issue) => ({
+    const ghItems: PluginFeedItem[] = SAMPLE_GITHUB_ISSUES_RESPONSE.map((issue) => ({
       sourceName: "GitHub",
       sourceUrl: "https://github.com/sampl/openfeed",
       title: `#${issue.number} ${issue.title}`,
@@ -532,7 +532,7 @@ describe("Integration: fixture-driven fetch scenarios", () => {
   });
 
   it("items from SAMPLE_BLUESKY_RESPONSE fixture have correct sourceNames", async () => {
-    const bskyItems: NewFeedItem[] = SAMPLE_BLUESKY_RESPONSE.feed.map((entry) => {
+    const bskyItems: PluginFeedItem[] = SAMPLE_BLUESKY_RESPONSE.feed.map((entry) => {
       const rkey = entry.post.uri.split("/").pop() ?? "";
       return {
         sourceName: "Bluesky",

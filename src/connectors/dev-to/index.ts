@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, NewFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface DevToArticle {
@@ -42,7 +42,7 @@ const devToPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("dev.to"),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly NewFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const limit = typeof options.limit === "number" ? options.limit : 10;
 
     const fetchUrl = buildFetchUrl(sourceUrl, limit);
@@ -55,7 +55,7 @@ const devToPlugin: BackendFeedPlugin = {
 
     const articles = (await response.json()) as DevToArticle[];
 
-    return articles.map((article): NewFeedItem => {
+    return articles.map((article): PluginFeedItem => {
       return {
         sourceName: "DEV Community",
         sourceUrl,
