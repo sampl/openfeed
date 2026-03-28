@@ -10,6 +10,7 @@ import { createSourcesRouter } from "./sources.js";
 const createMockDb = (): DbInterface => ({
   getItems: vi.fn(),
   upsertItems: vi.fn(),
+  replaceSourceItems: vi.fn(),
   updateItemStatus: vi.fn(),
   expireItems: vi.fn(),
   createRun: vi.fn(),

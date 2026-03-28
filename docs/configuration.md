@@ -34,9 +34,17 @@ feeds:
 
       - name: My City Weather
         url: https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&current_weather=true
-        maxItems: 1
-        expirationDays: 1
+        fetchMode: replace
 ```
+
+### Fetch mode
+
+| Value | Behavior |
+|---|---|
+| `append` (default) | Only new items are added; previous items stay in the queue |
+| `replace` | Previous items from this source are deleted on each fetch; only the latest is kept |
+
+Use `replace` for sources that represent current state, like weather or daily digests.
 
 ### Source options
 
@@ -44,6 +52,7 @@ feeds:
 |---|---|---|
 | `name` | string | Display name for this source |
 | `url` | string | Source URL |
+| `fetchMode` | `append` \| `replace` | Default: `append` |
 | `plugin` | string | Force a specific connector (optional) |
 | `maxItems` | number | Max items to keep from this source |
 | `maxAgeDays` | number | Ignore items older than N days |

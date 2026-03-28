@@ -2,12 +2,15 @@ import { readFileSync } from "fs";
 import yaml from "js-yaml";
 import type { TimeLimitEntry } from "../connectors/types.js";
 
+export type FetchMode = "append" | "replace";
+
 // TimeLimitConfig is the same shape as the shared TimeLimitEntry.
 export type TimeLimitConfig = TimeLimitEntry;
 
 export interface SourceConfig {
   readonly name: string;
   readonly url: string;
+  readonly fetchMode?: FetchMode;
   readonly plugin?: string;
   readonly options?: Record<string, unknown>;
   readonly maxItems?: number;
@@ -65,6 +68,9 @@ export const loadConfig = (configPath: string): UserConfig => {
     if (typeof s.url !== "string" || s.url.trim() === "") {
       throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}] must have a non-empty "url" string`);
     }
+    if (s.fetchMode !== undefined && s.fetchMode !== "append" && s.fetchMode !== "replace") {
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].fetchMode must be "append" or "replace"`);
+    }
     if (s.plugin !== undefined && typeof s.plugin !== "string") {
       throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].plugin must be a string`);
     }
@@ -80,6 +86,7 @@ export const loadConfig = (configPath: string): UserConfig => {
     return {
       name: s.name,
       url: s.url,
+      fetchMode: s.fetchMode as FetchMode | undefined,
       plugin: typeof s.plugin === "string" ? s.plugin : undefined,
       options: (s.options != null && typeof s.options === "object") ? s.options as Record<string, unknown> : undefined,
       maxItems: typeof s.maxItems === "number" ? Math.floor(s.maxItems) : undefined,

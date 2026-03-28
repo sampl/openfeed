@@ -48,6 +48,21 @@ describe("sqlite adapter", () => {
     });
   });
 
+  describe("replaceSourceItems", () => {
+    it("deletes old items for source and inserts new ones", () => {
+      const sourceUrl = "https://example.com/feed";
+      const original = makeItem({ id: "old-item", url: "https://example.com/old" });
+      db.upsertItems([original]);
+
+      const replacement = makeItem({ id: "new-item", url: "https://example.com/new" });
+      db.replaceSourceItems(sourceUrl, [replacement]);
+
+      const { items } = db.getItems("unread");
+      expect(items).toHaveLength(1);
+      expect(items[0].id).toBe("new-item");
+    });
+  });
+
   describe("updateItemStatus", () => {
     it("changes status correctly", () => {
       db.upsertItems([makeItem({ id: "item-1", url: "https://example.com/a" })]);
