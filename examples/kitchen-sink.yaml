@@ -45,10 +45,11 @@ feeds:
       - name: Example Museum
         url: https://www.instagram.com/examplemuseum/
 
-      # open-meteo — weather data; fetchMode: replace overwrites the previous item each run
+      # open-meteo — weather data; maxItems: 1 and expirationDays: 1 keep only today's weather
       - name: City Weather
         url: https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current=temperature_2m,wind_speed_10m,weather_code&hourly=temperature_2m,precipitation_probability
-        fetchMode: replace
+        maxItems: 1
+        expirationDays: 1
         options:
           temperature_unit: fahrenheit
 

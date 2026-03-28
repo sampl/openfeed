@@ -23,7 +23,8 @@ Common options:
 ```yaml
 - name: Brooklyn Weather
   url: https://api.open-meteo.com/v1/forecast?latitude=40.6782&longitude=-73.9442&current_weather=true&hourly=temperature_2m,precipitation_probability
-  fetchMode: replace
+  maxItems: 1
+  expirationDays: 1
   options:
     temperature_unit: fahrenheit
     wind_speed_unit: mph
@@ -35,4 +36,4 @@ Produces a single `richText` item per fetch with a summary like:
 
 > Currently 72°F, Partly cloudy. Wind: 12 mph. High: 80°F, Low: 65°F. Precipitation probability (next 6h): 20%.
 
-The item URL includes a date stamp so `fetchMode: replace` correctly replaces the prior day's weather item.
+The item URL includes a date stamp so each day's fetch produces a unique item. Combined with `expirationDays: 1`, yesterday's weather is automatically expired on the next fetch.

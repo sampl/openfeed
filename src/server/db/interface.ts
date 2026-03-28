@@ -52,8 +52,6 @@ export interface DbInterface {
   getItems: (status: ItemStatus, feedName?: string, limit?: number, offset?: number) => PaginatedItems;
   /** Inserts new items, skipping duplicates by URL. Returns the count actually inserted. */
   upsertItems: (items: NewDbItem[]) => number;
-  /** Deletes all existing items for `sourceUrl`, then inserts `items`. Returns the count inserted. */
-  replaceSourceItems: (sourceUrl: string, items: NewDbItem[]) => number;
   /** Updates a single item's status. No-ops silently if the id does not exist. */
   updateItemStatus: (id: string, status: ItemStatus) => void;
   /** Marks items for `sourceUrl` that were published before `olderThan` as "expired". Returns the count expired. */
