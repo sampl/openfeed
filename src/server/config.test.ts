@@ -31,7 +31,6 @@ feeds:
     sources:
       - name: "My Blog"
         url: "https://example.com/feed.xml"
-        fetchMode: append
 `);
 
     try {
@@ -42,7 +41,6 @@ feeds:
       expect(config.feeds[0].name).toBe("Main");
       expect(config.feeds[0].sources[0].name).toBe("My Blog");
       expect(config.feeds[0].sources[0].url).toBe("https://example.com/feed.xml");
-      expect(config.feeds[0].sources[0].fetchMode).toBe("append");
     } finally {
       cleanupFile(filePath);
     }
@@ -91,31 +89,6 @@ feeds:
     try {
       const config = loadConfig(filePath);
       expect(config.schedule).toBe("0 7 * * *");
-    } finally {
-      cleanupFile(filePath);
-    }
-  });
-
-  it("correctly parses fetchMode on sources", () => {
-    const filePath = writeTempConfig(`
-feeds:
-  - name: "Main"
-    sources:
-      - name: "Append Feed"
-        url: "https://example.com/append"
-        fetchMode: append
-      - name: "Replace Feed"
-        url: "https://example.com/replace"
-        fetchMode: replace
-      - name: "No Mode Feed"
-        url: "https://example.com/none"
-`);
-
-    try {
-      const config = loadConfig(filePath);
-      expect(config.feeds[0].sources[0].fetchMode).toBe("append");
-      expect(config.feeds[0].sources[1].fetchMode).toBe("replace");
-      expect(config.feeds[0].sources[2].fetchMode).toBeUndefined();
     } finally {
       cleanupFile(filePath);
     }

@@ -140,37 +140,6 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
     return insertMany(items) as number;
   };
 
-  const replaceSourceItems = (sourceUrl: string, items: NewDbItem[]): number => {
-    const deleteExisting = db.prepare("DELETE FROM items WHERE source_url = ?");
-    const insert = db.prepare(`
-      INSERT INTO items
-        (id, source_name, source_url, feed_name, title, description, url, published_at, render_data, status, created_at)
-      VALUES
-        (@id, @sourceName, @sourceUrl, @feedName, @title, @description, @url, @publishedAt, @renderData, 'unread', @createdAt)
-    `);
-
-    const replace = db.transaction((url: string, rows: NewDbItem[]) => {
-      deleteExisting.run(url);
-      for (const item of rows) {
-        insert.run({
-          id: item.id,
-          sourceName: item.sourceName,
-          sourceUrl: item.sourceUrl,
-          feedName: item.feedName ?? null,
-          title: item.title,
-          description: item.description ?? null,
-          url: item.url,
-          publishedAt: item.publishedAt.getTime(),
-          renderData: JSON.stringify(item.renderData),
-          createdAt: item.createdAt.getTime(),
-        });
-      }
-      return rows.length;
-    });
-
-    return replace(sourceUrl, items) as number;
-  };
-
   const updateItemStatus = (id: string, status: "unread" | "archived" | "read-later"): void => {
     db.prepare("UPDATE items SET status = ? WHERE id = ?").run(status, id);
   };
@@ -264,7 +233,6 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
   return {
     getItems,
     upsertItems,
-    replaceSourceItems,
     updateItemStatus,
     expireItems,
     createRun,
