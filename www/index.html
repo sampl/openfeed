@@ -111,7 +111,7 @@
 
     .btn-primary {
       background: var(--btn-primary-bg);
-      color: var(--btn-primary-text);
+      color: var(--btn-primary-text) !important;
     }
 
     .btn-secondary {
@@ -379,7 +379,7 @@
         <a href="https://openfeed-docs.pages.dev/" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Install</a>
         <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>Star</a>
       </div>
-      <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
+      <p class="cta-subtext">Open source and self hosted</p>
     </div>
   </section>
 
@@ -414,7 +414,7 @@
   <section>
     <div class="container">
       <h2>Curate the sources that matter to you</h2>
-      <p>Curate your own personal feed. Podcasts, blogs, newsletters, social accounts. Anything with a URL.</p>
+      <p>Curate your own personal feed. Podcasts, blogs, newsletters, social accounts. Anything with a URL can be added to OpenFeed.</p>
       <p>Want to follow the news from the front lines? Follow your favorite independent writers? See local community events? Just want to see cat memes? You can do it with OpenFeed.</p>
 
       <!-- GRAPHIC: Source logos — NYT, WSJ, YouTube, Substack, The Onion, New Yorker, Sam Harris, Adam Tooze, Ezra Klein, etc. -->
@@ -423,20 +423,12 @@
   </section>
 
   <!-- Algorithm -->
+  <!--
   <section>
     <div class="container">
       <h2>Design your own algorithm</h2>
       <p>You decide what matters and what doesn't. Describe your ultimate algorithm in plain English and let AI filter out the noise.</p>
 
-      <!-- GRAPHIC: A visual list of plain-English algorithm rules, e.g.:
-           - Summarize any new AI models
-           - Always show war stories first
-           - Ignore political news
-           - Don't show celebrity news
-           - Only one article per day about Ukraine
-           - Ignore articles that mention the Oscars
-      -->
-      <!--
       <ul class="algo-rules">
         <li>Summarize any new AI models</li>
         <li>Always show war stories first</li>
@@ -445,9 +437,9 @@
         <li>Only one article per day about Ukraine</li>
         <li>Ignore articles that mention the Oscars</li>
       </ul>
-      -->
     </div>
   </section>
+  -->
 
   <!-- Read, watch, listen -->
   <!--
@@ -507,7 +499,7 @@
         <a href="https://openfeed-docs.pages.dev/" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Install</a>
         <a href="https://github.com/sampl/openfeed" target="_blank" rel="noopener" class="btn btn-secondary"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>Star</a>
       </div>
-      <p class="cta-subtext"><a href="https://openfeed-docs.pages.dev/installation">See system requirements</a></p>
+      <p class="cta-subtext">Open source and self hosted</p>
     </div>
   </section>
 

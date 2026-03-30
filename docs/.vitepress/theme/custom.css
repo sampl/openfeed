@@ -1,0 +1,17 @@
+/* Bold headings */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6 {
+  font-weight: 800;
+}
+
+/* Links match primary text color instead of brand blue/purple */
+.vp-doc a {
+  color: var(--vp-c-text-1);
+}
+.vp-doc a:hover {
+  color: var(--vp-c-text-1);
+}
