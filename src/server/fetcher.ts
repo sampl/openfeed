@@ -73,13 +73,7 @@ export const runFetch = async (
           createdAt: new Date(),
         }));
 
-        let insertedCount: number;
-
-        if (source.fetchMode === "replace") {
-          insertedCount = db.replaceSourceItems(source.url, dbItems);
-        } else {
-          insertedCount = db.upsertItems(dbItems);
-        }
+        const insertedCount = db.upsertItems(dbItems);
 
         const expirationDays = resolveExpirationDays(source, feed, config);
         if (expirationDays != null) {
