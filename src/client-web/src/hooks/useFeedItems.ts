@@ -24,10 +24,10 @@ export const useFeedItems = () => {
   // Flatten all pages into a single items array
   const items = query.data?.pages.flatMap((page) => page.items) ?? [];
 
-  // Reset session state when the selected feed changes
+  // Reset method preference when the selected feed changes.
+  // readItemIds is intentionally NOT reset here — read state persists until hard refresh.
   useEffect(() => {
-    console.log(`🧲 useFeedItems effect — feed changed to ${snap.selectedFeed ?? "all"}, resetting session state`);
-    feedState.readItemIds = [];
+    console.log(`🧲 useFeedItems effect — feed changed to ${snap.selectedFeed ?? "all"}`);
     feedState.selectedMethod = null;
   }, [snap.selectedFeed]);
 

@@ -38,6 +38,36 @@ export const FeedPage = () => {
   // Track items saved this session so the bookmark icon fills immediately on tap
   const [savedItemIds, setSavedItemIds] = useState<Set<string>>(new Set());
 
+  // Save scroll position per feed to sessionStorage (cleared on hard refresh)
+  useEffect(() => {
+    const key = `scroll:${selectedFeed ?? "all"}`;
+    let timer: ReturnType<typeof setTimeout>;
+    const onScroll = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        sessionStorage.setItem(key, String(window.scrollY));
+      }, 100);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [selectedFeed]);
+
+  // Restore scroll position after the feed's items first appear in the DOM
+  const restoredFeedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (items.length === 0) return;
+    const feedKey = selectedFeed ?? "all";
+    if (restoredFeedRef.current === feedKey) return;
+    restoredFeedRef.current = feedKey;
+    const stored = sessionStorage.getItem(`scroll:${feedKey}`);
+    if (stored) {
+      window.scrollTo(0, parseInt(stored, 10));
+    }
+  }, [selectedFeed, items.length]);
+
   // Sentinel element at the bottom of the feed — triggers the next page load
   // when it scrolls into view.
   const sentinelRef = useRef<HTMLDivElement>(null);
