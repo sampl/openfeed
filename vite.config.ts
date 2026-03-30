@@ -24,6 +24,7 @@ export default defineConfig({
       connectors: path.resolve(__dirname, "./src/connectors"),
     },
   },
+  publicDir: path.resolve(__dirname, "src/public"),
   build: {
     outDir: path.resolve(__dirname, "dist/client"),
     emptyOutDir: true,
