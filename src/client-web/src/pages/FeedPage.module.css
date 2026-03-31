@@ -37,25 +37,15 @@
   margin: 0;
 }
 
-/* Time remaining banner shown when a daily limit is configured */
-.timeRemainingBanner {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0.4rem var(--gutter);
-  background: var(--background-secondary, #f3f4f6);
-  color: var(--text-tertiary);
-  font-size: var(--xs);
-  border-bottom: 1px solid var(--border);
-}
-
-/* Switches to amber when approaching the limit */
-.timeRemainingBannerWarning {
-  background: var(--amber-50, #fffbeb);
-  color: var(--amber-700, #b45309);
-  border-bottom-color: var(--amber-200, #fde68a);
-  font-weight: 600;
+/* Gradient fade below the sticky header, overlays the top of the feed list */
+.feedFade {
+  position: sticky;
+  top: 44px;
+  height: 24px;
+  background: linear-gradient(to bottom, var(--background-primary), transparent);
+  pointer-events: none;
+  z-index: 9;
+  margin-bottom: -24px;
 }
 
 /* Peaceful face icon in the time limit blocker */

@@ -6,7 +6,7 @@ import { useLatestRun } from "../hooks/useLatestRun";
 import { useTimeTracking } from "../hooks/useTimeTracking";
 import { useTimeLimits } from "../hooks/useTimeLimits";
 import { FeedPostCard } from "../components/FeedPostCard";
-import { FeedTabs } from "../components/FeedTabs";
+import { StickyFeedHeader } from "../components/StickyFeedHeader";
 import type { ApiFeedItem } from "connectors/types";
 import styles from "./FeedPage.module.css";
 
@@ -118,13 +118,8 @@ export const FeedPage = () => {
 
   return (
     <div className={styles.page}>
-      {remainingMinutes !== null && (
-        <div className={[styles.timeRemainingBanner, isWarning ? styles.timeRemainingBannerWarning : ""].join(" ").trim()}>
-          {Math.ceil(remainingMinutes)} min left today
-        </div>
-      )}
-
-      <FeedTabs />
+      <StickyFeedHeader latestRun={latestRun} remainingMinutes={remainingMinutes} isWarning={isWarning} />
+      <div className={styles.feedFade} aria-hidden="true" />
 
       {error && (
         <div className={styles.emptyContent}>
