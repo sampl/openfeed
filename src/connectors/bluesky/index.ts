@@ -37,7 +37,10 @@ const blueskyPlugin: BackendFeedPlugin = {
   listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
     const handle = extractHandle(sourceUrl);
     if (!handle) {
-      throw new FeedError(`Could not extract Bluesky handle from URL: ${sourceUrl}`, "invalid_config");
+      throw new FeedError(
+        `Bluesky URL type not supported: ${sourceUrl}. Only profile pages (bsky.app/profile/...) are supported.`,
+        "url_not_supported"
+      );
     }
 
     const limit = typeof options.limit === "number" ? options.limit : 10;

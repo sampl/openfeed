@@ -93,13 +93,13 @@ describe("bluesky listItems", () => {
     expect(fetchFn.mock.calls[0]?.[0]).toContain("limit=20");
   });
 
-  it("throws a FeedError with invalid_config when no handle can be extracted", async () => {
+  it("throws a FeedError with url_not_supported for non-profile Bluesky URLs", async () => {
     const fetchFn = vi.fn();
 
     const error = await blueskyPlugin.listItems("https://bsky.app", fetchFn).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
-    expect((error as FeedError).code).toBe("invalid_config");
-    expect((error as FeedError).message).toContain("Could not extract Bluesky handle");
+    expect((error as FeedError).code).toBe("url_not_supported");
+    expect((error as FeedError).message).toContain("Only profile pages");
   });
 
   it("throws a FeedError with rate_limited on 429 response", async () => {

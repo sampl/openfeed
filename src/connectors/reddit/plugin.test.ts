@@ -113,13 +113,13 @@ describe("reddit listItems", () => {
     expect(fetchFn.mock.calls[0]?.[0]).toContain("limit=10");
   });
 
-  it("throws a FeedError with invalid_config for an unparseable subreddit URL", async () => {
+  it("throws a FeedError with url_not_supported for non-subreddit Reddit URLs", async () => {
     const fetchFn = vi.fn();
 
     const error = await redditPlugin.listItems("https://www.reddit.com/", fetchFn).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
-    expect((error as FeedError).code).toBe("invalid_config");
-    expect((error as FeedError).message).toContain("Could not parse subreddit");
+    expect((error as FeedError).code).toBe("url_not_supported");
+    expect((error as FeedError).message).toContain("Only subreddit pages");
   });
 
   it("throws a FeedError with rate_limited when Reddit returns non-JSON", async () => {

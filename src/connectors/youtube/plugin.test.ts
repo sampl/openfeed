@@ -93,6 +93,16 @@ describe("youtube listItems", () => {
     expect((error as FeedError).message).toContain("Could not resolve YouTube channel ID");
   });
 
+  it("throws a FeedError with url_not_supported for non-channel YouTube URLs", async () => {
+    const fetchFn = vi.fn();
+
+    const error = await youtubeRssPlugin.listItems("https://www.youtube.com/watch?v=dQw4w9WgXcQ", fetchFn).catch((e) => e);
+    expect(error).toBeInstanceOf(FeedError);
+    expect((error as FeedError).code).toBe("url_not_supported");
+    expect((error as FeedError).message).toContain("Only channel pages");
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
   it("normalizes mobile URL to desktop when scraping @handle", async () => {
     const fetchFn = vi.fn()
       .mockResolvedValueOnce({ text: async () => SAMPLE_CHANNEL_PAGE_HTML } as unknown as Response)

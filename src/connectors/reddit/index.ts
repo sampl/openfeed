@@ -25,7 +25,10 @@ interface RedditResponse {
 // Extract the subreddit name from a reddit.com URL
 const extractSubreddit = (sourceUrl: string): string => {
   const match = sourceUrl.match(/reddit\.com\/r\/([^/?#]+)/i);
-  if (!match?.[1]) throw new FeedError(`Could not parse subreddit from URL: ${sourceUrl}`, "invalid_config");
+  if (!match?.[1]) throw new FeedError(
+    `Reddit URL type not supported: ${sourceUrl}. Only subreddit pages (reddit.com/r/...) are supported.`,
+    "url_not_supported"
+  );
   return match[1];
 };
 
