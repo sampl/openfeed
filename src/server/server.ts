@@ -11,11 +11,24 @@ import { createFeedsRouter } from "./api/feeds.js";
 import { createTimeRouter } from "./api/time.js";
 import { createConfigRouter } from "./api/config.js";
 import { createSourcesRouter } from "./api/sources.js";
+import { createAuthRouter } from "./api/auth.js";
 
-export const createServer = (config: UserConfig, db: DbInterface, configPath: string) => {
+export const createServer = (config: UserConfig, db: DbInterface, configPath: string, accessKey?: string) => {
   const app = express();
 
   app.use(express.json());
+
+  // Auth status is always public — register before the auth middleware
+  app.use("/api/auth", createAuthRouter(accessKey != null));
+
+  // Optional access key enforcement for all other API routes
+  if (accessKey != null) {
+    const expected = `Bearer ${accessKey}`;
+    app.use("/api", (req, res, next) => {
+      if (req.headers.authorization === expected) return next();
+      res.status(401).json({ error: "Access key required", authRequired: true });
+    });
+  }
 
   // General API rate limit: generous ceiling to protect against runaway scripts
   const apiLimiter = rateLimit({

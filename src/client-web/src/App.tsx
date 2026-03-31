@@ -3,6 +3,7 @@ import { House, BookmarkSimple, Gear } from "@phosphor-icons/react";
 import { ErrorBoundary, BottomNav, Toaster, type BottomNavItem } from "./ui_components";
 import { Debug } from "./ui_components";
 import { Header } from "./components/Header";
+import { AccessKeyModal } from "./components/AccessKeyModal";
 import { FeedPage } from "./pages/FeedPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SavedPage } from "./pages/SavedPage";
@@ -74,6 +75,7 @@ export const App = () => (
       </Routes>
       <Debug persistenceId="openfeed" />
       <Toaster />
+      <AccessKeyModal />
     </BrowserRouter>
   </ErrorBoundary>
 );
