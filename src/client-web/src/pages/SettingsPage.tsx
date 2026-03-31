@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Clock, ArrowsClockwise, Plus, GlobeSimple, BookOpen, Warning, CheckCircle, ListBullets, Code, Package, Swatches } from "@phosphor-icons/react";
+import { Clock, ArrowsClockwise, Plus, GlobeSimple, BookOpen, Warning, CheckCircle, ListBullets, Code, Package, Swatches, LockOpen, LockKey, Trash } from "@phosphor-icons/react";
 import { Copyright, SettingsSection, SettingsItem } from "../ui_components";
-import { useQuery } from "@tanstack/react-query";
-import { fetchSources } from "../apiClient";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchSources, fetchAuthStatus, clearAccessKey, getAccessKey } from "../apiClient";
 import { useLatestRun } from "../hooks/useLatestRun";
+import { authState } from "../state/authState";
 import styles from "./SettingsPage.module.css";
 
 const showAddToHomeScreenInstructions = () => {
@@ -43,8 +44,11 @@ const formatRelativeTime = (dateString: string): string => {
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const latestRun = useLatestRun();
   const { data: sources } = useQuery({ queryKey: ["sources"], queryFn: fetchSources });
+  const { data: authStatus } = useQuery({ queryKey: ["auth/status"], queryFn: fetchAuthStatus });
+  const hasKey = getAccessKey() != null;
 
   const fetchErrorCount = latestRun?.status === "error"
     ? latestRun.sourceResults.filter((r) => r.status === "error").length
@@ -112,6 +116,36 @@ export const SettingsPage = () => {
             onClick={() => navigate("/history")}
             showChevron={true}
           />
+        </SettingsSection>
+        <SettingsSection title="Access">
+          {authStatus?.required === false ? (
+            <SettingsItem
+              title="No access key required"
+              icon={<LockOpen size={18} />}
+            />
+          ) : authStatus?.required && hasKey ? (
+            <>
+              <SettingsItem
+                title="Authorized with access key"
+                icon={<CheckCircle size={18} />}
+              />
+              <SettingsItem
+                title="Clear access key"
+                icon={<Trash size={18} />}
+                onClick={() => {
+                  clearAccessKey();
+                  authState.showAuthModal = true;
+                  void queryClient.invalidateQueries();
+                }}
+              />
+            </>
+          ) : authStatus?.required && !hasKey ? (
+            <SettingsItem
+              title="Access key required"
+              icon={<LockKey size={18} />}
+              onClick={() => { authState.showAuthModal = true; }}
+            />
+          ) : null}
         </SettingsSection>
         <SettingsSection>
           <SettingsItem

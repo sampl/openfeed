@@ -34,7 +34,12 @@ if (args[0] === "fetch") {
   const port = portArg ?? config.port;
   const db = createSqliteDb(path.resolve(dbPath));
 
-  const app = createServer(config, db, path.resolve(configPath));
+  const accessKey = process.env.OPENFEED_ACCESS_KEY?.trim() || undefined;
+  if (accessKey) {
+    console.log("[openfeed] Access key protection enabled (OPENFEED_ACCESS_KEY)");
+  }
+
+  const app = createServer(config, db, path.resolve(configPath), accessKey);
 
   app.listen(port, () => {
     console.log(`[openfeed] Server running at http://localhost:${port}`);
