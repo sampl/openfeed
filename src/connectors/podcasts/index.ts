@@ -28,7 +28,7 @@ const podcastsPlugin: BackendFeedPlugin = {
     if (sourceUrl.includes("open.spotify.com/show")) {
       throw new FeedError(
         "Spotify podcast URLs are not supported. Please use the podcast's direct RSS feed URL or Apple Podcasts URL.",
-        "invalid_config"
+        "url_not_supported"
       );
     }
 

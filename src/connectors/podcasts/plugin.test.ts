@@ -35,12 +35,12 @@ describe("podcasts canHandle", () => {
 });
 
 describe("podcasts listItems", () => {
-  it("throws a FeedError with invalid_config for Spotify URLs", async () => {
+  it("throws a FeedError with url_not_supported for Spotify URLs", async () => {
     const fetchFn = vi.fn();
 
     const error = await podcastsPlugin.listItems(SPOTIFY_URL, fetchFn).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
-    expect((error as FeedError).code).toBe("invalid_config");
+    expect((error as FeedError).code).toBe("url_not_supported");
     expect((error as FeedError).message).toContain("Spotify");
   });
 

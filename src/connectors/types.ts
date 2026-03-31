@@ -128,6 +128,7 @@ export type FeedErrorCode =
   | "item_not_found"     // Source reachable but expected item URL was missing
   | "parse_error"        // Source reachable but content couldn't be parsed
   | "invalid_config"     // User misconfigured options (bad URL shape, wrong option type, etc.)
+  | "url_not_supported"  // URL is recognized by the plugin but this specific URL type is not supported
   | "missing_credential" // A required env-var credential is absent
   | "auth_error"         // Credential present but authentication failed (401/403)
   | "rate_limited"       // Source returned 429 or equivalent
@@ -141,6 +142,7 @@ export const FEED_ERROR_CODES: readonly FeedErrorCode[] = [
   "item_not_found",
   "parse_error",
   "invalid_config",
+  "url_not_supported",
   "missing_credential",
   "auth_error",
   "rate_limited",

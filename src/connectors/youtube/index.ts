@@ -34,11 +34,20 @@ const resolveChannelId = async (handleUrl: string, fetchFn: typeof fetch): Promi
 // Determine whether the URL already contains a bare channel ID path segment
 const isChannelIdUrl = (url: URL): boolean => url.pathname.startsWith("/channel/");
 
+// Determine whether the URL is a handle URL (e.g. /@SomeChannel)
+const isHandleUrl = (url: URL): boolean => url.pathname.startsWith("/@");
+
 const getChannelId = async (sourceUrl: string, fetchFn: typeof fetch): Promise<string> => {
   const url = new URL(sourceUrl);
   if (isChannelIdUrl(url)) {
     // /channel/CHANNEL_ID — extract directly
     return url.pathname.split("/").filter(Boolean)[1] ?? (() => { throw new FeedError("Missing channel ID in URL", "invalid_config"); })();
+  }
+  if (!isHandleUrl(url)) {
+    throw new FeedError(
+      `YouTube URL type not supported: ${sourceUrl}. Only channel pages (/@handle or /channel/ID) are supported.`,
+      "url_not_supported"
+    );
   }
   // @handle URL — must scrape the page to find the channel ID
   return resolveChannelId(sourceUrl, fetchFn);
