@@ -172,4 +172,3 @@ The script pulls the latest commits, reinstalls dependencies if they changed, an
 Once the server is running, navigate to its URL in Safari or Chrome. To install as a PWA on iOS: tap Share → "Add to Home Screen".
 
 For local access on the same network, find your computer's local IP (`ipconfig getifaddr en0` on macOS, `hostname -I` on Linux) and open `http://192.168.x.x:3000`.
-

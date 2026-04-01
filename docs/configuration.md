@@ -130,4 +130,3 @@ feeds:
 ```
 
 When the daily limit is reached, the feed is blocked until the next day.
-

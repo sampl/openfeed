@@ -12,6 +12,7 @@ const ERROR_CODE_LABELS: Record<FeedErrorCode, string> = {
   item_not_found: "Item not found",
   parse_error: "Could not parse content",
   invalid_config: "Configuration error",
+  url_not_supported: "URL not supported",
   missing_credential: "Missing credential",
   auth_error: "Authentication failed",
   rate_limited: "Rate limited",
