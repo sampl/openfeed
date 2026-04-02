@@ -61,9 +61,9 @@ Common examples:
 
 | Cron | Description |
 |---|---|
-| `"0 11 * * *"` | Daily at 6am Eastern (UTC-5) |
-| `"0 14 * * 0"` | Every Sunday at 9am Eastern |
-| `"0 22 * * 1-5"` | Every weekday at 5pm Eastern |
+| `"0 11 * * *"` | Daily at 11am UTC (6am EST / 7am EDT) |
+| `"0 14 * * 0"` | Every Sunday at 2pm UTC (9am EST / 10am EDT) |
+| `"0 22 * * 1-5"` | Every weekday at 10pm UTC (5pm EST / 6pm EDT) |
 | `"0 * * * *"` | Every hour |
 
 ## Auth
