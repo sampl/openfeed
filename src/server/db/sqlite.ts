@@ -1,53 +1,7 @@
 import Database from "better-sqlite3";
 import type { FeedItem, FeedItemRenderData } from "../../connectors/types.js";
 import type { DbInterface, NewDbItem, NewRun, NewTimeSession, PaginatedItems, Run, SourceResult, TimeUsage } from "./interface.js";
-
-const createSchema = (db: Database.Database): void => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS items (
-      id TEXT PRIMARY KEY,
-      source_name TEXT NOT NULL,
-      source_url TEXT NOT NULL,
-      title TEXT NOT NULL,
-      description TEXT,
-      url TEXT NOT NULL UNIQUE,
-      published_at INTEGER,
-      render_data TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'unread',
-      created_at INTEGER NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_items_status_published ON items (status, published_at DESC);
-
-    CREATE TABLE IF NOT EXISTS runs (
-      id TEXT PRIMARY KEY,
-      triggered_by TEXT NOT NULL,
-      started_at INTEGER NOT NULL,
-      completed_at INTEGER,
-      status TEXT NOT NULL,
-      error_message TEXT,
-      source_results TEXT
-    );
-    CREATE INDEX IF NOT EXISTS idx_runs_started ON runs (started_at DESC);
-  `);
-
-  // Add feed_name column to existing databases that predate this field
-  try {
-    db.exec("ALTER TABLE items ADD COLUMN feed_name TEXT");
-  } catch {
-    // Column already exists — safe to ignore
-  }
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS time_sessions (
-      id TEXT PRIMARY KEY,
-      feed_name TEXT,
-      date TEXT NOT NULL,
-      duration_ms INTEGER NOT NULL,
-      created_at INTEGER NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_time_sessions_date ON time_sessions (date, feed_name);
-  `);
-};
+import { runMigrations } from "./migrations.js";
 
 const rowToFeedItem = (row: Record<string, unknown>): FeedItem => ({
   id: row.id as string,
@@ -81,7 +35,7 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
   // WAL mode improves concurrent read/write performance
   db.pragma("journal_mode = WAL");
 
-  createSchema(db);
+  runMigrations(db);
 
   const getItems = (
     status: "unread" | "archived" | "read-later",
@@ -230,6 +184,11 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
     return { byFeed, total };
   };
 
+  const getDbVersion = (): number => {
+    const row = db.prepare("SELECT MAX(version) as v FROM schema_migrations").get() as { v: number | null };
+    return row.v ?? 0;
+  };
+
   return {
     getItems,
     upsertItems,
@@ -240,5 +199,6 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
     getRuns,
     recordTimeSession,
     getTimeUsage,
+    getDbVersion,
   };
 };

@@ -4,6 +4,30 @@ The OpenFeed server exposes a REST API that the web UI uses to serve your conten
 
 The base URL is the address of your OpenFeed server, e.g. `http://localhost:3000`.
 
+## Version
+
+### Get server version
+
+```
+GET /api/version
+```
+
+Returns the running application version and database schema version. Always public — no authentication required.
+
+**Response:**
+
+```json
+{
+  "version": "0.1.0",
+  "dbVersion": 4
+}
+```
+
+| Field | Description |
+|---|---|
+| `version` | The application version, matching the `version` field in `package.json` |
+| `dbVersion` | The highest database migration number that has been applied |
+
 ## Items
 
 ### Get items

@@ -123,4 +123,11 @@ describe("sqlite adapter", () => {
       expect(runs[2].id).toBe("run-a");
     });
   });
+
+  describe("getDbVersion", () => {
+    it("returns the highest applied migration number after init", () => {
+      const version = db.getDbVersion();
+      expect(version).toBe(4);
+    });
+  });
 });

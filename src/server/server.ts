@@ -12,14 +12,16 @@ import { createTimeRouter } from "./api/time.js";
 import { createConfigRouter } from "./api/config.js";
 import { createSourcesRouter } from "./api/sources.js";
 import { createAuthRouter } from "./api/auth.js";
+import { createVersionRouter } from "./api/version.js";
 
 export const createServer = (config: UserConfig, db: DbInterface, configPath: string, accessKey?: string) => {
   const app = express();
 
   app.use(express.json());
 
-  // Auth status is always public — register before the auth middleware
+  // Public routes — registered before the auth middleware
   app.use("/api/auth", createAuthRouter(accessKey != null));
+  app.use("/api/version", createVersionRouter(db));
 
   // Optional access key enforcement for all other API routes
   if (accessKey != null) {
