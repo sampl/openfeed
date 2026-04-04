@@ -72,4 +72,9 @@ export interface DbInterface {
   recordTimeSession: (session: NewTimeSession) => void;
   /** Returns aggregated reading time in milliseconds for the given YYYY-MM-DD date. */
   getTimeUsage: (date: string) => TimeUsage;
+
+  // Versioning
+
+  /** Returns the current database schema version (highest applied migration number). */
+  getDbVersion: () => number;
 }
