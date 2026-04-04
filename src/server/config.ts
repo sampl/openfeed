@@ -8,7 +8,7 @@ export type TimeLimitConfig = TimeLimitEntry;
 export interface SourceConfig {
   readonly name: string;
   readonly url: string;
-  readonly plugin?: string;
+  readonly connector?: string;
   readonly options?: Record<string, unknown>;
   readonly maxItems?: number;
   readonly maxAgeDays?: number;
@@ -34,6 +34,10 @@ export interface UserConfig {
   readonly maxItems?: number;
   readonly maxAgeDays?: number;
   readonly expirationDays?: number;
+  /** npm package names or local JS file paths to load as connectors at startup. */
+  readonly connectors?: readonly string[];
+  /** Directory to auto-scan for connector modules (any .js/.mjs file or index.js in a subdirectory). */
+  readonly connectorsDir?: string;
 }
 
 export const loadConfig = (configPath: string): UserConfig => {
@@ -65,8 +69,8 @@ export const loadConfig = (configPath: string): UserConfig => {
     if (typeof s.url !== "string" || s.url.trim() === "") {
       throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}] must have a non-empty "url" string`);
     }
-    if (s.plugin !== undefined && typeof s.plugin !== "string") {
-      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].plugin must be a string`);
+    if (s.connector !== undefined && typeof s.connector !== "string") {
+      throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].connector must be a string`);
     }
     if (s.maxItems !== undefined && (typeof s.maxItems !== "number" || s.maxItems < 1)) {
       throw new Error(`[openfeed] feeds[${feedIndex}].sources[${index}].maxItems must be a positive number`);
@@ -80,7 +84,7 @@ export const loadConfig = (configPath: string): UserConfig => {
     return {
       name: s.name,
       url: s.url,
-      plugin: typeof s.plugin === "string" ? s.plugin : undefined,
+      connector: typeof s.connector === "string" ? s.connector : undefined,
       options: (s.options != null && typeof s.options === "object") ? s.options as Record<string, unknown> : undefined,
       maxItems: typeof s.maxItems === "number" ? Math.floor(s.maxItems) : undefined,
       maxAgeDays: typeof s.maxAgeDays === "number" ? Math.floor(s.maxAgeDays) : undefined,
@@ -141,5 +145,13 @@ export const loadConfig = (configPath: string): UserConfig => {
     ? parsed.expirationDays
     : undefined;
 
-  return { port, schedule, feeds, timeLimit, maxItems: globalMaxItems, maxAgeDays: globalMaxAgeDays, expirationDays };
+  const connectors = Array.isArray(parsed.connectors)
+    ? (parsed.connectors as unknown[]).filter((c): c is string => typeof c === "string")
+    : undefined;
+
+  const connectorsDir = typeof parsed.connectorsDir === "string" && parsed.connectorsDir.trim() !== ""
+    ? parsed.connectorsDir.trim()
+    : undefined;
+
+  return { port, schedule, feeds, timeLimit, maxItems: globalMaxItems, maxAgeDays: globalMaxAgeDays, expirationDays, connectors, connectorsDir };
 };

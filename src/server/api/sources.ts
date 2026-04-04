@@ -7,7 +7,7 @@ export interface SourceSummary {
   readonly name: string;
   readonly url: string;
   readonly feedName: string;
-  readonly plugin?: string;
+  readonly connector?: string;
   readonly lastStatus?: "success" | "error" | "skipped";
   readonly lastErrorMessage?: string;
   readonly lastErrorCode?: FeedErrorCode;
@@ -24,7 +24,7 @@ export const createSourcesRouter = (config: UserConfig, db: DbInterface): Router
           name: source.name,
           url: source.url,
           feedName: feed.name,
-          plugin: source.plugin,
+          connector: source.connector,
         }))
       );
 

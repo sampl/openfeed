@@ -155,17 +155,17 @@ describe("runFetch", () => {
     expect(updateRunCall[1].status).toBe("error");
   });
 
-  it("passes source.plugin to resolvePlugin as the second argument", async () => {
+  it("passes source.connector to resolvePlugin as the second argument", async () => {
     const plugin = makePlugin("rss");
     mockResolvePlugin.mockReturnValue(plugin);
 
-    const source = makeSource({ url: "https://example.com", plugin: "rss" });
+    const source = makeSource({ url: "https://example.com", connector: "rss" });
     await runFetch(makeConfig([source]), db, "manual");
 
     expect(mockResolvePlugin).toHaveBeenCalledWith("https://example.com", "rss");
   });
 
-  it("passes undefined plugin to resolvePlugin when source has no plugin field", async () => {
+  it("passes undefined connector to resolvePlugin when source has no connector field", async () => {
     const plugin = makePlugin("rss");
     mockResolvePlugin.mockReturnValue(plugin);
 

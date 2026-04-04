@@ -18,12 +18,12 @@ For Apple Podcasts URLs, the plugin:
 
 ## Direct RSS feeds work better
 
-If you have the podcast's direct RSS feed URL, use the `rss` plugin instead — it skips the iTunes lookup and works for any podcast:
+If you have the podcast's direct RSS feed URL, use the `rss` connector instead — it skips the iTunes lookup and works for any podcast:
 
 ```yaml
 - name: My Podcast
   url: https://feeds.example.com/my-podcast.rss
-  plugin: rss
+  connector: rss
 ```
 
 ## Apple Podcasts example

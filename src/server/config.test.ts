@@ -94,25 +94,25 @@ feeds:
     }
   });
 
-  it("parses the plugin field when provided", () => {
+  it("parses the connector field when provided", () => {
     const filePath = writeTempConfig(`
 feeds:
   - name: "Main"
     sources:
       - name: "Forced RSS"
         url: "https://example.com"
-        plugin: rss
+        connector: rss
 `);
 
     try {
       const config = loadConfig(filePath);
-      expect(config.feeds[0].sources[0].plugin).toBe("rss");
+      expect(config.feeds[0].sources[0].connector).toBe("rss");
     } finally {
       cleanupFile(filePath);
     }
   });
 
-  it("leaves plugin undefined when not provided", () => {
+  it("leaves connector undefined when not provided", () => {
     const filePath = writeTempConfig(`
 feeds:
   - name: "Main"
@@ -123,25 +123,25 @@ feeds:
 
     try {
       const config = loadConfig(filePath);
-      expect(config.feeds[0].sources[0].plugin).toBeUndefined();
+      expect(config.feeds[0].sources[0].connector).toBeUndefined();
     } finally {
       cleanupFile(filePath);
     }
   });
 
-  it("throws when plugin field is not a string", () => {
+  it("throws when connector field is not a string", () => {
     const filePath = writeTempConfig(`
 feeds:
   - name: "Main"
     sources:
       - name: "Feed"
         url: "https://example.com/feed.xml"
-        plugin: 123
+        connector: 123
 `);
 
     try {
       expect(() => loadConfig(filePath)).toThrow(
-        'feeds[0].sources[0].plugin must be a string'
+        'feeds[0].sources[0].connector must be a string'
       );
     } finally {
       cleanupFile(filePath);

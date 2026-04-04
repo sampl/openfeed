@@ -40,7 +40,7 @@ export const runFetch = async (
 
   for (const feed of feedsToFetch) {
     for (const source of feed.sources) {
-      const plugin = resolvePlugin(source.url, source.plugin);
+      const plugin = resolvePlugin(source.url, source.connector);
 
       if (plugin.name === "default") {
         sourceResults.push({
