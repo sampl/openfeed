@@ -1,0 +1,67 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem var(--gutter);
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  /* Hide scrollbar while allowing horizontal scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.header::-webkit-scrollbar {
+  display: none;
+}
+
+.errorCircle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--background-error);
+  color: var(--text-error);
+  transition: opacity 0.1s;
+}
+
+.errorCircle:hover {
+  opacity: 0.8;
+}
+
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 0.125rem;
+}
+
+.tab {
+  flex-shrink: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: var(--sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  white-space: nowrap;
+  transition: background 0.1s, color 0.1s;
+}
+
+.tab:hover {
+  background: var(--background-hover);
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background: var(--background-item);
+  color: var(--text-primary);
+  font-weight: 600;
+}
