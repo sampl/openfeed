@@ -21,9 +21,9 @@ describe("resolvePlugin", () => {
     expect(plugin.name).toBe("rss");
   });
 
-  it("throws when the forced plugin name is unknown", () => {
+  it("throws when the forced connector name is unknown", () => {
     expect(() => resolvePlugin("https://example.com", "non-existent-plugin")).toThrow(
-      'Unknown plugin: "non-existent-plugin"'
+      'Unknown connector: "non-existent-plugin"'
     );
   });
 

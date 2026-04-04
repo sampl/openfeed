@@ -7,7 +7,7 @@ You can create and share your own connectors to pull custom sources into OpenFee
 An OpenFeed connector is a TypeScript module that exports a `BackendFeedPlugin` object with the following shape:
 
 ```typescript
-import type { BackendFeedPlugin, FetchFn, NewFeedItem } from 'openfeed/plugins/types'
+import type { BackendFeedPlugin, FetchFn, PluginFeedItem } from 'openfeed/connectors/types'
 
 const myConnector: BackendFeedPlugin = {
   name: 'my-connector',
@@ -56,7 +56,7 @@ Throw `FeedError` instead of plain `Error` so OpenFeed can record a structured e
 Import `FeedError` from the types module:
 
 ```typescript
-import { FeedError } from 'openfeed/plugins/types'
+import { FeedError } from 'openfeed/connectors/types'
 ```
 
 | Code | When to use |
@@ -126,12 +126,42 @@ describe('myConnector', () => {
 })
 ```
 
-## Publish
+## Loading your connector
 
-Publish your connector to npm with the `openfeed-connector-` prefix so others can discover it:
+### Local file
 
-```bash
-npm publish --access public
+Point to your connector file in `openfeed.yaml` (relative to the config file):
+
+```yaml
+connectors:
+  - ./my-connector.js
+
+feeds:
+  - name: Main
+    sources:
+      - name: My Source
+        url: https://mysite.com
+        connector: my-connector
 ```
 
-We encourage you to share your connectors by opening a PR to add them to the built-in connector list.
+### npm package
+
+Publish your connector and install it on the server, then reference it by package name:
+
+```bash
+npm install openfeed-connector-mysite
+```
+
+```yaml
+connectors:
+  - openfeed-connector-mysite
+
+feeds:
+  - name: Main
+    sources:
+      - name: My Source
+        url: https://mysite.com
+        connector: mysite
+```
+
+Name the npm package with the `openfeed-connector-` prefix so others can discover it. We also welcome PRs to include connectors in the built-in connector list.

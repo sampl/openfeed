@@ -15,7 +15,7 @@ Then configure your source to use the `rss` plugin with the RSSHub URL instead o
 ```yaml
 - name: My TikTok Feed
   url: https://rsshub.app/tiktok/user/@username
-  plugin: rss
+  connector: rss
 ```
 
 This bypasses the need for a TikTok API key and works as long as the RSSHub instance is available.

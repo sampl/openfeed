@@ -44,7 +44,7 @@ feeds:
 |---|---|---|
 | `name` | string | Display name for this source |
 | `url` | string | Source URL |
-| `plugin` | string | Force a specific connector (optional) |
+| `connector` | string | Force a specific connector by name (optional) |
 | `maxItems` | number | Max items to keep from this source |
 | `maxAgeDays` | number | Ignore items older than N days |
 | `expirationDays` | number | Auto-archive items after N days |
@@ -130,3 +130,50 @@ feeds:
 ```
 
 When the daily limit is reached, the feed is blocked until the next day.
+
+## External connectors
+
+You can extend OpenFeed with custom connectors without modifying the server source code. Connectors can be loaded from npm packages or from local files on the server.
+
+### Loading from npm
+
+Install the package on your server and list it under `connectors` in your config:
+
+```yaml
+connectors:
+  - openfeed-connector-mastodon
+  - openfeed-connector-bluesky-lists
+```
+
+Then force a source to use it with the `connector` field:
+
+```yaml
+feeds:
+  - name: Social
+    sources:
+      - name: My Mastodon
+        url: https://mastodon.social/@me
+        connector: mastodon
+```
+
+### Loading local files
+
+Point to a local JS file (relative to the config file) or a directory of connectors:
+
+```yaml
+# Load specific files
+connectors:
+  - ./my-connectors/internal-blog.js
+  - ./my-connectors/company-calendar.js
+
+# Or auto-scan a directory for all connector modules
+connectorsDir: ./my-connectors
+```
+
+The `connectorsDir` directory is scanned for:
+- `*.js` and `*.mjs` files directly in the directory
+- `*/index.js` files in subdirectories
+
+### Writing connectors
+
+See [Writing a connector](./connectors/custom.md) for how to implement the `BackendFeedPlugin` interface.
