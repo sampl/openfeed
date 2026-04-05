@@ -57,9 +57,9 @@ Fetches posts from a [Bluesky](https://bsky.app) profile URL.
 
 **Example URL:** `https://bsky.app/profile/example.bsky.social`
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `limit` | number | `10` | Number of posts to fetch |
+| Option  | Type   | Default | Description              |
+| ------- | ------ | ------- | ------------------------ |
+| `limit` | number | `10`    | Number of posts to fetch |
 
 ## buttondown
 
@@ -107,9 +107,9 @@ Fetches open issues and activity from a [GitHub](https://github.com) repo or use
 
 **Example URL:** `https://github.com/example-org/example-repo`
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `limit` | number | `10` | Max number of open issues to fetch per run |
+| Option  | Type   | Default | Description                                |
+| ------- | ------ | ------- | ------------------------------------------ |
+| `limit` | number | `10`    | Max number of open issues to fetch per run |
 
 ## gmail
 
@@ -125,9 +125,9 @@ Fetches events from a public [Google Calendar](https://calendar.google.com) feed
 
 **Example URL:** `https://calendar.google.com/calendar`
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `icsUrl` | string | — | Public iCal URL from Google Calendar settings (required) |
+| Option        | Type   | Default    | Description                                              |
+| ------------- | ------ | ---------- | -------------------------------------------------------- |
+| `icsUrl`      | string | —          | Public iCal URL from Google Calendar settings (required) |
 | `calendarUrl` | string | source URL | URL to use for items that don't have their own event URL |
 
 ## hacker-news
@@ -168,10 +168,10 @@ Fetches daily puzzles from the [NYT Crossword](https://nytimes.com/crosswords). 
 
 **Example URL:** `https://www.nytimes.com/crosswords`
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `apiKey` | string | — | NYT API key from [developer.nytimes.com](https://developer.nytimes.com) (required) |
-| `limit` | number | `7` | Number of recent puzzles to fetch |
+| Option   | Type   | Default | Description                                                                        |
+| -------- | ------ | ------- | ---------------------------------------------------------------------------------- |
+| `apiKey` | string | —       | NYT API key from [developer.nytimes.com](https://developer.nytimes.com) (required) |
+| `limit`  | number | `7`     | Number of recent puzzles to fetch                                                  |
 
 ## open-meteo
 
@@ -181,11 +181,11 @@ Fetches weather forecasts from the [Open-Meteo](https://open-meteo.com) weather 
 
 Options are passed as query parameters to the API URL. Common options include:
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `temperature_unit` | string | `"celsius"` | Temperature unit (`"celsius"` or `"fahrenheit"`) |
-| `wind_speed_unit` | string | `"kmh"` | Wind speed unit (`"kmh"`, `"mph"`, `"kn"`) |
-| `precipitation_unit` | string | `"mm"` | Precipitation unit (`"mm"` or `"inch"`) |
+| Option               | Type   | Default     | Description                                      |
+| -------------------- | ------ | ----------- | ------------------------------------------------ |
+| `temperature_unit`   | string | `"celsius"` | Temperature unit (`"celsius"` or `"fahrenheit"`) |
+| `wind_speed_unit`    | string | `"kmh"`     | Wind speed unit (`"kmh"`, `"mph"`, `"kn"`)       |
+| `precipitation_unit` | string | `"mm"`      | Precipitation unit (`"mm"` or `"inch"`)          |
 
 ## podcasts
 
@@ -209,11 +209,11 @@ Fetches posts from a [Reddit](https://reddit.com) subreddit or thread URL.
 
 **Example URL:** `https://www.reddit.com/r/programming/`
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `sort` | string | `"top"` | Sort order for posts (`"top"`, `"new"`, `"hot"`) |
-| `time` | string | `"week"` | Time period for sorting (`"day"`, `"week"`, `"month"`, `"year"`, `"all"`) |
-| `limit` | number | `5` | Number of posts to fetch |
+| Option  | Type   | Default  | Description                                                               |
+| ------- | ------ | -------- | ------------------------------------------------------------------------- |
+| `sort`  | string | `"top"`  | Sort order for posts (`"top"`, `"new"`, `"hot"`)                          |
+| `time`  | string | `"week"` | Time period for sorting (`"day"`, `"week"`, `"month"`, `"year"`, `"all"`) |
+| `limit` | number | `5`      | Number of posts to fetch                                                  |
 
 ## reuters
 

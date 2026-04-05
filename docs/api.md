@@ -23,10 +23,10 @@ Returns the running application version and database schema version. Always publ
 }
 ```
 
-| Field | Description |
-|---|---|
-| `version` | The application version, matching the `version` field in `package.json` |
-| `dbVersion` | The highest database migration number that has been applied |
+| Field       | Description                                                             |
+| ----------- | ----------------------------------------------------------------------- |
+| `version`   | The application version, matching the `version` field in `package.json` |
+| `dbVersion` | The highest database migration number that has been applied             |
 
 ## Items
 
@@ -40,12 +40,12 @@ Returns a paginated list of feed items.
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `status` | `unread` \| `archived` \| `read-later` | Filter by status |
-| `feed` | string | Filter by feed name |
-| `limit` | number | Items per page (default: 30) |
-| `offset` | number | Pagination offset (default: 0) |
+| Parameter | Type                                   | Description                    |
+| --------- | -------------------------------------- | ------------------------------ |
+| `status`  | `unread` \| `archived` \| `read-later` | Filter by status               |
+| `feed`    | string                                 | Filter by feed name            |
+| `limit`   | number                                 | Items per page (default: 30)   |
+| `offset`  | number                                 | Pagination offset (default: 0) |
 
 **Response:**
 
@@ -114,10 +114,7 @@ Returns the list of configured feeds from `openfeed.yaml`.
 
 ```json
 {
-  "feeds": [
-    { "name": "Main" },
-    { "name": "Evening" }
-  ]
+  "feeds": [{ "name": "Main" }, { "name": "Evening" }]
 }
 ```
 
@@ -131,9 +128,9 @@ GET /api/runs
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `limit` | number | Results to return (default: 50) |
+| Parameter | Type   | Description                     |
+| --------- | ------ | ------------------------------- |
+| `limit`   | number | Results to return (default: 50) |
 
 **Response:**
 
@@ -187,9 +184,9 @@ GET /api/time/usage
 
 **Query parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `date` | `YYYY-MM-DD` | Date to query (default: today) |
+| Parameter | Type         | Description                    |
+| --------- | ------------ | ------------------------------ |
+| `date`    | `YYYY-MM-DD` | Date to query (default: today) |
 
 **Response:**
 

@@ -40,31 +40,31 @@ feeds:
 
 ### Source options
 
-| Option | Type | Description |
-|---|---|---|
-| `name` | string | Display name for this source |
-| `url` | string | Source URL |
-| `connector` | string | Force a specific connector by name (optional) |
-| `maxItems` | number | Max items to keep from this source |
-| `maxAgeDays` | number | Ignore items older than N days |
-| `expirationDays` | number | Auto-archive items after N days |
+| Option           | Type   | Description                                   |
+| ---------------- | ------ | --------------------------------------------- |
+| `name`           | string | Display name for this source                  |
+| `url`            | string | Source URL                                    |
+| `connector`      | string | Force a specific connector by name (optional) |
+| `maxItems`       | number | Max items to keep from this source            |
+| `maxAgeDays`     | number | Ignore items older than N days                |
+| `expirationDays` | number | Auto-archive items after N days               |
 
 ## Schedule
 
 The `schedule` field uses standard cron syntax: `minute hour day-of-month month day-of-week`. All times are UTC.
 
 ```yaml
-schedule: "0 7 * * *"  # 7am UTC daily (default)
+schedule: "0 7 * * *" # 7am UTC daily (default)
 ```
 
 Common examples:
 
-| Cron | Description |
-|---|---|
-| `"0 11 * * *"` | Daily at 11am UTC (6am EST / 7am EDT) |
-| `"0 14 * * 0"` | Every Sunday at 2pm UTC (9am EST / 10am EDT) |
+| Cron             | Description                                   |
+| ---------------- | --------------------------------------------- |
+| `"0 11 * * *"`   | Daily at 11am UTC (6am EST / 7am EDT)         |
+| `"0 14 * * 0"`   | Every Sunday at 2pm UTC (9am EST / 10am EDT)  |
 | `"0 22 * * 1-5"` | Every weekday at 10pm UTC (5pm EST / 6pm EDT) |
-| `"0 * * * *"` | Every hour |
+| `"0 * * * *"`    | Every hour                                    |
 
 ## Auth
 
@@ -74,8 +74,8 @@ Some sources require API keys. Add them as environment variables in a `.env` fil
 FIRECRAWL_API_KEY=your_firecrawl_api_key_here
 ```
 
-| Variable | Required for |
-|---|---|
+| Variable            | Required for      |
+| ------------------- | ----------------- |
 | `FIRECRAWL_API_KEY` | Instagram sources |
 
 ### Adding environment variables on hosted platforms
@@ -94,7 +94,7 @@ feeds:
   - name: Morning
     schedule: "0 7 * * *"
     timeLimit:
-      daily: 30    # minutes
+      daily: 30 # minutes
     sources:
       - name: New York Times
         url: https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
@@ -124,8 +124,8 @@ Optionally cap reading time per feed per day or week:
 feeds:
   - name: Main
     timeLimit:
-      daily: 30    # minutes
-      weekly: 180  # minutes
+      daily: 30 # minutes
+      weekly: 180 # minutes
     sources: ...
 ```
 
@@ -171,6 +171,7 @@ connectorsDir: ./my-connectors
 ```
 
 The `connectorsDir` directory is scanned for:
+
 - `*.js` and `*.mjs` files directly in the directory
 - `*/index.js` files in subdirectories
 

@@ -41,6 +41,7 @@ OpenFeed comes with one official client, bundled with the server when you instal
 - Web - React-based; supports PWAs, mobile web, and desktop.
 
 Ideas for OpenFeed clients:
+
 - Native mobile - native iOS and Android apps for browsing your OpenFeed
 - Print - automatically print the news each day
 - CLI - browse your feed from the terminal

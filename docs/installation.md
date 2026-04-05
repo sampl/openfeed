@@ -142,7 +142,7 @@ name: Deploy openfeed
 on:
   push:
     paths:
-      - 'openfeed/**'
+      - "openfeed/**"
     branches: [main]
 
 jobs:
