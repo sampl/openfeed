@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginAS2Object } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface GitHubIssue {
@@ -11,7 +11,6 @@ interface GitHubIssue {
   state: string;
 }
 
-// Extract owner and repo from a github.com/{owner}/{repo} URL
 const extractOwnerRepo = (sourceUrl: string): { owner: string; repo: string } => {
   const match = sourceUrl.match(/github\.com\/([^/?#]+)\/([^/?#]+)/i);
   if (!match?.[1] || !match[2]) throw new FeedError(`Could not parse owner/repo from URL: ${sourceUrl}`, "invalid_config");
@@ -21,12 +20,10 @@ const extractOwnerRepo = (sourceUrl: string): { owner: string; repo: string } =>
 const githubPlugin: BackendFeedPlugin = {
   name: "github",
 
-  // Matches github.com/{owner}/{repo} — requires at least two path segments
   canHandle: (sourceUrl) => /github\.com\/[^/?#]+\/[^/?#]+/.test(sourceUrl),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn, _context, options = {}): Promise<readonly PluginAS2Object[]> => {
     const { owner, repo } = extractOwnerRepo(sourceUrl);
-
     const limit = typeof options.limit === "number" ? options.limit : 10;
 
     const params = new URLSearchParams({
@@ -47,25 +44,21 @@ const githubPlugin: BackendFeedPlugin = {
     } as RequestInit);
 
     if (!response.ok) {
-      const code = response.status === 404 ? "source_not_found" : response.status === 401 || response.status === 403 ? "auth_error" : response.status === 429 ? "rate_limited" : "network_error";
+      const code = response.status === 404 ? "source_not_found"
+        : (response.status === 401 || response.status === 403) ? "auth_error"
+        : response.status === 429 ? "rate_limited"
+        : "network_error";
       throw new FeedError(`GitHub API error: ${response.status} ${response.statusText}`, code);
     }
 
     const issues = (await response.json()) as GitHubIssue[];
-    const sourceName = `${owner}/${repo}`;
 
-    return issues.map((issue): PluginFeedItem => ({
-      sourceName,
-      sourceUrl,
-      title: `#${issue.number}: ${issue.title}`,
-      description: issue.body != null ? issue.body.slice(0, 300) || undefined : undefined,
+    return issues.map((issue): PluginAS2Object => ({
+      type: "Article",
+      name: `#${issue.number}: ${issue.title}`,
+      summary: issue.body != null ? issue.body.slice(0, 300) || undefined : undefined,
       url: issue.html_url,
-      publishedAt: new Date(issue.created_at),
-      renderData: {
-        richText: {
-          text: issue.body ?? issue.title,
-        },
-      },
+      published: new Date(issue.created_at),
     }));
   },
 };

@@ -31,6 +31,8 @@ describe("medium canHandle", () => {
   });
 });
 
+const mockContext = { sourceName: "Test Source", sourceUrl: "https://medium.com" };
+
 describe("medium listItems — with username", () => {
   it("extracts username and fetches user-specific feed", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
@@ -40,11 +42,9 @@ describe("medium listItems — with username", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://medium.com/feed/@johndoe");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("An Interesting Article");
-    expect(item.sourceName).toBe("Medium - @johndoe");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Medium article content</p>", text: "Medium article content" },
-    });
+    expect(item.name).toBe("An Interesting Article");
+    expect(item.content).toBe("<p>Medium article content</p>");
+    expect(item.summary).toBe("Medium article content");
   });
 });
 
@@ -56,7 +56,6 @@ describe("medium listItems — without username", () => {
 
     expect(fetchFn).toHaveBeenCalledWith("https://medium.com/feed");
     expect(items).toHaveLength(1);
-    expect(items[0]!.sourceName).toBe("Medium");
   });
 });
 
@@ -65,7 +64,7 @@ describe("medium listItems — options.feed override", () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://medium.com/feed/tag/typescript";
 
-    await plugin.listItems("https://medium.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://medium.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

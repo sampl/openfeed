@@ -32,6 +32,8 @@ describe("wall-street-journal canHandle", () => {
 });
 
 describe("wall-street-journal listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,8 +42,7 @@ describe("wall-street-journal listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://feeds.a.dj.com/rss/RSSWorldNews.xml");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("World Markets Update");
-    expect(item.sourceName).toBe("The Wall Street Journal");
+    expect(item.name).toBe("World Markets Update");
     expect(item.url).toBe("https://www.wsj.com/articles/world-markets-update");
   });
 
@@ -49,7 +50,7 @@ describe("wall-street-journal listItems", () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://feeds.a.dj.com/rss/RSSMarketsMain.xml";
 
-    await plugin.listItems("https://www.wsj.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.wsj.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

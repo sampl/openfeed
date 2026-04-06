@@ -48,7 +48,7 @@ describe("buttondown listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://buttondown.com/hacker-newsletter/rss");
   });
 
-  it("parses feed items and returns PluginFeedItem array", async () => {
+  it("parses feed items and returns PluginAS2Object array", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
     const items = await buttondownPlugin.listItems(
@@ -58,17 +58,11 @@ describe("buttondown listItems", () => {
 
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Issue #123: Top links from Hacker News");
-    expect(item.sourceName).toBe("Hacker Newsletter");
-    expect(item.sourceUrl).toBe("https://buttondown.com/hacker-newsletter/archive");
+    expect(item.name).toBe("Issue #123: Top links from Hacker News");
     expect(item.url).toBe("https://buttondown.com/hacker-newsletter/archive/issue-123");
-    expect(item.publishedAt).toEqual(new Date("Fri, 15 Mar 2024 10:00:00 +0000"));
-    expect(item.renderData).toMatchObject({
-      richText: {
-        html: "<p>This week in HN: AI, open source tools, and more.</p>",
-        text: "This week in HN: AI, open source tools, and more.",
-      },
-    });
+    expect(item.published).toEqual(new Date("Fri, 15 Mar 2024 10:00:00 +0000"));
+    expect(item.content).toBe("<p>This week in HN: AI, open source tools, and more.</p>");
+    expect(item.summary).toBe("This week in HN: AI, open source tools, and more.");
   });
 });
 

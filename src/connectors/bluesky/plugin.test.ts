@@ -37,6 +37,8 @@ describe("bluesky canHandle", () => {
   });
 });
 
+const mockContext = { sourceName: "Test Source", sourceUrl: "https://bsky.app/profile/foo.bsky.social" };
+
 describe("bluesky listItems", () => {
   it("extracts handle and maps posts to feed items", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
@@ -54,16 +56,13 @@ describe("bluesky listItems", () => {
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.sourceName).toBe("@foo.bsky.social");
-    expect(first.title).toBe("Hello from Bluesky!");
     expect(first.url).toBe("https://bsky.app/profile/foo.bsky.social/post/rkey001");
-    expect(first.publishedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
-    expect(first.renderData).toMatchObject({
-      richText: { text: "Hello from Bluesky!\nThis is a multiline post." },
-    });
+    expect(first.published).toEqual(new Date("2024-01-15T10:00:00.000Z"));
+    expect(first.content).toBe("Hello from Bluesky!\nThis is a multiline post.");
+    expect(first.summary).toBe("Hello from Bluesky!\nThis is a multiline post.");
   });
 
-  it("truncates title to 80 chars for long first lines", async () => {
+  it("summary is capped at 200 chars for long posts", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => SAMPLE_BSKY_RESPONSE,
@@ -75,7 +74,7 @@ describe("bluesky listItems", () => {
     );
 
     const second = items[1]!;
-    expect(second.title.length).toBe(80);
+    expect(second.summary?.length).toBeLessThanOrEqual(200);
   });
 
   it("uses limit option in API request", async () => {
@@ -87,6 +86,7 @@ describe("bluesky listItems", () => {
     await blueskyPlugin.listItems(
       "https://bsky.app/profile/foo.bsky.social",
       fetchFn,
+      mockContext,
       { limit: 20 }
     );
 

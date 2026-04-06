@@ -8,19 +8,19 @@
  * fixture data or throw FeedErrors.
  *
  * These tests verify end-to-end behaviour:
- *   POST /api/fetch  →  fetcher runs plugins, stores items
- *   GET  /api/items  →  returns stored items
- *   GET  /api/runs   →  returns run history with source results
- *   GET  /api/sources →  returns sources with last-run status
- *   PATCH /api/items/:id →  updates item status
- *   GET  /api/feeds  →  returns configured feeds
+ *   POST /api/fetch     →  fetcher runs plugins, stores objects
+ *   GET  /api/objects   →  returns stored objects
+ *   GET  /api/runs      →  returns run history with source results
+ *   GET  /api/sources   →  returns sources with last-run status
+ *   POST /api/activities →  creates Read/Add activity for an object
+ *   GET  /api/feeds     →  returns configured feeds
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createServer as createHttpServer } from "http";
 import type { AddressInfo } from "net";
 import { createSqliteDb } from "./db/sqlite.js";
 import { createServer as createExpressApp } from "./server.js";
-import type { PluginFeedItem } from "../connectors/types.js";
+import type { PluginAS2Object } from "../connectors/types.js";
 import { FeedError } from "../connectors/types.js";
 import {
   SAMPLE_HN_RESPONSE,
@@ -34,9 +34,9 @@ vi.mock("./pluginRegistry.js", () => ({ resolvePlugin: vi.fn() }));
 import { resolvePlugin } from "./pluginRegistry.js";
 const mockResolvePlugin = resolvePlugin as ReturnType<typeof vi.fn>;
 
-// Set a safe default so calls from the items router (which resolves plugin icons
-// per-item on GET /api/items) never receive undefined after mockReturnValueOnce
-// values set up for runFetch are exhausted.
+// Set a safe default so calls from the objects router (which resolves plugin
+// icons per-object) never receive undefined after mockReturnValueOnce values
+// set up for runFetch are exhausted.
 beforeEach(() => {
   mockResolvePlugin.mockReturnValue({ name: "rss", icon: undefined });
 });
@@ -58,23 +58,24 @@ const makeConfig = () => ({
   ],
 });
 
-/** Build a fake PluginFeedItem with sensible defaults.
- * Uses a recent publishedAt so items are not filtered by the default maxAgeDays=30. */
-const makeFeedItem = (overrides: Partial<PluginFeedItem> = {}): PluginFeedItem => ({
-  sourceName: "Hacker News",
-  sourceUrl: "https://news.ycombinator.com",
-  title: "Test Item",
+/**
+ * Build a fake PluginAS2Object with sensible defaults.
+ * Uses a recent published date so objects are not filtered by the default maxAgeDays=30.
+ */
+const makePluginObject = (overrides: Partial<PluginAS2Object> = {}): PluginAS2Object => ({
+  type: "Article",
+  name: "Test Item",
   url: `https://example.com/item-${Math.random().toString(36).slice(2)}`,
-  publishedAt: new Date(), // Use current time so items pass the maxAgeDays filter
-  renderData: { richText: { text: "Test content" } },
+  published: new Date(), // Use current time so objects pass the maxAgeDays filter
+  content: "Test content",
   ...overrides,
 });
 
-/** Build a fake plugin whose listItems resolves with the supplied items. */
-const makePlugin = (name: string, items: PluginFeedItem[]) => ({
+/** Build a fake plugin whose listItems resolves with the supplied objects. */
+const makePlugin = (name: string, objects: PluginAS2Object[]) => ({
   name,
   canHandle: vi.fn(() => true),
-  listItems: vi.fn(async () => items),
+  listItems: vi.fn(async () => objects),
 });
 
 /** Build a fake plugin whose listItems throws the supplied error. */
@@ -102,7 +103,7 @@ const startServer = async () => {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe("Integration: successful fetch populates the items endpoint", () => {
+describe("Integration: successful fetch populates the objects endpoint", () => {
   let baseUrl: string;
   let close: () => Promise<void>;
 
@@ -115,18 +116,16 @@ describe("Integration: successful fetch populates the items endpoint", () => {
     await close();
   });
 
-  it("POST /api/fetch stores items and GET /api/items returns them", async () => {
-    const hnItem = makeFeedItem({ title: "Show HN: Something cool", url: "https://news.ycombinator.com/item?id=1" });
-    const ghItem = makeFeedItem({
-      sourceName: "GitHub",
-      sourceUrl: "https://github.com/sampl/openfeed",
-      title: "Fix the bug",
+  it("POST /api/fetch stores objects and GET /api/objects returns them", async () => {
+    const hnObj = makePluginObject({ name: "Show HN: Something cool", url: "https://news.ycombinator.com/item?id=1" });
+    const ghObj = makePluginObject({
+      name: "Fix the bug",
       url: "https://github.com/sampl/openfeed/issues/42",
     });
 
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [hnItem]))
-      .mockReturnValueOnce(makePlugin("github", [ghItem]));
+      .mockReturnValueOnce(makePlugin("hacker-news", [hnObj]))
+      .mockReturnValueOnce(makePlugin("github", [ghObj]));
 
     const fetchRes = await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
     expect(fetchRes.status).toBe(200);
@@ -134,18 +133,18 @@ describe("Integration: successful fetch populates the items endpoint", () => {
     expect(success).toBe(true);
     expect(typeof runId).toBe("string");
 
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    expect(itemsRes.status).toBe(200);
-    const { items } = await itemsRes.json() as { items: Array<{ title: string }> };
-    const titles = items.map((i) => i.title);
-    expect(titles).toContain("Show HN: Something cool");
-    expect(titles).toContain("Fix the bug");
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    expect(objectsRes.status).toBe(200);
+    const { items } = await objectsRes.json() as { items: Array<{ name: string }> };
+    const names = items.map((i) => i.name);
+    expect(names).toContain("Show HN: Something cool");
+    expect(names).toContain("Fix the bug");
   });
 
   it("GET /api/runs shows a successful run with source results after fetch", async () => {
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [makeFeedItem()]))
-      .mockReturnValueOnce(makePlugin("github", [makeFeedItem({ url: "https://github.com/item-2" })]));
+      .mockReturnValueOnce(makePlugin("hacker-news", [makePluginObject()]))
+      .mockReturnValueOnce(makePlugin("github", [makePluginObject({ url: "https://github.com/item-2" })]));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
@@ -193,13 +192,13 @@ describe("Integration: rate-limited source records error in run", () => {
     await close();
   });
 
-  it("run status is error and errorCode is rate_limited; no items stored", async () => {
+  it("run status is error and errorCode is rate_limited; no objects stored for that source", async () => {
     const rateLimitedPlugin = makeErrorPlugin(
       "hacker-news",
       new FeedError("Failed to fetch feed: HTTP 429", "rate_limited")
     );
     const successPlugin = makePlugin("github", [
-      makeFeedItem({ url: "https://github.com/item-ok", sourceName: "GitHub", sourceUrl: "https://github.com/sampl/openfeed" }),
+      makePluginObject({ url: "https://github.com/item-ok" }),
     ]);
 
     // HN is rate-limited; GitHub succeeds
@@ -220,9 +219,9 @@ describe("Integration: rate-limited source records error in run", () => {
     expect(hnResult!.status).toBe("error");
     expect(hnResult!.errorCode).toBe("rate_limited");
 
-    // GitHub item should still appear
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    const { items } = await itemsRes.json() as { items: unknown[] };
+    // GitHub object should still appear
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await objectsRes.json() as { items: unknown[] };
     expect(items).toHaveLength(1);
   });
 });
@@ -240,28 +239,28 @@ describe("Integration: mixed success and failure across two sources", () => {
     await close();
   });
 
-  it("stores items only from the successful source", async () => {
-    const hnItems = [
-      makeFeedItem({ title: "HN Post 1", url: "https://hn.example.com/1" }),
-      makeFeedItem({ title: "HN Post 2", url: "https://hn.example.com/2" }),
+  it("stores objects only from the successful source", async () => {
+    const hnObjects = [
+      makePluginObject({ name: "HN Post 1", url: "https://hn.example.com/1" }),
+      makePluginObject({ name: "HN Post 2", url: "https://hn.example.com/2" }),
     ];
 
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", hnItems))
+      .mockReturnValueOnce(makePlugin("hacker-news", hnObjects))
       .mockReturnValueOnce(makeErrorPlugin("github", new FeedError("Not found", "source_not_found")));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    const { items } = await itemsRes.json() as { items: Array<{ title: string }> };
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await objectsRes.json() as { items: Array<{ name: string }> };
     expect(items).toHaveLength(2);
-    expect(items.map((i) => i.title)).toContain("HN Post 1");
-    expect(items.map((i) => i.title)).toContain("HN Post 2");
+    expect(items.map((i) => i.name)).toContain("HN Post 1");
+    expect(items.map((i) => i.name)).toContain("HN Post 2");
   });
 
   it("run has one success and one error in sourceResults", async () => {
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [makeFeedItem()]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [makePluginObject()]))
       .mockReturnValueOnce(makeErrorPlugin("github", new FeedError("Auth required", "auth_error")));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
@@ -279,7 +278,7 @@ describe("Integration: mixed success and failure across two sources", () => {
   });
 });
 
-describe("Integration: multiple sequential fetches deduplicate items", () => {
+describe("Integration: multiple sequential fetches deduplicate objects", () => {
   let baseUrl: string;
   let close: () => Promise<void>;
 
@@ -292,20 +291,20 @@ describe("Integration: multiple sequential fetches deduplicate items", () => {
     await close();
   });
 
-  it("items with the same URL are not duplicated across two fetches", async () => {
+  it("objects with the same URL are not duplicated across two fetches", async () => {
     const stableUrl = "https://hn.example.com/stable-item";
-    const item = makeFeedItem({ title: "Stable Item", url: stableUrl });
+    const obj = makePluginObject({ name: "Stable Item", url: stableUrl });
 
-    // Two fetches, same item URL both times
+    // Two fetches, same object URL both times
     mockResolvePlugin
-      .mockReturnValue(makePlugin("hacker-news", [item]));
+      .mockReturnValue(makePlugin("hacker-news", [obj]));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    const { items } = await itemsRes.json() as { items: unknown[] };
-    // Item is stored only once despite two fetches
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await objectsRes.json() as { items: unknown[] };
+    // Object is stored only once despite two fetches
     expect(items).toHaveLength(1);
 
     // But two runs are recorded
@@ -314,28 +313,28 @@ describe("Integration: multiple sequential fetches deduplicate items", () => {
     expect(runs).toHaveLength(2);
   });
 
-  it("new items from subsequent fetches are added alongside existing ones", async () => {
-    const item1 = makeFeedItem({ title: "First Fetch Item", url: "https://hn.example.com/item-1" });
-    const item2 = makeFeedItem({ title: "Second Fetch Item", url: "https://hn.example.com/item-2" });
+  it("new objects from subsequent fetches are added alongside existing ones", async () => {
+    const obj1 = makePluginObject({ name: "First Fetch Item", url: "https://hn.example.com/item-1" });
+    const obj2 = makePluginObject({ name: "Second Fetch Item", url: "https://hn.example.com/item-2" });
 
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [item1]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [obj1]))
       .mockReturnValueOnce(makePlugin("github", []))
-      .mockReturnValueOnce(makePlugin("hacker-news", [item1, item2]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [obj1, obj2]))
       .mockReturnValueOnce(makePlugin("github", []));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    const { items } = await itemsRes.json() as { items: Array<{ title: string }> };
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await objectsRes.json() as { items: Array<{ name: string }> };
     expect(items).toHaveLength(2);
-    expect(items.map((i) => i.title)).toContain("First Fetch Item");
-    expect(items.map((i) => i.title)).toContain("Second Fetch Item");
+    expect(items.map((i) => i.name)).toContain("First Fetch Item");
+    expect(items.map((i) => i.name)).toContain("Second Fetch Item");
   });
 });
 
-describe("Integration: item status update flow", () => {
+describe("Integration: activity creation flow", () => {
   let baseUrl: string;
   let close: () => Promise<void>;
 
@@ -348,46 +347,105 @@ describe("Integration: item status update flow", () => {
     await close();
   });
 
-  it("PATCH /api/items/:id moves item from unread to archived", async () => {
-    const item = makeFeedItem({ title: "Archivable Item", url: "https://hn.example.com/archive-me" });
+  it("POST /api/activities with type=Read removes object from unread view", async () => {
+    const obj = makePluginObject({ name: "Readable Item", url: "https://hn.example.com/read-me" });
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [item]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [obj]))
       .mockReturnValueOnce(makePlugin("github", []));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    // Get the stored item's id
-    const unreadRes = await fetch(`${baseUrl}/api/items?status=unread`);
-    const { items: unreadItems } = await unreadRes.json() as { items: Array<{ id: string; title: string }> };
-    const stored = unreadItems.find((i) => i.title === "Archivable Item")!;
+    // Get the stored object's id from the unread view
+    const unreadRes = await fetch(`${baseUrl}/api/objects?view=unread`);
+    const { items: unreadItems } = await unreadRes.json() as { items: Array<{ id: string; name: string }> };
+    const stored = unreadItems.find((i) => i.name === "Readable Item")!;
     expect(stored).toBeDefined();
 
-    // Archive it
-    const patchRes = await fetch(`${baseUrl}/api/items/${stored.id}`, {
-      method: "PATCH",
+    // Mark it as Read
+    const actRes = await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "archived" }),
+      body: JSON.stringify({ type: "Read", objectId: stored.id }),
     });
-    expect(patchRes.status).toBe(200);
+    expect(actRes.status).toBe(201);
 
     // Verify it no longer appears in unread
-    const unreadAfter = await fetch(`${baseUrl}/api/items?status=unread`);
+    const unreadAfter = await fetch(`${baseUrl}/api/objects?view=unread`);
     const { items: remaining } = await unreadAfter.json() as { items: Array<{ id: string }> };
     expect(remaining.every((i) => i.id !== stored.id)).toBe(true);
-
-    // Verify it appears in archived
-    const archivedRes = await fetch(`${baseUrl}/api/items?status=archived`);
-    const { items: archived } = await archivedRes.json() as { items: Array<{ id: string }> };
-    expect(archived.some((i) => i.id === stored.id)).toBe(true);
   });
 
-  it("PATCH /api/items/:id returns 400 for invalid status", async () => {
-    const res = await fetch(`${baseUrl}/api/items/some-id`, {
-      method: "PATCH",
+  it("POST /api/activities with type=Add saves object to saved view", async () => {
+    const obj = makePluginObject({ name: "Saveable Item", url: "https://hn.example.com/save-me" });
+    mockResolvePlugin
+      .mockReturnValueOnce(makePlugin("hacker-news", [obj]))
+      .mockReturnValueOnce(makePlugin("github", []));
+
+    await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
+
+    const allRes = await fetch(`${baseUrl}/api/objects?view=all`);
+    const { items } = await allRes.json() as { items: Array<{ id: string; name: string }> };
+    const stored = items.find((i) => i.name === "Saveable Item")!;
+    expect(stored).toBeDefined();
+
+    // Add it to saved
+    const actRes = await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "deleted" }),
+      body: JSON.stringify({ type: "Add", objectId: stored.id, target: { type: "Collection", name: "read-later" } }),
+    });
+    expect(actRes.status).toBe(201);
+
+    // Verify it appears in saved view
+    const savedRes = await fetch(`${baseUrl}/api/objects?view=saved`);
+    const { items: savedItems } = await savedRes.json() as { items: Array<{ id: string }> };
+    expect(savedItems.some((i) => i.id === stored.id)).toBe(true);
+  });
+
+  it("POST /api/activities returns 400 for invalid type", async () => {
+    const res = await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "Delete", objectId: "some-id" }),
     });
     expect(res.status).toBe(400);
+  });
+
+  it("POST /api/activities returns 404 for unknown objectId", async () => {
+    const res = await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "Read", objectId: "nonexistent-id" }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("POST /api/activities returns 409 when Read activity already exists", async () => {
+    const obj = makePluginObject({ name: "Already Read", url: "https://hn.example.com/already-read" });
+    mockResolvePlugin
+      .mockReturnValueOnce(makePlugin("hacker-news", [obj]))
+      .mockReturnValueOnce(makePlugin("github", []));
+
+    await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
+
+    const allRes = await fetch(`${baseUrl}/api/objects?view=all`);
+    const { items } = await allRes.json() as { items: Array<{ id: string; name: string }> };
+    const stored = items.find((i) => i.name === "Already Read")!;
+
+    // First Read — succeeds
+    await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "Read", objectId: stored.id }),
+    });
+
+    // Second Read — conflict
+    const conflictRes = await fetch(`${baseUrl}/api/activities`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "Read", objectId: stored.id }),
+    });
+    expect(conflictRes.status).toBe(409);
   });
 });
 
@@ -406,7 +464,7 @@ describe("Integration: sources endpoint reflects last-run status", () => {
 
   it("sources show success and error status after a mixed fetch", async () => {
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [makeFeedItem()]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [makePluginObject()]))
       .mockReturnValueOnce(makeErrorPlugin("github", new FeedError("Rate limited", "rate_limited")));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
@@ -465,8 +523,8 @@ describe("Integration: network error is captured in run", () => {
       expect(r.errorCode).toBe("network_error");
     });
 
-    const itemsRes = await fetch(`${baseUrl}/api/items`);
-    const { items } = await itemsRes.json() as { items: unknown[] };
+    const objectsRes = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await objectsRes.json() as { items: unknown[] };
     expect(items).toHaveLength(0);
   });
 });
@@ -484,79 +542,74 @@ describe("Integration: fixture-driven fetch scenarios", () => {
     await close();
   });
 
-  it("items from SAMPLE_HN_RESPONSE fixture are stored and retrievable", async () => {
-    // Build items that mirror what the real HN plugin would return from SAMPLE_HN_RESPONSE.
-    // Use new Date() for publishedAt so items pass the default maxAgeDays=30 filter.
-    const hnItems: PluginFeedItem[] = SAMPLE_HN_RESPONSE.hits.map((hit) => ({
-      sourceName: "Hacker News",
-      sourceUrl: "https://news.ycombinator.com",
-      title: hit.title,
+  it("objects from SAMPLE_HN_RESPONSE fixture are stored and retrievable", async () => {
+    // Build objects that mirror what the real HN plugin would return from SAMPLE_HN_RESPONSE.
+    const hnObjects: PluginAS2Object[] = SAMPLE_HN_RESPONSE.hits.map((hit) => ({
+      type: "Article" as const,
+      name: hit.title,
       url: hit.url,
-      publishedAt: new Date(), // recent date so items aren't filtered out
-      renderData: {
-        richText: { text: `${hit.points} points, ${hit.num_comments} comments` },
-      },
+      published: new Date(), // recent date so objects aren't filtered out
+      content: `${hit.points} points, ${hit.num_comments} comments`,
     }));
 
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", hnItems))
+      .mockReturnValueOnce(makePlugin("hacker-news", hnObjects))
       .mockReturnValueOnce(makePlugin("github", []));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const res = await fetch(`${baseUrl}/api/items`);
-    const { items } = await res.json() as { items: Array<{ title: string; url: string }> };
-    expect(items[0]!.title).toBe("Show HN: Something interesting");
+    const res = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await res.json() as { items: Array<{ name: string; url: string }> };
+    expect(items[0]!.name).toBe("Show HN: Something interesting");
     expect(items[0]!.url).toBe("https://example.com/interesting");
   });
 
-  it("items from SAMPLE_GITHUB_ISSUES_RESPONSE fixture are stored and retrievable", async () => {
-    const ghItems: PluginFeedItem[] = SAMPLE_GITHUB_ISSUES_RESPONSE.map((issue) => ({
-      sourceName: "GitHub",
-      sourceUrl: "https://github.com/sampl/openfeed",
-      title: `#${issue.number} ${issue.title}`,
+  it("objects from SAMPLE_GITHUB_ISSUES_RESPONSE fixture are stored and retrievable", async () => {
+    const ghObjects: PluginAS2Object[] = SAMPLE_GITHUB_ISSUES_RESPONSE.map((issue) => ({
+      type: "Article" as const,
+      name: `#${issue.number} ${issue.title}`,
       url: issue.html_url,
-      publishedAt: new Date(), // recent date so items aren't filtered out
-      renderData: { richText: { text: issue.body ?? "" } },
+      published: new Date(), // recent date so objects aren't filtered out
+      content: issue.body ?? "",
     }));
 
     mockResolvePlugin
       .mockReturnValueOnce(makePlugin("hacker-news", []))
-      .mockReturnValueOnce(makePlugin("github", ghItems));
+      .mockReturnValueOnce(makePlugin("github", ghObjects));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const res = await fetch(`${baseUrl}/api/items`);
-    const { items } = await res.json() as { items: Array<{ title: string }> };
-    expect(items[0]!.title).toBe("#42 Fix the thing");
+    const res = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await res.json() as { items: Array<{ name: string }> };
+    expect(items[0]!.name).toBe("#42 Fix the thing");
   });
 
-  it("items from SAMPLE_BLUESKY_RESPONSE fixture have correct sourceNames", async () => {
-    const bskyItems: PluginFeedItem[] = SAMPLE_BLUESKY_RESPONSE.feed.map((entry) => {
+  it("objects from SAMPLE_BLUESKY_RESPONSE fixture have correct sourceName", async () => {
+    const bskyObjects: PluginAS2Object[] = SAMPLE_BLUESKY_RESPONSE.feed.map((entry) => {
       const rkey = entry.post.uri.split("/").pop() ?? "";
       return {
-        sourceName: "Bluesky",
-        sourceUrl: "https://bsky.app/profile/user.bsky.social",
-        title: entry.post.record.text.slice(0, 80),
+        type: "Note" as const,
+        content: entry.post.record.text,
+        summary: entry.post.record.text.slice(0, 200),
         url: `https://bsky.app/profile/${entry.post.author.handle}/post/${rkey}`,
-        publishedAt: new Date(), // recent date so items aren't filtered out
-        renderData: { richText: { text: entry.post.record.text } },
+        published: new Date(), // recent date so objects aren't filtered out
       };
     });
 
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("bluesky", bskyItems))
+      .mockReturnValueOnce(makePlugin("bluesky", bskyObjects))
       .mockReturnValueOnce(makePlugin("github", []));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const res = await fetch(`${baseUrl}/api/items`);
-    const { items } = await res.json() as { items: Array<{ title: string }> };
-    expect(items[0]!.title).toContain("Hello from Bluesky");
+    const res = await fetch(`${baseUrl}/api/objects`);
+    const { items } = await res.json() as { items: Array<{ content: string; sourceName: string }> };
+    expect(items[0]!.content).toContain("Hello from Bluesky");
+    expect(items[0]!.sourceName).toBe("Hacker News"); // sourceName comes from config (first source in "Tech" feed)
   });
 });
 
-describe("Integration: feed filter on GET /api/items", () => {
+describe("Integration: feed filter on GET /api/objects", () => {
   let baseUrl: string;
   let close: () => Promise<void>;
 
@@ -569,21 +622,21 @@ describe("Integration: feed filter on GET /api/items", () => {
     await close();
   });
 
-  it("returns only items belonging to the requested feed", async () => {
-    const hnItem = makeFeedItem({ title: "HN Post", url: "https://hn.example.com/post" });
+  it("returns only objects belonging to the requested feed", async () => {
+    const hnObj = makePluginObject({ name: "HN Post", url: "https://hn.example.com/post" });
 
     // Both sources are in the "Tech" feed; after fetch, filter by feedName
     mockResolvePlugin
-      .mockReturnValueOnce(makePlugin("hacker-news", [hnItem]))
+      .mockReturnValueOnce(makePlugin("hacker-news", [hnObj]))
       .mockReturnValueOnce(makePlugin("github", []));
 
     await fetch(`${baseUrl}/api/fetch`, { method: "POST" });
 
-    const techRes = await fetch(`${baseUrl}/api/items?feed=Tech`);
+    const techRes = await fetch(`${baseUrl}/api/objects?feed=Tech`);
     const { items: techItems } = await techRes.json() as { items: unknown[] };
     expect(techItems).toHaveLength(1);
 
-    const unknownFeedRes = await fetch(`${baseUrl}/api/items?feed=NonExistent`);
+    const unknownFeedRes = await fetch(`${baseUrl}/api/objects?feed=NonExistent`);
     const { items: noItems } = await unknownFeedRes.json() as { items: unknown[] };
     expect(noItems).toHaveLength(0);
   });

@@ -51,38 +51,32 @@ describe("open-meteo plugin", () => {
       const fetchFn = vi.fn().mockResolvedValue(makeResponse(SAMPLE_RESPONSE));
       const items = await plugin.listItems(BROOKLYN_URL, fetchFn);
 
-      expect(items[0]!.title).toBe("Brooklyn Weather");
-      expect(items[0]!.sourceName).toBe("Brooklyn Weather");
+      expect(items).toHaveLength(1);
+      expect(items[0]!.type).toBe("Note");
     });
 
     it("falls back to 'Current Weather' for non-Brooklyn coordinates", async () => {
       const fetchFn = vi.fn().mockResolvedValue(makeResponse(SAMPLE_RESPONSE));
       const items = await plugin.listItems(GENERIC_URL, fetchFn);
 
-      expect(items[0]!.title).toBe("Current Weather");
+      expect(items[0]!.type).toBe("Note");
     });
 
     it("builds a summary containing temperature and description", async () => {
       const fetchFn = vi.fn().mockResolvedValue(makeResponse(SAMPLE_RESPONSE));
       const items = await plugin.listItems(BROOKLYN_URL, fetchFn);
 
-      const renderData = items[0]!.renderData;
-      if ("richText" in renderData && renderData.richText) {
-        expect(renderData.richText.text).toContain("8.5°C");
-        expect(renderData.richText.text).toContain("Overcast");
-        expect(renderData.richText.text).toContain("12.3 km/h");
-      }
+      expect(items[0]!.content).toContain("8.5°C");
+      expect(items[0]!.content).toContain("Overcast");
+      expect(items[0]!.content).toContain("12.3 km/h");
     });
 
     it("includes high/low when hourly data is present", async () => {
       const fetchFn = vi.fn().mockResolvedValue(makeResponse(SAMPLE_RESPONSE));
       const items = await plugin.listItems(BROOKLYN_URL, fetchFn);
 
-      const renderData = items[0]!.renderData;
-      if ("richText" in renderData && renderData.richText) {
-        expect(renderData.richText.text).toContain("High:");
-        expect(renderData.richText.text).toContain("Low:");
-      }
+      expect(items[0]!.content).toContain("High:");
+      expect(items[0]!.content).toContain("Low:");
     });
 
     it("uses an unknown weather code fallback description", async () => {
@@ -93,10 +87,7 @@ describe("open-meteo plugin", () => {
       const fetchFn = vi.fn().mockResolvedValue(makeResponse(response));
       const items = await plugin.listItems(BROOKLYN_URL, fetchFn);
 
-      const renderData = items[0]!.renderData;
-      if ("richText" in renderData && renderData.richText) {
-        expect(renderData.richText.text).toContain("Weather code 999");
-      }
+      expect(items[0]!.content).toContain("Weather code 999");
     });
 
     it("URL is date-suffixed for replace-mode dedup", async () => {

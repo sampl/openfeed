@@ -64,18 +64,15 @@ describe("instagram plugin", () => {
 
       expect(items).toHaveLength(1);
       const item = items[0]!;
-      expect(item.title).toBe("Recent posts from @nasa");
-      expect(item.sourceName).toBe("@nasa");
+      expect(item.name).toBe("Recent posts from @nasa");
       // URL should contain the profile URL and today's date
       expect(item.url).toMatch(/^https:\/\/www\.instagram\.com\/nasa\/#\d{4}-\d{2}-\d{2}$/);
       // richText should be capped at 500 chars
-      expect(item.renderData).toMatchObject({
-        embed: { url: "https://www.instagram.com/nasa/" },
-        richText: { text: expect.any(String) },
-      });
-      if ("richText" in item.renderData && item.renderData.richText) {
-        expect(item.renderData.richText.text.length).toBeLessThanOrEqual(500);
-      }
+      expect(typeof item.summary).toBe("string");
+      expect(item.summary!.length).toBeLessThanOrEqual(500);
+      expect(item.attachment).toBeDefined();
+      expect(item.attachment![0]!.href).toBe("https://www.instagram.com/nasa/");
+      expect(item.attachment![0]!.rel).toBe("alternate");
     });
 
     it("handles missing markdown gracefully", async () => {
@@ -85,9 +82,7 @@ describe("instagram plugin", () => {
 
       const items = await plugin.listItems("https://www.instagram.com/nasa/", fetchFn);
       expect(items).toHaveLength(1);
-      if ("richText" in items[0]!.renderData && items[0]!.renderData.richText) {
-        expect(items[0]!.renderData.richText.text).toBe("");
-      }
+      expect(items[0]!.summary).toBeUndefined();
     });
   });
 });

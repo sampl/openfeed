@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginAS2Object } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface NytPuzzle {
@@ -18,7 +18,7 @@ const nytCrosswordPlugin: BackendFeedPlugin = {
   canHandle: (sourceUrl) =>
     sourceUrl.includes("nytimes.com") && sourceUrl.includes("crossword"),
 
-  listItems: async (sourceUrl, fetchFn, options) => {
+  listItems: async (sourceUrl, fetchFn, _context, options): Promise<readonly PluginAS2Object[]> => {
     const apiKey = options?.apiKey;
     if (typeof apiKey !== "string" || !apiKey) {
       throw new FeedError(
@@ -36,25 +36,23 @@ const nytCrosswordPlugin: BackendFeedPlugin = {
     });
 
     if (!response.ok) {
-      const code = response.status === 401 || response.status === 403 ? "auth_error" : response.status === 429 ? "rate_limited" : "network_error";
+      const code = (response.status === 401 || response.status === 403) ? "auth_error"
+        : response.status === 429 ? "rate_limited"
+        : "network_error";
       throw new FeedError(`NYT Crossword API returned HTTP ${response.status}`, code);
     }
 
     const data = (await response.json()) as NytPuzzlesResponse;
 
-    return data.results.map((puzzle): PluginFeedItem => {
-      const title = puzzle.title ?? `NYT Crossword - ${puzzle.print_date}`;
+    return data.results.map((puzzle): PluginAS2Object => {
+      const name = puzzle.title ?? `NYT Crossword - ${puzzle.print_date}`;
       const url = `https://www.nytimes.com/crosswords/game/daily/${puzzle.print_date}`;
 
       return {
-        sourceName: "NYT Crossword",
-        sourceUrl,
-        title,
+        type: "Event",
+        name,
         url,
-        publishedAt: new Date(puzzle.print_date),
-        renderData: {
-          richText: { text: title },
-        },
+        published: new Date(puzzle.print_date),
       };
     });
   },

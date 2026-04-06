@@ -32,6 +32,8 @@ describe("centcom canHandle", () => {
 });
 
 describe("centcom listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -42,21 +44,19 @@ describe("centcom listItems", () => {
     );
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("CENTCOM News Release");
-    expect(item.sourceName).toBe("CENTCOM");
+    expect(item.name).toBe("CENTCOM News Release");
     expect(item.url).toBe(
       "https://www.centcom.mil/MEDIA/NEWS-ARTICLES/News-Article-View/Article/12345/centcom-news-release/"
     );
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>CENTCOM press release content</p>", text: "CENTCOM press release content" },
-    });
+    expect(item.content).toBe("<p>CENTCOM press release content</p>");
+    expect(item.summary).toBe("CENTCOM press release content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://www.centcom.mil/DesktopModules/ArticleCS/Feed.aspx?ContentType=1&Site=575&max=25";
 
-    await plugin.listItems("https://www.centcom.mil", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.centcom.mil", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

@@ -152,7 +152,7 @@ describe("podcasts listItems", () => {
     );
 
     expect(items).toHaveLength(1);
-    expect(items[0]!.title).toBe("Episode 1");
+    expect(items[0]!.name).toBe("Episode 1");
     expect(items[0]!.url).toBe("https://example.com/ep1");
   });
 });

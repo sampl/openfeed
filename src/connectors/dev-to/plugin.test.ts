@@ -42,6 +42,8 @@ describe("dev-to canHandle", () => {
 });
 
 describe("dev-to listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://dev.to" };
+
   it("fetches default top articles for plain dev.to URL", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
       ok: true,
@@ -54,14 +56,10 @@ describe("dev-to listItems", () => {
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.sourceName).toBe("DEV Community");
-    expect(first.title).toBe("Getting started with TypeScript");
-    expect(first.description).toBe("A beginner's guide to TypeScript");
+    expect(first.name).toBe("Getting started with TypeScript");
+    expect(first.summary).toBe("A beginner's guide to TypeScript");
     expect(first.url).toBe("https://dev.to/user1/getting-started-with-typescript-abc");
-    expect(first.publishedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
-    expect(first.renderData).toMatchObject({
-      richText: { text: "A beginner's guide to TypeScript" },
-    });
+    expect(first.published).toEqual(new Date("2024-01-15T10:00:00.000Z"));
   });
 
   it("uses username in API call for @username URL", async () => {
@@ -93,7 +91,7 @@ describe("dev-to listItems", () => {
       json: async () => [],
     } as unknown as Response);
 
-    await devToPlugin.listItems("https://dev.to", fetchFn, { limit: 20 });
+    await devToPlugin.listItems("https://dev.to", fetchFn, mockContext, { limit: 20 });
 
     expect(fetchFn.mock.calls[0]?.[0]).toContain("per_page=20");
   });

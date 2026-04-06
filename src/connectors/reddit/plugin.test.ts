@@ -49,6 +49,8 @@ describe("reddit canHandle", () => {
 });
 
 describe("reddit listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://www.reddit.com" };
+
   it("fetches top posts and returns feed items with default options", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
       headers: { get: () => "application/json" },
@@ -68,14 +70,10 @@ describe("reddit listItems", () => {
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.sourceName).toBe("r/BedStuy");
-    expect(first.title).toBe("Cool post about Brooklyn");
-    expect(first.description).toBe("Some body text here");
+    expect(first.name).toBe("Cool post about Brooklyn");
+    expect(first.summary).toBe("Some body text here");
     expect(first.url).toBe("https://www.reddit.com/r/BedStuy/comments/abc123/cool_post_about_brooklyn/");
-    expect(first.publishedAt).toEqual(new Date(1700000000 * 1000));
-    expect(first.renderData).toMatchObject({
-      richText: { text: "Some body text here" },
-    });
+    expect(first.published).toEqual(new Date(1700000000 * 1000));
   });
 
   it("uses richText title fallback when selftext is empty (link posts)", async () => {
@@ -90,10 +88,7 @@ describe("reddit listItems", () => {
     );
 
     const linkPost = items[1]!;
-    expect(linkPost.description).toBeUndefined();
-    expect(linkPost.renderData).toMatchObject({
-      richText: { text: "Link post no body" },
-    });
+    expect(linkPost.summary).toBeUndefined();
   });
 
   it("respects sort/time/limit options", async () => {
@@ -105,6 +100,7 @@ describe("reddit listItems", () => {
     await redditPlugin.listItems(
       "https://www.reddit.com/r/nyc",
       fetchFn,
+      mockContext,
       { sort: "hot", time: "day", limit: 10 }
     );
 

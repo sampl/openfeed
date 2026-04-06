@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginAS2Object } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface FirecrawlResponse {
@@ -9,7 +9,6 @@ interface FirecrawlResponse {
   };
 }
 
-// Extract the username path segment from an Instagram profile URL
 const extractUsername = (sourceUrl: string): string => {
   const url = new URL(sourceUrl);
   const segments = url.pathname.split("/").filter(Boolean);
@@ -21,7 +20,7 @@ const instagramFirecrawlPlugin: BackendFeedPlugin = {
 
   canHandle: (sourceUrl) => sourceUrl.includes("instagram.com"),
 
-  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginAS2Object[]> => {
     const apiKey = process.env["FIRECRAWL_API_KEY"];
     if (!apiKey) {
       throw new FeedError(
@@ -42,24 +41,24 @@ const instagramFirecrawlPlugin: BackendFeedPlugin = {
     const json = (await response.json()) as FirecrawlResponse;
     const scrapedMarkdown = json.data?.markdown ?? "";
     const username = extractUsername(sourceUrl);
-    const sourceName = `@${username}`;
 
     // One item per day — date suffix acts as the dedup key
     const dateStamp = new Date().toISOString().slice(0, 10);
 
-    const item: PluginFeedItem = {
-      sourceName,
-      sourceUrl,
-      title: `Recent posts from ${sourceName}`,
+    return [{
+      type: "Page",
+      name: `Recent posts from @${username}`,
+      summary: scrapedMarkdown.slice(0, 500) || undefined,
       url: `${sourceUrl}#${dateStamp}`,
-      publishedAt: new Date(),
-      renderData: {
-        embed: { url: sourceUrl },
-        richText: { text: scrapedMarkdown.slice(0, 500) },
-      },
-    };
-
-    return [item];
+      published: new Date(),
+      attachment: [{
+        type: "Link",
+        href: sourceUrl,
+        mediaType: "text/html",
+        rel: "alternate",
+        name: `@${username} on Instagram`,
+      }],
+    }];
   },
 };
 

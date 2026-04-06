@@ -32,6 +32,8 @@ describe("reuters canHandle", () => {
 });
 
 describe("reuters listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("reuters listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://feeds.reuters.com/reuters/topNews");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("World News Headline");
-    expect(item.sourceName).toBe("Reuters");
+    expect(item.name).toBe("World News Headline");
     expect(item.url).toBe("https://www.reuters.com/world/world-news-headline");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Reuters news content</p>", text: "Reuters news content" },
-    });
+    expect(item.content).toBe("<p>Reuters news content</p>");
+    expect(item.summary).toBe("Reuters news content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://feeds.reuters.com/reuters/businessNews";
 
-    await plugin.listItems("https://www.reuters.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.reuters.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

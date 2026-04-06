@@ -1,85 +1,170 @@
-// Render method data shapes — plugins populate whichever methods they support
-export interface VideoRenderData {
-  readonly videoId?: string;
-  readonly url?: string;
+// ---------------------------------------------------------------------------
+// ActivityStreams 2.0 core types
+// ---------------------------------------------------------------------------
+
+/** An AS2 Link — used in attachment[] to reference external media. */
+export interface AS2Link {
+  readonly type: "Link";
+  readonly href: string;
+  readonly mediaType?: string; // e.g. "video/mp4", "audio/mpeg", "text/html"
+  readonly rel?: string;       // e.g. "video", "enclosure", "alternate"
+  readonly name?: string;      // display label
 }
 
-export interface RichTextRenderData {
-  readonly html?: string;
-  readonly text: string; // required plain text fallback
+/** A hashtag or mention tag — used in tag[] on social posts. */
+export interface AS2Tag {
+  readonly type: "Hashtag" | "Mention";
+  readonly name: string;  // e.g. "#rust" or "@user@domain"
+  readonly href?: string; // canonical URL for the tag, if available
 }
 
-export interface AudioRenderData {
-  readonly url: string;
-}
+/** AS2 Object types supported by the frontend. */
+export type AS2ObjectType = "Note" | "Article" | "Video" | "Audio" | "Event" | "Page";
 
-export interface EmbedRenderData {
-  readonly url: string;
-}
-
-// Discriminated union: at least one render method is required.
-// TypeScript will error at compile time if none are provided.
-export type FeedItemRenderData =
-  | {
-      video: VideoRenderData;
-      richText?: RichTextRenderData;
-      audio?: AudioRenderData;
-      embed?: EmbedRenderData;
-    }
-  | {
-      video?: VideoRenderData;
-      richText: RichTextRenderData;
-      audio?: AudioRenderData;
-      embed?: EmbedRenderData;
-    }
-  | {
-      video?: VideoRenderData;
-      richText?: RichTextRenderData;
-      audio: AudioRenderData;
-      embed?: EmbedRenderData;
-    }
-  | {
-      video?: VideoRenderData;
-      richText?: RichTextRenderData;
-      audio?: AudioRenderData;
-      embed: EmbedRenderData;
-    };
-
-// Shape returned by plugin.listItems — does not include DB-managed fields
-export interface PluginFeedItem {
-  readonly sourceName: string;
-  readonly sourceUrl: string;
-  readonly feedName?: string;
-  readonly title: string;
-  readonly description?: string;
-  readonly url: string; // used as deduplication key
-  readonly publishedAt: Date;
-  readonly renderData: FeedItemRenderData;
-}
-
-// Writable item statuses — the values a user or API can set on an item.
-export type ItemStatus = "unread" | "archived" | "read-later";
-
-// All statuses an item can hold in the DB, including system-managed ones.
-export type StoredItemStatus = ItemStatus | "expired";
-
-// Shape stored in DB and served to the frontend.
-// sourceIconUrl is not stored in DB — it is attached by the items API at response time.
-export interface FeedItem extends PluginFeedItem {
+/**
+ * An AS2 Object — what a piece of content is.
+ * Stored in the `objects` table; returned by the API nested inside the feed.
+ *
+ * Type guide:
+ *  Note    — short-form text without a meaningful standalone title
+ *            (social posts, weather updates, short status items)
+ *  Article — long-form content with a real headline
+ *            (RSS articles, blog posts, news stories, HN posts)
+ *  Video   — video content; attachment[] holds the embed link
+ *            (YouTube, TikTok)
+ *  Audio   — audio content; attachment[] holds the enclosure URL
+ *            (Podcasts)
+ *  Event   — calendar event
+ *            (Google Calendar)
+ *  Page    — generic web page / iframe embed
+ *            (anything best shown in an iframe)
+ */
+export interface AS2Object {
   readonly id: string;
-  readonly status: StoredItemStatus;
-  readonly createdAt: Date;
-  readonly sourceIconUrl?: string;
+  readonly type: AS2ObjectType;
+  readonly name?: string;           // title; omit for Note
+  readonly summary?: string;        // short description / teaser
+  readonly content?: string;        // full HTML/markdown/plain body
+  readonly mediaType?: string;      // content media type; defaults to "text/html"
+  readonly url: string;             // canonical URL; used as dedup key
+  readonly attachment?: AS2Link[];  // media links (video embed, audio enclosure, etc.)
+  readonly published?: string;      // ISO 8601 publication date from source
+  // Relational AS2 fields — available for connectors that need them
+  readonly inReplyTo?: AS2Link;           // for reply threads (social media)
+  readonly tag?: (AS2Link | AS2Tag)[];    // hashtags, mentions
+  readonly context?: AS2Link;            // conversation/thread grouping
+  // Framework-managed fields (never set by plugins)
+  readonly sourceName: string;      // display name from YAML config
+  readonly sourceUrl: string;       // source URL from YAML config
+  readonly feedName?: string;       // logical feed grouping from YAML config
+  readonly sourceIconUrl?: string;  // injected at response time from plugin.icon
 }
 
-// API-serialized version of FeedItem: Date fields become ISO strings over JSON.
-// Use this type on the frontend when working with items fetched from the API.
-export interface ApiFeedItem extends Omit<FeedItem, "publishedAt" | "createdAt"> {
-  readonly publishedAt: string;
-  readonly createdAt: string;
+// ---------------------------------------------------------------------------
+// AS2 Activity types
+// ---------------------------------------------------------------------------
+
+/** Activity types used by OpenFeed. */
+export type AS2ActivityType = "Create" | "Read" | "Add";
+
+/** An AS2 Activity — what happened to an object. */
+export interface AS2Activity {
+  readonly id: string;
+  readonly type: AS2ActivityType;
+  readonly object: AS2Object;
+  readonly target?: { readonly type: "Collection"; readonly name: "read-later" };
+  readonly published: string; // ISO 8601
 }
 
-// Shared API response types — used by both the server routes and the frontend API client.
+// ---------------------------------------------------------------------------
+// API response shapes
+// ---------------------------------------------------------------------------
+
+/**
+ * Paginated list of objects returned by GET /api/objects.
+ * The field is intentionally "items" (not "objects") for consistency with
+ * the rest of the API and minimal frontend churn.
+ */
+export interface PaginatedObjectsResponse {
+  readonly items: AS2Object[];
+  readonly hasMore: boolean;
+  readonly total: number;
+}
+
+// ---------------------------------------------------------------------------
+// Plugin interface
+// ---------------------------------------------------------------------------
+
+/**
+ * What plugins return — full AS2 expressiveness with only `type` and `url`
+ * required. Framework-owned fields (id, sourceName, sourceUrl, feedName,
+ * sourceIconUrl) are NEVER set by plugins; they come from the YAML config
+ * via the `context` parameter passed to listItems().
+ *
+ * `published` is a Date here for convenience; the framework converts it to
+ * an ISO string before storing.
+ *
+ * Any valid AS2 property beyond the declared fields can be included via the
+ * index signature — e.g. inReplyTo, tag, context for social connectors.
+ * Unknown properties are serialised into the `extras` JSON column and
+ * deserialised back onto AS2Object at response time, transparently.
+ */
+export interface PluginAS2Object {
+  readonly type: AS2ObjectType;
+  readonly url: string;            // canonical URL; dedup key
+  readonly published?: Date;       // Date for convenience; framework converts to ISO
+  readonly name?: string;
+  readonly summary?: string;
+  readonly content?: string;
+  readonly mediaType?: string;
+  readonly attachment?: AS2Link[];
+  readonly inReplyTo?: AS2Link;
+  readonly tag?: (AS2Link | AS2Tag)[];
+  readonly context?: AS2Link;
+  readonly [key: string]: unknown; // any additional valid AS2 property
+}
+
+/**
+ * Source provenance passed to every plugin — comes entirely from the YAML
+ * config, never from the plugin itself.
+ */
+export interface PluginContext {
+  readonly sourceName: string;  // the `name:` field from openfeed.yaml
+  readonly sourceUrl: string;   // the `url:` field from openfeed.yaml
+  readonly feedName?: string;   // the containing feed name
+}
+
+/**
+ * Every content-source plugin must implement this interface.
+ * Plugins are registered in pluginRegistry.ts; the first plugin whose
+ * canHandle() returns true for a given source URL is used.
+ */
+export interface BackendFeedPlugin {
+  readonly name: string;
+  /** Raw SVG markup for this source's icon. Encoded as a data URI at response time. */
+  readonly icon?: string;
+  /** Returns true if this plugin knows how to fetch `sourceUrl`. */
+  readonly canHandle: (sourceUrl: string) => boolean;
+  /**
+   * Fetches and returns objects for `sourceUrl`.
+   * @param fetchFn  - Injected fetch function for unit-testability.
+   * @param context  - Source provenance from YAML config (sourceName, sourceUrl, feedName).
+   * @param options  - Plugin-specific options declared in the user's YAML config.
+   */
+  readonly listItems: (
+    sourceUrl: string,
+    fetchFn: FetchFn,
+    context: PluginContext,
+    options?: Record<string, unknown>
+  ) => Promise<readonly PluginAS2Object[]>;
+}
+
+/** Inject fetch so plugins are unit-testable without hitting the network. */
+export type FetchFn = typeof fetch;
+
+// ---------------------------------------------------------------------------
+// Run / source result types (unchanged)
+// ---------------------------------------------------------------------------
 
 export interface SourceResult {
   readonly sourceName: string;
@@ -93,18 +178,16 @@ export interface SourceResult {
 export interface FetchRun {
   readonly id: string;
   readonly triggeredBy: "schedule" | "manual";
-  readonly startedAt: string; // ISO string from JSON serialization
+  readonly startedAt: string;  // ISO string from JSON serialisation
   readonly completedAt?: string;
   readonly status: "running" | "success" | "error";
   readonly errorMessage?: string;
   readonly sourceResults: readonly SourceResult[];
 }
 
-export interface PaginatedItemsResponse {
-  readonly items: ApiFeedItem[];
-  readonly hasMore: boolean;
-  readonly total: number;
-}
+// ---------------------------------------------------------------------------
+// Time tracking types (unchanged)
+// ---------------------------------------------------------------------------
 
 export interface TimeLimitEntry {
   readonly daily?: number;  // minutes
@@ -121,22 +204,22 @@ export interface TimeUsageResponse {
   readonly total: number;                  // minutes
 }
 
-// Structured error codes plugins should use instead of plain Error throws.
-// The fetcher captures these codes and stores them on SourceResult for UI grouping.
-export type FeedErrorCode =
-  | "source_not_found"   // Source URL returned 404 or could not be reached
-  | "item_not_found"     // Source reachable but expected item URL was missing
-  | "parse_error"        // Source reachable but content couldn't be parsed
-  | "invalid_config"     // User misconfigured options (bad URL shape, wrong option type, etc.)
-  | "url_not_supported"  // URL is recognized by the plugin but this specific URL type is not supported
-  | "missing_credential" // A required env-var credential is absent
-  | "auth_error"         // Credential present but authentication failed (401/403)
-  | "rate_limited"       // Source returned 429 or equivalent
-  | "network_error"      // Network-level failure (timeout, DNS, connection refused)
-  | "unknown";           // Catch-all for unexpected errors
+// ---------------------------------------------------------------------------
+// Structured error types (unchanged)
+// ---------------------------------------------------------------------------
 
-// Runtime-iterable list of all valid FeedErrorCode values.
-// Useful for validation and exhaustive checks without duplicating the union.
+export type FeedErrorCode =
+  | "source_not_found"
+  | "item_not_found"
+  | "parse_error"
+  | "invalid_config"
+  | "url_not_supported"
+  | "missing_credential"
+  | "auth_error"
+  | "rate_limited"
+  | "network_error"
+  | "unknown";
+
 export const FEED_ERROR_CODES: readonly FeedErrorCode[] = [
   "source_not_found",
   "item_not_found",
@@ -151,8 +234,8 @@ export const FEED_ERROR_CODES: readonly FeedErrorCode[] = [
 ];
 
 /**
- * Plugins should throw this instead of a plain `Error` so the fetcher can
- * store a structured error code on the run's `SourceResult` for UI display.
+ * Plugins should throw this instead of a plain Error so the fetcher can
+ * store a structured error code on the run's SourceResult for UI display.
  */
 export class FeedError extends Error {
   readonly code: FeedErrorCode;
@@ -161,30 +244,4 @@ export class FeedError extends Error {
     this.name = "FeedError";
     this.code = code;
   }
-}
-
-/** Inject fetch so plugins are unit-testable without hitting the network. */
-export type FetchFn = typeof fetch;
-
-/**
- * Every content-source plugin must implement this interface.
- * Plugins are registered in `pluginRegistry.ts`; the first plugin whose
- * `canHandle` returns true for a given source URL is used.
- */
-export interface BackendFeedPlugin {
-  readonly name: string;
-  /** Raw SVG markup for this source's icon. The server encodes it as a data URI at response time. */
-  readonly icon?: string;
-  /** Returns true if this plugin knows how to fetch `sourceUrl`. */
-  readonly canHandle: (sourceUrl: string) => boolean;
-  /**
-   * Fetches and returns items for `sourceUrl`.
-   * @param fetchFn - Injected fetch function, allowing unit tests to mock network calls.
-   * @param options - Plugin-specific options declared in the user's YAML config.
-   */
-  readonly listItems: (
-    sourceUrl: string,
-    fetchFn: FetchFn,
-    options?: Record<string, unknown>
-  ) => Promise<readonly PluginFeedItem[]>;
 }

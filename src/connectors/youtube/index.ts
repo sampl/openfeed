@@ -1,17 +1,12 @@
 import { XMLParser } from "fast-xml-parser";
-import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginAS2Object } from "../types.js";
 import { FeedError } from "../types.js";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
-// Normalize mobile YouTube URL to desktop so page scraping works
-// (mobile pages don't embed channelId in HTML)
 const toDesktopUrl = (url: string): string =>
   url.replace("://m.youtube.com", "://www.youtube.com");
 
-// Extract channel ID from a YouTube page using two strategies:
-// 1. channelId JSON field in ytInitialData (may be removed in future YouTube updates)
-// 2. Canonical link tag in the page head (more stable, always present)
 const resolveChannelId = async (handleUrl: string, fetchFn: typeof fetch): Promise<string> => {
   const response = await fetchFn(toDesktopUrl(handleUrl));
   const html = await response.text();
@@ -31,16 +26,12 @@ const resolveChannelId = async (handleUrl: string, fetchFn: typeof fetch): Promi
   );
 };
 
-// Determine whether the URL already contains a bare channel ID path segment
 const isChannelIdUrl = (url: URL): boolean => url.pathname.startsWith("/channel/");
-
-// Determine whether the URL is a handle URL (e.g. /@SomeChannel)
 const isHandleUrl = (url: URL): boolean => url.pathname.startsWith("/@");
 
 const getChannelId = async (sourceUrl: string, fetchFn: typeof fetch): Promise<string> => {
   const url = new URL(sourceUrl);
   if (isChannelIdUrl(url)) {
-    // /channel/CHANNEL_ID — extract directly
     return url.pathname.split("/").filter(Boolean)[1] ?? (() => { throw new FeedError("Missing channel ID in URL", "invalid_config"); })();
   }
   if (!isHandleUrl(url)) {
@@ -49,7 +40,6 @@ const getChannelId = async (sourceUrl: string, fetchFn: typeof fetch): Promise<s
       "url_not_supported"
     );
   }
-  // @handle URL — must scrape the page to find the channel ID
   return resolveChannelId(sourceUrl, fetchFn);
 };
 
@@ -66,14 +56,13 @@ interface YoutubeAtomFeed {
   feed?: { entry?: YoutubeAtomEntry | YoutubeAtomEntry[] };
 }
 
-const youtubRssPlugin: BackendFeedPlugin = {
+const youtubePlugin: BackendFeedPlugin = {
   name: "youtube",
-  // Red rounded rectangle with white play triangle — YouTube brand colours
   icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#FF0000"/><polygon points="8,5 8,15 16,10" fill="white"/></svg>`,
 
   canHandle: (sourceUrl) => sourceUrl.includes("youtube.com"),
 
-  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginFeedItem[]> => {
+  listItems: async (sourceUrl, fetchFn): Promise<readonly PluginAS2Object[]> => {
     const channelId = await getChannelId(sourceUrl, fetchFn);
     const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
@@ -82,30 +71,31 @@ const youtubRssPlugin: BackendFeedPlugin = {
     const parsed = parser.parse(xml) as YoutubeAtomFeed;
 
     const rawEntries = parsed.feed?.entry ?? [];
-    // fast-xml-parser returns a single object instead of an array when there is only one entry
     const entries: YoutubeAtomEntry[] = Array.isArray(rawEntries) ? rawEntries : [rawEntries];
 
-    return entries.map((entry): PluginFeedItem => {
+    return entries.map((entry): PluginAS2Object => {
       const videoId = entry["yt:videoId"] ?? "";
-      const title = entry.title ?? "";
+      const name = entry.title ?? "";
       const description =
         entry["media:group"]?.["media:description"] ?? entry.summary ?? "";
       const publishedRaw = entry.published ?? new Date().toISOString();
 
       return {
-        sourceName: "YouTube",
-        sourceUrl,
-        title,
-        description,
+        type: "Video",
+        name,
+        summary: description || undefined,
         url: `https://www.youtube.com/watch?v=${videoId}`,
-        publishedAt: new Date(publishedRaw),
-        renderData: {
-          video: { videoId },
-          richText: { text: description || title },
-        },
+        published: new Date(publishedRaw),
+        attachment: [{
+          type: "Link",
+          href: `https://www.youtube.com/embed/${videoId}`,
+          mediaType: "text/html",
+          rel: "video",
+          name,
+        }],
       };
     });
   },
 };
 
-export default youtubRssPlugin;
+export default youtubePlugin;

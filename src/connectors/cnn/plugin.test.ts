@@ -32,6 +32,8 @@ describe("cnn canHandle", () => {
 });
 
 describe("cnn listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("cnn listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://rss.cnn.com/rss/edition.rss");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Breaking News Story");
-    expect(item.sourceName).toBe("CNN");
+    expect(item.name).toBe("Breaking News Story");
     expect(item.url).toBe("https://www.cnn.com/2024/01/15/politics/story/index.html");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>News content here</p>", text: "News content here" },
-    });
+    expect(item.content).toBe("<p>News content here</p>");
+    expect(item.summary).toBe("News content here");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://rss.cnn.com/rss/cnn_topstories.rss";
 
-    await plugin.listItems("https://www.cnn.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.cnn.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

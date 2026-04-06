@@ -32,6 +32,8 @@ describe("washington-post canHandle", () => {
 });
 
 describe("washington-post listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("washington-post listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://feeds.washingtonpost.com/rss/national");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("National News Story");
-    expect(item.sourceName).toBe("The Washington Post");
+    expect(item.name).toBe("National News Story");
     expect(item.url).toBe("https://www.washingtonpost.com/national/story");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Article content</p>", text: "Article content" },
-    });
+    expect(item.content).toBe("<p>Article content</p>");
+    expect(item.summary).toBe("Article content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://feeds.washingtonpost.com/rss/world";
 
-    await plugin.listItems("https://www.washingtonpost.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.washingtonpost.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

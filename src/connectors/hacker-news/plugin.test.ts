@@ -36,6 +36,8 @@ describe("hacker-news canHandle", () => {
 });
 
 describe("hacker-news listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://news.ycombinator.com" };
+
   it("maps hits to feed items with correct fields", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
       ok: true,
@@ -50,13 +52,9 @@ describe("hacker-news listItems", () => {
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.sourceName).toBe("Hacker News");
-    expect(first.title).toBe("Show HN: Something interesting");
+    expect(first.name).toBe("Show HN: Something interesting");
     expect(first.url).toBe("https://example.com/interesting");
-    expect(first.publishedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
-    expect(first.renderData).toMatchObject({
-      richText: { text: "Show HN: Something interesting" },
-    });
+    expect(first.published).toEqual(new Date("2024-01-15T10:00:00.000Z"));
   });
 
   it("falls back to HN item URL when hit.url is null", async () => {
@@ -83,6 +81,7 @@ describe("hacker-news listItems", () => {
     await hackerNewsPlugin.listItems(
       "https://news.ycombinator.com",
       fetchFn,
+      mockContext,
       { limit: 25 }
     );
 

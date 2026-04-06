@@ -32,6 +32,8 @@ describe("espn canHandle", () => {
 });
 
 describe("espn listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("espn listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://www.espn.com/espn/rss/news");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Sports Headline");
-    expect(item.sourceName).toBe("ESPN");
+    expect(item.name).toBe("Sports Headline");
     expect(item.url).toBe("https://www.espn.com/nfl/story/_/id/12345/sports-headline");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>ESPN sports content</p>", text: "ESPN sports content" },
-    });
+    expect(item.content).toBe("<p>ESPN sports content</p>");
+    expect(item.summary).toBe("ESPN sports content");
   });
 
   it("uses options.feed when provided for sport-specific feeds", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const nflFeed = "https://www.espn.com/espn/rss/nfl/news";
 
-    await plugin.listItems("https://www.espn.com/nfl", fetchFn, { feed: nflFeed });
+    await plugin.listItems("https://www.espn.com/nfl", fetchFn, mockContext, { feed: nflFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(nflFeed);
   });

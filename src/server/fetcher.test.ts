@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { DbInterface } from "./db/interface.js";
 import type { UserConfig } from "./config.js";
-import type { PluginFeedItem } from "../connectors/types.js";
+import type { PluginAS2Object } from "../connectors/types.js";
 import { FeedError } from "../connectors/types.js";
 
 vi.mock("./pluginRegistry.js", () => ({
@@ -13,12 +13,20 @@ import { resolvePlugin } from "./pluginRegistry.js";
 import { runFetch } from "./fetcher.js";
 
 const createMockDb = (): DbInterface => ({
-  getItems: vi.fn(),
-  upsertItems: vi.fn(() => 2),
-  updateItemStatus: vi.fn(),
+  upsertObjects: vi.fn(() => 2),
+  getUnreadObjects: vi.fn(() => ({ objects: [], hasMore: false, total: 0 })),
+  getSavedObjects: vi.fn(() => ({ objects: [], hasMore: false, total: 0 })),
+  getAllObjects: vi.fn(() => ({ objects: [], hasMore: false, total: 0 })),
+  expireObjects: vi.fn(() => 0),
+  createActivity: vi.fn(() => "act-123"),
+  hasActivity: vi.fn(() => false),
+  objectExists: vi.fn(() => false),
   createRun: vi.fn(() => "run-123"),
   updateRun: vi.fn(),
   getRuns: vi.fn(),
+  recordTimeSession: vi.fn(),
+  getTimeUsage: vi.fn(),
+  getDbVersion: vi.fn(() => 7),
 });
 
 const makeSource = (overrides = {}) => ({
@@ -27,20 +35,19 @@ const makeSource = (overrides = {}) => ({
   ...overrides,
 });
 
-const makeFeedItem = (overrides: Partial<PluginFeedItem> = {}): PluginFeedItem => ({
-  sourceName: "Test Source",
-  sourceUrl: "https://example.com/feed",
-  title: "Test Item",
+const makePluginObject = (overrides: Partial<PluginAS2Object> = {}): PluginAS2Object => ({
+  type: "Article",
+  name: "Test Item",
   url: "https://example.com/item-1",
-  publishedAt: new Date("2024-01-01T00:00:00Z"),
-  renderData: { richText: { text: "content" } },
+  published: new Date("2024-01-01T00:00:00Z"),
+  content: "content",
   ...overrides,
 });
 
-const makePlugin = (name: string, items: PluginFeedItem[] = [makeFeedItem()]) => ({
+const makePlugin = (name: string, objects: PluginAS2Object[] = [makePluginObject()]) => ({
   name,
   canHandle: vi.fn(() => true),
-  listItems: vi.fn(async () => items),
+  listItems: vi.fn(async () => objects),
 });
 
 const makeConfig = (sources = [makeSource()]): UserConfig => ({
@@ -182,7 +189,7 @@ describe("runFetch", () => {
     await runFetch(makeConfig(), db, "manual");
 
     expect(defaultPlugin.listItems).not.toHaveBeenCalled();
-    expect(db.upsertItems).not.toHaveBeenCalled();
+    expect(db.upsertObjects).not.toHaveBeenCalled();
 
     const updateRunCall = (db.updateRun as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(updateRunCall[1].sourceResults[0].status).toBe("skipped");
