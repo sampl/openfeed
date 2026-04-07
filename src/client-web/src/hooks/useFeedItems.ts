@@ -2,8 +2,8 @@ import { useCallback, useEffect } from "react";
 import { useSnapshot } from "valtio";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { feedState } from "../state/feedState";
-import { fetchItems, updateItemStatus } from "../apiClient";
-import type { RenderMethodKey } from "../state/feedState";
+import { fetchObjects, createActivity } from "../apiClient";
+import type { RendererKey } from "../state/feedState";
 
 const PAGE_SIZE = 30;
 
@@ -11,9 +11,9 @@ export const useFeedItems = () => {
   const snap = useSnapshot(feedState);
 
   const query = useInfiniteQuery({
-    queryKey: ["items", "unread", snap.selectedFeed],
+    queryKey: ["objects", "unread", snap.selectedFeed],
     queryFn: ({ pageParam }) =>
-      fetchItems("unread", snap.selectedFeed ?? undefined, PAGE_SIZE, pageParam),
+      fetchObjects("unread", snap.selectedFeed ?? undefined, PAGE_SIZE, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const fetched = allPages.reduce((sum, page) => sum + page.items.length, 0);
@@ -39,7 +39,7 @@ export const useFeedItems = () => {
     // Non-fatal — the UI is already updated optimistically; swallow network errors
     // so a transient failure (e.g. "Load failed" on iOS) doesn't produce an
     // unhandled rejection that triggers the global error banner.
-    await updateItemStatus(id, "archived").catch(() => {});
+    await createActivity("Read", id).catch(() => {});
   }, []);
 
   const markReadLater = useCallback(async (id: string) => {
@@ -50,10 +50,10 @@ export const useFeedItems = () => {
       feedState.readItemIds.push(id);
     }
     // Non-fatal — same reasoning as markAsRead above.
-    await updateItemStatus(id, "read-later").catch(() => {});
+    await createActivity("Add", id, { type: "Collection", name: "read-later" }).catch(() => {});
   }, []);
 
-  const selectMethod = useCallback((method: RenderMethodKey) => {
+  const selectMethod = useCallback((method: RendererKey) => {
     console.log(`🧲 useFeedItems selectMethod — method=${method}`);
     feedState.selectedMethod = method;
   }, []);

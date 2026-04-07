@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  fetchItems,
-  updateItemStatus,
+  fetchObjects,
+  createActivity,
   triggerFetch,
   fetchRuns,
   fetchFeeds,
@@ -27,12 +27,12 @@ afterEach(() => {
 });
 
 describe("apiClient error handling", () => {
-  describe("fetchItems", () => {
+  describe("fetchObjects", () => {
     it("returns items on success", async () => {
       const payload = { items: [{ id: "1" }], hasMore: false, total: 1 };
       mockFetch.mockResolvedValue(makeJsonResponse(200, payload));
 
-      const result = await fetchItems("unread");
+      const result = await fetchObjects("unread");
       expect(result.items).toHaveLength(1);
     });
 
@@ -44,7 +44,7 @@ describe("apiClient error handling", () => {
         json: vi.fn().mockResolvedValue({ error: "Database is unavailable right now." }),
       });
 
-      await expect(fetchItems("unread")).rejects.toThrow("Database is unavailable right now.");
+      await expect(fetchObjects("unread")).rejects.toThrow("Database is unavailable right now.");
     });
 
     it("falls back to status code when the error body has no message", async () => {
@@ -55,7 +55,7 @@ describe("apiClient error handling", () => {
         json: vi.fn().mockResolvedValue({}),
       });
 
-      await expect(fetchItems("unread")).rejects.toThrow("status 503");
+      await expect(fetchObjects("unread")).rejects.toThrow("status 503");
     });
 
     it("falls back to statusText when the error body is not JSON", async () => {
@@ -66,43 +66,58 @@ describe("apiClient error handling", () => {
         json: vi.fn().mockRejectedValue(new SyntaxError("not JSON")),
       });
 
-      await expect(fetchItems("unread")).rejects.toThrow("Internal Server Error");
+      await expect(fetchObjects("unread")).rejects.toThrow("Internal Server Error");
     });
 
     it("builds the correct URL with all params", async () => {
       mockFetch.mockResolvedValue(makeJsonResponse(200, { items: [], hasMore: false, total: 0 }));
 
-      await fetchItems("archived", "Tech", 10, 30);
+      await fetchObjects("all", "Tech", 10, 30);
 
       const url = mockFetch.mock.calls[0][0] as string;
-      expect(url).toContain("status=archived");
+      expect(url).toContain("view=all");
       expect(url).toContain("feed=Tech");
       expect(url).toContain("limit=10");
       expect(url).toContain("offset=30");
     });
   });
 
-  describe("updateItemStatus", () => {
-    it("sends a PATCH request with the correct body", async () => {
-      mockFetch.mockResolvedValue(makeJsonResponse(200, { success: true }));
+  describe("createActivity", () => {
+    it("sends a POST request with the correct body for Read", async () => {
+      mockFetch.mockResolvedValue(makeJsonResponse(201, { id: "act-1" }));
 
-      await updateItemStatus("item-1", "archived");
+      await createActivity("Read", "obj-1");
 
-      expect(mockFetch).toHaveBeenCalledWith("/api/items/item-1", expect.objectContaining({
-        method: "PATCH",
-        body: JSON.stringify({ status: "archived" }),
+      expect(mockFetch).toHaveBeenCalledWith("/api/activities", expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ type: "Read", objectId: "obj-1", target: undefined }),
       }));
     });
 
-    it("throws with the server error message on failure", async () => {
+    it("sends the target when creating an Add activity", async () => {
+      mockFetch.mockResolvedValue(makeJsonResponse(201, { id: "act-2" }));
+
+      await createActivity("Add", "obj-1", { type: "Collection", name: "read-later" });
+
+      const body = JSON.parse(mockFetch.mock.calls[0][1].body as string) as { target?: unknown };
+      expect(body.target).toEqual({ type: "Collection", name: "read-later" });
+    });
+
+    it("does not throw on 409 (idempotent)", async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 409, statusText: "Conflict", json: vi.fn().mockResolvedValue({}) });
+
+      await expect(createActivity("Read", "obj-1")).resolves.toBeUndefined();
+    });
+
+    it("throws with the server error message on non-409 failure", async () => {
       mockFetch.mockResolvedValue({
         ok: false,
-        status: 400,
+        status: 404,
         statusText: "",
-        json: vi.fn().mockResolvedValue({ error: '"deleted" is not a valid item status.' }),
+        json: vi.fn().mockResolvedValue({ error: "Object not found." }),
       });
 
-      await expect(updateItemStatus("item-1", "archived")).rejects.toThrow("is not a valid item status");
+      await expect(createActivity("Read", "missing")).rejects.toThrow("Object not found.");
     });
   });
 

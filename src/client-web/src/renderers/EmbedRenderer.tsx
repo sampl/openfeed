@@ -1,24 +1,23 @@
-import type { EmbedRenderData } from "connectors/types";
 import styles from "./EmbedRenderer.module.css";
 
 interface Props {
-  data: EmbedRenderData;
+  url: string;
 }
 
-export const EmbedRenderer = ({ data }: Props) => {
-  console.log(`🔗 EmbedRenderer render — url=${data.url}`);
+export const EmbedRenderer = ({ url }: Props) => {
+  console.log(`🔗 EmbedRenderer render — url=${url}`);
 
   return (
     <div className={styles.wrapper}>
       <iframe
-        src={data.url}
+        src={url}
         title="Embedded content"
         className={styles.iframe}
         sandbox="allow-scripts allow-same-origin allow-popups"
       />
       {/* Fallback link in case the browser blocks the iframe or sandbox prevents rendering */}
       <p className={styles.fallback}>
-        <a href={data.url} target="_blank" rel="noopener noreferrer">
+        <a href={url} target="_blank" rel="noopener noreferrer">
           Open in new tab
         </a>
       </p>

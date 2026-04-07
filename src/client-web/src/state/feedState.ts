@@ -1,10 +1,10 @@
 import { proxy } from "valtio";
-import type { ApiFeedItem } from "connectors/types";
+import type { AS2Object } from "connectors/types";
 
-export type RenderMethodKey = "video" | "richText" | "audio" | "embed";
+export type RendererKey = "video" | "audio" | "embed" | "content";
 
 interface FeedState {
-  selectedMethod: RenderMethodKey | null;
+  selectedMethod: RendererKey | null;
   selectedFeed: string | null;
   // IDs of items marked read/later in this session — kept visible until refresh
   readItemIds: string[];
@@ -16,11 +16,11 @@ export const feedState = proxy<FeedState>({
   readItemIds: [],
 });
 
-export const getAvailableMethods = (item: ApiFeedItem): RenderMethodKey[] => {
-  const methods: RenderMethodKey[] = [];
-  if (item.renderData.video) methods.push("video");
-  if (item.renderData.richText) methods.push("richText");
-  if (item.renderData.audio) methods.push("audio");
-  if (item.renderData.embed) methods.push("embed");
-  return methods;
+export const getAvailableRenderers = (item: AS2Object): RendererKey[] => {
+  const keys: RendererKey[] = [];
+  if (item.type === "Video" || item.attachment?.some((a) => a.rel === "video")) keys.push("video");
+  if (item.type === "Audio" || item.attachment?.some((a) => a.rel === "enclosure")) keys.push("audio");
+  if (item.type === "Page" || item.attachment?.some((a) => a.rel === "embed")) keys.push("embed");
+  if (item.content != null || item.summary != null) keys.push("content");
+  return keys;
 };

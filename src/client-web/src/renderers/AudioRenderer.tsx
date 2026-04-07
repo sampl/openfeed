@@ -1,18 +1,17 @@
-import type { AudioRenderData } from "connectors/types";
 import styles from "./AudioRenderer.module.css";
 
 interface Props {
-  data: AudioRenderData;
+  audioUrl: string;
 }
 
-export const AudioRenderer = ({ data }: Props) => {
-  console.log(`🔊 AudioRenderer render — url=${data.url}`);
+export const AudioRenderer = ({ audioUrl }: Props) => {
+  console.log(`🔊 AudioRenderer render — url=${audioUrl}`);
 
   return (
     <div className={styles.wrapper}>
       <audio
         controls
-        src={data.url}
+        src={audioUrl}
         className={styles.player}
         preload="metadata"
       >

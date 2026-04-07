@@ -1,15 +1,14 @@
 import type {
   FetchRun,
   FeedErrorCode,
-  ItemStatus,
-  PaginatedItemsResponse,
+  PaginatedObjectsResponse,
   SourceResult,
   TimeLimitEntry,
   TimeLimitsResponse,
   TimeUsageResponse,
 } from "connectors/types";
 
-export type { FetchRun, FeedErrorCode, ItemStatus, PaginatedItemsResponse, SourceResult, TimeLimitEntry, TimeLimitsResponse, TimeUsageResponse };
+export type { FetchRun, FeedErrorCode, PaginatedObjectsResponse, SourceResult, TimeLimitEntry, TimeLimitsResponse, TimeUsageResponse };
 
 export interface SourceSummary {
   readonly name: string;
@@ -60,26 +59,30 @@ const getErrorMessage = async (res: Response, fallback: string): Promise<string>
   return res.statusText.length > 0 ? `${fallback} (${res.statusText})` : `${fallback} (status ${res.status})`;
 };
 
-export const fetchItems = async (
-  status: ItemStatus,
+export const fetchObjects = async (
+  view: "unread" | "saved" | "all" = "unread",
   feedName?: string,
   limit = 30,
   offset = 0,
-): Promise<PaginatedItemsResponse> => {
-  const params = new URLSearchParams({ status, limit: String(limit), offset: String(offset) });
+): Promise<PaginatedObjectsResponse> => {
+  const params = new URLSearchParams({ view, limit: String(limit), offset: String(offset) });
   if (feedName != null) params.set("feed", feedName);
-  const res = await fetch(`/api/items?${params.toString()}`, { headers: getAuthHeaders() });
-  if (!res.ok) throw new Error(await getErrorMessage(res, "Could not load your feed items"));
+  const res = await fetch(`/api/objects?${params.toString()}`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error(await getErrorMessage(res, "Could not load your feed"));
   return res.json();
 };
 
-export const updateItemStatus = async (id: string, status: ItemStatus): Promise<void> => {
-  const res = await fetch(`/api/items/${id}`, {
-    method: "PATCH",
+export const createActivity = async (
+  type: "Read" | "Add",
+  objectId: string,
+  target?: { type: "Collection"; name: "read-later" },
+): Promise<void> => {
+  const res = await fetch("/api/activities", {
+    method: "POST",
     headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ type, objectId, target }),
   });
-  if (!res.ok) throw new Error(await getErrorMessage(res, "Could not update the item"));
+  if (!res.ok && res.status !== 409) throw new Error(await getErrorMessage(res, "Could not create activity"));
 };
 
 export const triggerFetch = async (): Promise<{ runId: string }> => {

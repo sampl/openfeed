@@ -1,8 +1,8 @@
 import { useEffect, useRef, memo, type MouseEvent } from "react";
 import { BookmarkSimple, Export, Check } from "@phosphor-icons/react";
-import type { ApiFeedItem } from "connectors/types";
-import type { RenderMethodKey } from "../state/feedState";
-import { getAvailableMethods } from "../state/feedState";
+import type { AS2Object } from "connectors/types";
+import type { RendererKey } from "../state/feedState";
+import { getAvailableRenderers } from "../state/feedState";
 import { MethodToggle } from "./MethodToggle";
 import { VideoRenderer } from "../renderers/VideoRenderer";
 import { RichTextRenderer } from "../renderers/RichTextRenderer";
@@ -12,14 +12,14 @@ import { formatRelativeDate, getDomain } from "../utils/format";
 import styles from "./FeedPostCard.module.css";
 
 export interface FeedPostCardProps {
-  item: ApiFeedItem;
+  item: AS2Object;
   isRead: boolean;
   isSaved: boolean;
   onRead: (id: string) => void | Promise<void>;
   onBookmark: (id: string) => void | Promise<void>;
-  onShare: (item: ApiFeedItem) => void | Promise<void>;
-  selectedMethod: RenderMethodKey | null;
-  onSelectMethod: (method: RenderMethodKey) => void;
+  onShare: (item: AS2Object) => void | Promise<void>;
+  selectedMethod: RendererKey | null;
+  onSelectMethod: (method: RendererKey) => void;
 }
 
 export const FeedPostCard = memo(({
@@ -35,8 +35,12 @@ export const FeedPostCard = memo(({
   console.log(`🃏 FeedPostCard render — id=${item.id} isRead=${isRead} isSaved=${isSaved} method=${selectedMethod}`);
 
   const cardRef = useRef<HTMLElement>(null);
-  const availableMethods = getAvailableMethods(item);
-  const activeMethod: RenderMethodKey = selectedMethod ?? availableMethods[0];
+  const availableMethods = getAvailableRenderers(item);
+  const activeMethod: RendererKey = selectedMethod ?? availableMethods[0];
+
+  const videoLink = item.attachment?.find((a) => a.rel === "video");
+  const audioLink = item.attachment?.find((a) => a.rel === "enclosure");
+  const embedLink = item.attachment?.find((a) => a.rel === "embed") ?? item.attachment?.[0];
 
   // Keep a ref to the latest onRead so the observer effect doesn't need to
   // include it in its dependency array — otherwise a new function reference
@@ -100,11 +104,11 @@ export const FeedPostCard = memo(({
           <span className={styles.sourceName}>{item.sourceName}</span>
         </div>
 
-        <h2 className={styles.title}>{item.title}</h2>
+        {item.name && <h2 className={styles.title}>{item.name}</h2>}
 
-        {/* Only show description when there's no richText — avoids duplicating the same content */}
-        {item.description && !item.renderData.richText && (
-          <p className={styles.description}>{item.description}</p>
+        {/* Only show summary when there's no full content — avoids duplicating the same content */}
+        {item.summary && item.content == null && (
+          <p className={styles.description}>{item.summary}</p>
         )}
       </a>
 
@@ -119,17 +123,17 @@ export const FeedPostCard = memo(({
               />
             </div>
           )}
-          {activeMethod === "video" && item.renderData.video && (
-            <VideoRenderer data={item.renderData.video} />
+          {activeMethod === "video" && videoLink && (
+            <VideoRenderer embedUrl={videoLink.href} />
           )}
-          {activeMethod === "richText" && item.renderData.richText && (
-            <RichTextRenderer data={item.renderData.richText} />
+          {activeMethod === "content" && (
+            <RichTextRenderer content={item.content ?? item.summary} mediaType={item.mediaType} />
           )}
-          {activeMethod === "audio" && item.renderData.audio && (
-            <AudioRenderer data={item.renderData.audio} />
+          {activeMethod === "audio" && audioLink && (
+            <AudioRenderer audioUrl={audioLink.href} />
           )}
-          {activeMethod === "embed" && item.renderData.embed && (
-            <EmbedRenderer data={item.renderData.embed} />
+          {activeMethod === "embed" && embedLink && (
+            <EmbedRenderer url={embedLink.href} />
           )}
         </div>
       )}
@@ -137,7 +141,7 @@ export const FeedPostCard = memo(({
       <div className={styles.postItemMeta}>
         <span className={styles.sourceUrl}>{getDomain(item.sourceUrl || item.url)}</span>
         <span className={styles.metaSep}>·</span>
-        <span className={styles.publishedAt}>{formatRelativeDate(item.publishedAt)}</span>
+        <span className={styles.publishedAt}>{formatRelativeDate(item.published ?? "")}</span>
       </div>
 
       <div className={styles.postActions}>

@@ -7,7 +7,7 @@ import { useTimeTracking } from "../hooks/useTimeTracking";
 import { useTimeLimits } from "../hooks/useTimeLimits";
 import { FeedPostCard } from "../components/FeedPostCard";
 import { StickyFeedHeader } from "../components/StickyFeedHeader";
-import type { ApiFeedItem } from "connectors/types";
+import type { AS2Object } from "connectors/types";
 import styles from "./FeedPage.module.css";
 
 const EMPTY_EMOJIS = ["🎉", "🌟", "✨", "🎊", "🌈", "🦋", "🌸", "🌊", "🎵", "🚀"];
@@ -88,7 +88,7 @@ export const FeedPage = () => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleShare = useCallback(async (item: ApiFeedItem) => {
+  const handleShare = useCallback(async (item: AS2Object) => {
     const text = `${item.url} - shared with Open Feed`;
     try {
       await navigator.clipboard.writeText(text);

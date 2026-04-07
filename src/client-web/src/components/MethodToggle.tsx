@@ -1,23 +1,23 @@
-import type { RenderMethodKey } from "../state/feedState";
+import type { RendererKey } from "../state/feedState";
 import styles from "./MethodToggle.module.css";
 
-const METHOD_LABELS: Record<RenderMethodKey, string> = {
+const METHOD_LABELS: Record<RendererKey, string> = {
   video: "Video",
-  richText: "Text",
+  content: "Text",
   audio: "Audio",
   embed: "Embed",
 };
 
 interface Props {
-  methods: RenderMethodKey[];
-  selected: RenderMethodKey;
-  onSelect: (method: RenderMethodKey) => void;
+  methods: RendererKey[];
+  selected: RendererKey;
+  onSelect: (method: RendererKey) => void;
 }
 
 export const MethodToggle = ({ methods, selected, onSelect }: Props) => {
   console.log(`🔀 MethodToggle render — selected=${selected} methods=[${methods.join(",")}]`);
 
-  const handleSelect = (method: RenderMethodKey) => {
+  const handleSelect = (method: RendererKey) => {
     console.log(`🔀 MethodToggle select — ${method}`);
     onSelect(method);
   };
