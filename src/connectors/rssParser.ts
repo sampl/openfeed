@@ -130,7 +130,7 @@ const parseRss2Items = (
 
 const parseAtomItems = (
   feed: NonNullable<AtomFeed["feed"]>,
-  sourceUrl: string
+  _sourceUrl: string
 ): readonly PluginAS2Object[] => {
   const rawEntries = feed.entry ?? [];
   const entries: AtomEntry[] = Array.isArray(rawEntries) ? rawEntries : [rawEntries];

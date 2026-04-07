@@ -88,7 +88,7 @@ const openMeteoPlugin: BackendFeedPlugin = {
 
     const fahrenheit = isFahrenheit(fetchUrl);
     const summary = buildSummary(data, fahrenheit);
-    const locationName = deriveLocationName(sourceUrl);
+    const _locationName = deriveLocationName(sourceUrl);
     const dateStamp = new Date().toISOString().slice(0, 10);
 
     return [{

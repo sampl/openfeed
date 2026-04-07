@@ -10,7 +10,8 @@ An OpenFeed connector is a TypeScript module that exports a `BackendFeedPlugin` 
 import type {
   BackendFeedPlugin,
   FetchFn,
-  PluginFeedItem,
+  PluginAS2Object,
+  PluginContext,
 } from "openfeed/connectors/types";
 
 const myConnector: BackendFeedPlugin = {
@@ -24,19 +25,18 @@ const myConnector: BackendFeedPlugin = {
   listItems: async (
     sourceUrl: string,
     fetchFn: FetchFn,
+    context: PluginContext,
     options?: Record<string, unknown>,
-  ): Promise<readonly NewFeedItem[]> => {
+  ): Promise<readonly PluginAS2Object[]> => {
     const response = await fetchFn(sourceUrl);
     const data = await response.json();
     return data.items.map((item) => ({
-      sourceName: "My Source",
-      sourceUrl,
-      title: item.title,
+      type: "Article",
+      name: item.title,
       url: item.url,
-      publishedAt: new Date(item.date),
-      renderData: {
-        richText: { text: item.body },
-      },
+      published: new Date(item.date),
+      content: item.body,
+      mediaType: "text/html",
     }));
   },
 };
@@ -44,14 +44,16 @@ const myConnector: BackendFeedPlugin = {
 export default myConnector;
 ```
 
-Each item must include at least one render method in `renderData`:
+Each item must include the required fields `type` and `url`. The `type` field determines how the content is displayed:
 
-| Method     | Data                 | How it renders             |
-| ---------- | -------------------- | -------------------------- |
-| `video`    | `{ videoId?, url? }` | YouTube embed or `<video>` |
-| `richText` | `{ html?, text }`    | Formatted article content  |
-| `audio`    | `{ url }`            | `<audio>` player           |
-| `embed`    | `{ url }`            | `<iframe>` fallback        |
+| Type      | Description                                                    | Common fields          |
+| --------- | -------------------------------------------------------------- | ---------------------- |
+| `Article` | Long-form content with a headline (RSS, blog posts, news)      | `name`, `content`      |
+| `Note`    | Short-form text without a standalone title (social posts)      | `content`              |
+| `Video`   | Video content with embed link                                  | `url`, `attachment`    |
+| `Audio`   | Audio content with enclosure URL                               | `url`, `attachment`    |
+| `Event`   | Calendar event                                                 | `name`, `published`    |
+| `Page`    | Generic web page best shown in an iframe                       | `url`                  |
 
 ## Error handling
 
@@ -134,9 +136,10 @@ describe("myConnector", () => {
           ],
         }),
     });
-    const items = await myConnector.listItems("https://mysite.com", mockFetch);
+    const context = { sourceName: "Test", sourceUrl: "https://mysite.com" };
+    const items = await myConnector.listItems("https://mysite.com", mockFetch, context);
     expect(items).toHaveLength(1);
-    expect(items[0].title).toBe("Test");
+    expect(items[0].name).toBe("Test");
   });
 });
 ```

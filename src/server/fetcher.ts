@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import type { DbInterface, NewDbObject } from "./db/interface.js";
 import type { FeedConfig, SourceConfig, UserConfig } from "./config.js";
 import { resolvePlugin } from "./pluginRegistry.js";
-import type { PluginAS2Object, AS2Link, AS2Tag } from "../connectors/types.js";
+import type { PluginAS2Object } from "../connectors/types.js";
 import { FeedError } from "../connectors/types.js";
 import type { SourceResult } from "./db/interface.js";
 
