@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
-import type { ApiFeedItem } from "connectors/types";
-import type { RenderMethodKey } from "../state/feedState";
-import { getAvailableMethods } from "../state/feedState";
+import type { AS2Object } from "connectors/types";
+import type { RendererKey } from "../state/feedState";
+import { getAvailableRenderers } from "../state/feedState";
 import { MethodToggle } from "../components/MethodToggle";
 import { VideoRenderer } from "../renderers/VideoRenderer";
 import { RichTextRenderer } from "../renderers/RichTextRenderer";
@@ -14,12 +14,16 @@ import { formatDate } from "../utils/format";
 export const ItemDetailPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const item = (location.state as { item?: ApiFeedItem } | null)?.item ?? null;
+  const item = (location.state as { item?: AS2Object } | null)?.item ?? null;
 
-  const [selectedMethod, setSelectedMethod] = useState<RenderMethodKey | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<RendererKey | null>(null);
 
-  const availableMethods = item ? getAvailableMethods(item) : [];
-  const activeMethod: RenderMethodKey = selectedMethod ?? availableMethods[0];
+  const availableMethods = item ? getAvailableRenderers(item) : [];
+  const activeMethod: RendererKey = selectedMethod ?? availableMethods[0];
+
+  const videoLink = item?.attachment?.find((a) => a.rel === "video");
+  const audioLink = item?.attachment?.find((a) => a.rel === "enclosure");
+  const embedLink = item?.attachment?.find((a) => a.rel === "embed") ?? item?.attachment?.[0];
 
   if (!item) {
     return (
@@ -59,12 +63,14 @@ export const ItemDetailPage = () => {
               {item.sourceName}
             </span>
             <span className="text-[length:var(--xs)] text-[var(--text-tertiary)]">
-              {formatDate(item.publishedAt)}
+              {formatDate(item.published ?? "")}
             </span>
           </div>
-          <h1 className="text-[length:var(--lg)] font-bold leading-snug m-0 text-[var(--text-primary)]">
-            {item.title}
-          </h1>
+          {item.name && (
+            <h1 className="text-[length:var(--lg)] font-bold leading-snug m-0 text-[var(--text-primary)]">
+              {item.name}
+            </h1>
+          )}
           {availableMethods.length > 1 && (
             <div className="pt-1">
               <MethodToggle
@@ -78,17 +84,17 @@ export const ItemDetailPage = () => {
 
         {/* Content renderer */}
         <div className="pt-3">
-          {activeMethod === "video" && item.renderData.video && (
-            <VideoRenderer data={item.renderData.video} />
+          {activeMethod === "video" && videoLink && (
+            <VideoRenderer embedUrl={videoLink.href} />
           )}
-          {activeMethod === "richText" && item.renderData.richText && (
-            <RichTextRenderer data={item.renderData.richText} />
+          {activeMethod === "content" && (
+            <RichTextRenderer content={item.content ?? item.summary} mediaType={item.mediaType} />
           )}
-          {activeMethod === "audio" && item.renderData.audio && (
-            <AudioRenderer data={item.renderData.audio} />
+          {activeMethod === "audio" && audioLink && (
+            <AudioRenderer audioUrl={audioLink.href} />
           )}
-          {activeMethod === "embed" && item.renderData.embed && (
-            <EmbedRenderer data={item.renderData.embed} />
+          {activeMethod === "embed" && embedLink && (
+            <EmbedRenderer url={embedLink.href} />
           )}
         </div>
 

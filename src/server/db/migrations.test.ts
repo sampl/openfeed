@@ -51,10 +51,12 @@ describe("runMigrations", () => {
       db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as { name: string }[]
     ).map((r) => r.name);
 
-    expect(tables).toContain("items");
+    expect(tables).toContain("objects");
+    expect(tables).toContain("activities");
     expect(tables).toContain("runs");
     expect(tables).toContain("time_sessions");
     expect(tables).toContain("schema_migrations");
+    expect(tables).not.toContain("items");
   });
 
   it("stamps existing tables as applied without re-running migrations (bootstrap)", () => {
@@ -98,7 +100,7 @@ describe("runMigrations", () => {
       VALUES ('existing-item', 'Test', 'https://example.com', 'Title', 'https://example.com/1', '{}', 'unread', 0)
     `);
 
-    // Run migrations — should not error and should not wipe the existing data
+    // Run migrations — should migrate existing data and drop items table
     runMigrations(db);
 
     // All migrations should be stamped as applied
@@ -107,8 +109,18 @@ describe("runMigrations", () => {
       .all() as { version: number }[];
     expect(applied).toHaveLength(MIGRATIONS.length);
 
-    // Existing data should be preserved
-    const items = db.prepare("SELECT * FROM items").all();
-    expect(items).toHaveLength(1);
+    // Existing item should have been migrated to objects table
+    const objects = db.prepare("SELECT * FROM objects").all();
+    expect(objects).toHaveLength(1);
+
+    // A Create activity should have been created for the unread item
+    const activities = db.prepare("SELECT * FROM activities").all() as { type: string }[];
+    expect(activities.some((a) => a.type === "Create")).toBe(true);
+
+    // items table should have been dropped by migration 7
+    const tables = (
+      db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+    ).map((r) => r.name);
+    expect(tables).not.toContain("items");
   });
 });

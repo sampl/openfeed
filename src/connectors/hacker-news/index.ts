@@ -1,4 +1,4 @@
-import type { BackendFeedPlugin, PluginFeedItem } from "../types.js";
+import type { BackendFeedPlugin, PluginAS2Object } from "../types.js";
 import { FeedError } from "../types.js";
 
 interface HnHit {
@@ -16,12 +16,11 @@ interface HnResponse {
 
 const hackerNewsPlugin: BackendFeedPlugin = {
   name: "hacker-news",
-  // Orange square with white Y letterform — Hacker News brand colours
   icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect width="20" height="20" fill="#FF6600"/><path d="M4 4 L10 10.5 L16 4 M10 10.5 L10 16" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
   canHandle: (sourceUrl) => sourceUrl.includes("news.ycombinator.com"),
 
-  listItems: async (sourceUrl, fetchFn, options = {}): Promise<readonly PluginFeedItem[]> => {
+  listItems: async (_sourceUrl, fetchFn, _context, options = {}): Promise<readonly PluginAS2Object[]> => {
     const limit = typeof options.limit === "number" ? options.limit : 10;
 
     const fetchUrl = `https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=${limit}`;
@@ -34,19 +33,14 @@ const hackerNewsPlugin: BackendFeedPlugin = {
 
     const json = (await response.json()) as HnResponse;
 
-    return json.hits.map((hit): PluginFeedItem => {
-      // Ask HN and similar posts have no external URL — fall back to HN item page
+    return json.hits.map((hit): PluginAS2Object => {
       const itemUrl = hit.url ?? `https://news.ycombinator.com/item?id=${hit.objectID}`;
 
       return {
-        sourceName: "Hacker News",
-        sourceUrl,
-        title: hit.title,
+        type: "Article",
+        name: hit.title,
         url: itemUrl,
-        publishedAt: new Date(hit.created_at),
-        renderData: {
-          richText: { text: hit.title },
-        },
+        published: new Date(hit.created_at),
       };
     });
   },

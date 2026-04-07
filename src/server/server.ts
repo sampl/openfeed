@@ -4,7 +4,8 @@ import { fileURLToPath } from "url";
 import rateLimit from "express-rate-limit";
 import type { DbInterface } from "./db/interface.js";
 import type { UserConfig } from "./config.js";
-import { createItemsRouter } from "./api/items.js";
+import { createObjectsRouter } from "./api/objects.js";
+import { createActivitiesRouter } from "./api/activities.js";
 import { createFetchRouter } from "./api/fetch.js";
 import { createRunsRouter } from "./api/runs.js";
 import { createFeedsRouter } from "./api/feeds.js";
@@ -53,7 +54,8 @@ export const createServer = (config: UserConfig, db: DbInterface, configPath: st
   // API routes
   app.use("/api/fetch", fetchLimiter);
   app.use("/api", apiLimiter);
-  app.use("/api/items", createItemsRouter(db));
+  app.use("/api/objects", createObjectsRouter(db));
+  app.use("/api/activities", createActivitiesRouter(db));
   app.use("/api/fetch", createFetchRouter(config, db));
   app.use("/api/runs", createRunsRouter(db));
   app.use("/api/feeds", createFeedsRouter(config));

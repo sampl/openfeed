@@ -2,8 +2,6 @@ import type { BackendFeedPlugin } from "../types.js";
 import { FeedError } from "../types.js";
 import { fetchAndParseRss } from "../rssParser.js";
 
-// Extract the numeric podcast ID from an Apple Podcasts URL.
-// Supports formats like: /id123456 or ?id=123456
 const extractApplePodcastId = (url: string): string | null => {
   const match = /\/id(\d+)/.exec(url) ?? /[?&]id=(\d+)/.exec(url);
   return match?.[1] ?? null;
@@ -44,10 +42,7 @@ const podcastsPlugin: BackendFeedPlugin = {
     const lookupResponse = await fetchFn(lookupUrl);
     if (!lookupResponse.ok) {
       const code = lookupResponse.status === 404 ? "source_not_found" : "network_error";
-      throw new FeedError(
-        `iTunes lookup failed: HTTP ${lookupResponse.status}`,
-        code
-      );
+      throw new FeedError(`iTunes lookup failed: HTTP ${lookupResponse.status}`, code);
     }
 
     const lookupData = (await lookupResponse.json()) as ItunesLookupResponse;

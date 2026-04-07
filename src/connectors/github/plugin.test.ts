@@ -37,6 +37,8 @@ describe("github canHandle", () => {
 });
 
 describe("github listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://github.com/dnd-kit/dnd-kit" };
+
   it("maps issues to feed items with correct fields", async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce({
       ok: true,
@@ -51,13 +53,10 @@ describe("github listItems", () => {
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.sourceName).toBe("dnd-kit/dnd-kit");
-    expect(first.title).toBe("#42: Fix drag handle offset on touch devices");
+    expect(first.name).toBe("#42: Fix drag handle offset on touch devices");
     expect(first.url).toBe("https://github.com/dnd-kit/dnd-kit/issues/42");
-    expect(first.publishedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
-    expect(first.renderData).toMatchObject({
-      richText: { text: "When using touch input, the drag handle position is offset by 10px." },
-    });
+    expect(first.published).toEqual(new Date("2024-01-15T10:00:00.000Z"));
+    expect(first.summary).toBe("When using touch input, the drag handle position is offset by 10px.");
   });
 
   it("falls back to title text when issue body is null", async () => {
@@ -72,9 +71,7 @@ describe("github listItems", () => {
     );
 
     const second = items[1]!;
-    expect(second.renderData).toMatchObject({
-      richText: { text: "Add keyboard accessibility support" },
-    });
+    expect(second.summary).toBeUndefined();
   });
 
   it("uses limit option in API request", async () => {
@@ -86,6 +83,7 @@ describe("github listItems", () => {
     await githubPlugin.listItems(
       "https://github.com/dnd-kit/dnd-kit",
       fetchFn,
+      mockContext,
       { limit: 25 }
     );
 

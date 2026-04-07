@@ -57,13 +57,13 @@ describe("youtube listItems", () => {
 
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Test Video Title");
+    expect(item.name).toBe("Test Video Title");
     expect(item.url).toBe("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-    expect(item.publishedAt).toEqual(new Date("2024-01-15T10:00:00+00:00"));
-    expect(item.renderData).toMatchObject({
-      video: { videoId: "dQw4w9WgXcQ" },
-      richText: { text: "Test video description" },
-    });
+    expect(item.published).toEqual(new Date("2024-01-15T10:00:00+00:00"));
+    expect(item.attachment).toHaveLength(1);
+    expect(item.attachment![0]!.href).toBe("https://www.youtube.com/embed/dQw4w9WgXcQ");
+    expect(item.attachment![0]!.rel).toBe("video");
+    expect(item.summary).toBe("Test video description");
   });
 
   it("uses the channel ID directly from a /channel/ URL (no page scrape)", async () => {

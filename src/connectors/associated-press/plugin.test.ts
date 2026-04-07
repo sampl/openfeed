@@ -32,6 +32,8 @@ describe("associated-press canHandle", () => {
 });
 
 describe("associated-press listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("associated-press listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://feeds.apnews.com/apnews/topnews");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Top News Story");
-    expect(item.sourceName).toBe("Associated Press");
+    expect(item.name).toBe("Top News Story");
     expect(item.url).toBe("https://apnews.com/article/top-news-story");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>AP news content</p>", text: "AP news content" },
-    });
+    expect(item.content).toBe("<p>AP news content</p>");
+    expect(item.summary).toBe("AP news content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://feeds.apnews.com/apnews/science";
 
-    await plugin.listItems("https://apnews.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://apnews.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

@@ -2,7 +2,6 @@ import type { BackendFeedPlugin } from "../types.js";
 import { fetchAndParseRss } from "../rssParser.js";
 
 // Derive the RSS feed URL from a Buttondown archive URL.
-// https://buttondown.com/{newsletter}/archive → https://buttondown.com/{newsletter}/rss
 const resolveRssUrl = (sourceUrl: string): string => {
   const url = new URL(sourceUrl);
   url.pathname = url.pathname.replace(/\/archive\/?$/, "/rss");

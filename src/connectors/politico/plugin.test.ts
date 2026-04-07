@@ -32,6 +32,8 @@ describe("politico canHandle", () => {
 });
 
 describe("politico listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("politico listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://www.politico.com/rss/politicopicks.xml");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Political News Story");
-    expect(item.sourceName).toBe("Politico");
+    expect(item.name).toBe("Political News Story");
     expect(item.url).toBe("https://www.politico.com/news/2024/01/15/story");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Political content here</p>", text: "Political content here" },
-    });
+    expect(item.content).toBe("<p>Political content here</p>");
+    expect(item.summary).toBe("Political content here");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://www.politico.com/rss/congress.xml";
 
-    await plugin.listItems("https://www.politico.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.politico.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

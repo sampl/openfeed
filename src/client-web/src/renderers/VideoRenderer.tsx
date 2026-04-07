@@ -1,15 +1,10 @@
-import type { VideoRenderData } from "connectors/types";
 import styles from "./VideoRenderer.module.css";
 
 interface Props {
-  data: VideoRenderData;
+  embedUrl: string;
 }
 
-export const VideoRenderer = ({ data }: Props) => {
-  const embedUrl = data.videoId
-    ? `https://www.youtube.com/embed/${data.videoId}`
-    : data.url ?? "";
-
+export const VideoRenderer = ({ embedUrl }: Props) => {
   console.log(`🎞 VideoRenderer render — embedUrl=${embedUrl}`);
 
   if (!embedUrl) return <p>No video available</p>;

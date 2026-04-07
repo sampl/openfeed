@@ -51,38 +51,33 @@ describe("rss canHandle", () => {
 });
 
 describe("rss listItems — RSS 2.0", () => {
-  it("parses RSS 2.0 and returns PluginFeedItem array", async () => {
+  it("parses RSS 2.0 and returns PluginAS2Object array", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS2_XML);
 
     const items = await genericRssPlugin.listItems("https://example.com/feed", fetchFn);
 
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Test Article");
-    expect(item.sourceName).toBe("Example Blog");
+    expect(item.name).toBe("Test Article");
     expect(item.url).toBe("https://example.com/article");
-    expect(item.publishedAt).toEqual(new Date("Mon, 15 Jan 2024 10:00:00 +0000"));
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Test content</p>", text: "Test content" },
-    });
+    expect(item.published).toEqual(new Date("Mon, 15 Jan 2024 10:00:00 +0000"));
+    expect(item.content).toBe("<p>Test content</p>");
+    expect(item.summary).toBe("Test content");
   });
 });
 
 describe("rss listItems — Atom", () => {
-  it("parses Atom feeds and returns PluginFeedItem array", async () => {
+  it("parses Atom feeds and returns PluginAS2Object array", async () => {
     const fetchFn = makeFetch(SAMPLE_ATOM_XML);
 
     const items = await genericRssPlugin.listItems("https://example.com/atom", fetchFn);
 
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Atom Article");
-    expect(item.sourceName).toBe("Atom Blog");
+    expect(item.name).toBe("Atom Article");
     expect(item.url).toBe("https://example.com/atom-article");
-    expect(item.publishedAt).toEqual(new Date("2024-01-15T10:00:00+00:00"));
-    expect(item.renderData).toMatchObject({
-      richText: { text: "Atom content here" },
-    });
+    expect(item.published).toEqual(new Date("2024-01-15T10:00:00+00:00"));
+    expect(item.summary).toBe("Atom content here");
   });
 });
 

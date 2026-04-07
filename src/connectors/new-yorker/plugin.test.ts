@@ -32,6 +32,8 @@ describe("new-yorker canHandle", () => {
 });
 
 describe("new-yorker listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("new-yorker listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://www.newyorker.com/feed/everything");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Feature Article Title");
-    expect(item.sourceName).toBe("The New Yorker");
+    expect(item.name).toBe("Feature Article Title");
     expect(item.url).toBe("https://www.newyorker.com/magazine/2024/01/15/feature-article");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>New Yorker article content</p>", text: "New Yorker article content" },
-    });
+    expect(item.content).toBe("<p>New Yorker article content</p>");
+    expect(item.summary).toBe("New Yorker article content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://www.newyorker.com/feed/culture";
 
-    await plugin.listItems("https://www.newyorker.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.newyorker.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

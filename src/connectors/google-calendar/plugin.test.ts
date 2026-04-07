@@ -32,6 +32,8 @@ describe("google-calendar canHandle", () => {
   });
 });
 
+const mockContext = { sourceName: "Test Source", sourceUrl: "https://calendar.google.com/calendar" };
+
 describe("google-calendar listItems", () => {
   it("throws a FeedError with invalid_config when no icsUrl in options", async () => {
     const fetchFn = vi.fn();
@@ -49,6 +51,7 @@ describe("google-calendar listItems", () => {
     const error = await googleCalendarPlugin.listItems(
       "https://calendar.google.com/calendar",
       fetchFn,
+      mockContext,
       { icsUrl: "https://calendar.google.com/ical/test.ics" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -60,6 +63,7 @@ describe("google-calendar listItems", () => {
     const error = await googleCalendarPlugin.listItems(
       "https://calendar.google.com/calendar",
       fetchFn,
+      mockContext,
       { icsUrl: "https://calendar.google.com/ical/private.ics" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -75,20 +79,19 @@ describe("google-calendar listItems", () => {
     const items = await googleCalendarPlugin.listItems(
       "https://calendar.google.com/calendar",
       fetchFn,
+      mockContext,
       { icsUrl: "https://calendar.google.com/calendar/ical/test/public/basic.ics" }
     );
 
     expect(items).toHaveLength(2);
 
     const first = items[0]!;
-    expect(first.title).toBe("Team standup");
+    expect(first.name).toBe("Team standup");
     expect(first.url).toBe("https://meet.google.com/abc-defg-hij");
-    expect(first.renderData).toMatchObject({
-      richText: { text: expect.stringContaining("Team standup") },
-    });
+    expect(first.summary).toContain("Daily team sync");
 
     const second = items[1]!;
-    expect(second.title).toBe("All hands");
+    expect(second.name).toBe("All hands");
     // No URL in event — falls back to sourceUrl
     expect(second.url).toBe("https://calendar.google.com/calendar");
   });

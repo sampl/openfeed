@@ -32,6 +32,8 @@ describe("al-jazeera canHandle", () => {
 });
 
 describe("al-jazeera listItems", () => {
+  const mockContext = { sourceName: "Test Source", sourceUrl: "https://example.com" };
+
   it("fetches the default RSS feed and returns items", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
 
@@ -40,19 +42,17 @@ describe("al-jazeera listItems", () => {
     expect(fetchFn).toHaveBeenCalledWith("https://www.aljazeera.com/xml/rss/all.xml");
     expect(items).toHaveLength(1);
     const item = items[0]!;
-    expect(item.title).toBe("Global News Story");
-    expect(item.sourceName).toBe("Al Jazeera");
+    expect(item.name).toBe("Global News Story");
     expect(item.url).toBe("https://www.aljazeera.com/news/2024/1/15/global-news-story");
-    expect(item.renderData).toMatchObject({
-      richText: { html: "<p>Al Jazeera news content</p>", text: "Al Jazeera news content" },
-    });
+    expect(item.content).toBe("<p>Al Jazeera news content</p>");
+    expect(item.summary).toBe("Al Jazeera news content");
   });
 
   it("uses options.feed when provided", async () => {
     const fetchFn = makeFetch(SAMPLE_RSS_XML);
     const customFeed = "https://www.aljazeera.com/xml/rss/opinion.xml";
 
-    await plugin.listItems("https://www.aljazeera.com", fetchFn, { feed: customFeed });
+    await plugin.listItems("https://www.aljazeera.com", fetchFn, mockContext, { feed: customFeed });
 
     expect(fetchFn).toHaveBeenCalledWith(customFeed);
   });

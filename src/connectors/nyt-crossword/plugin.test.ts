@@ -34,6 +34,8 @@ describe("nyt-crossword canHandle", () => {
   });
 });
 
+const mockContext = { sourceName: "Test Source", sourceUrl: "https://www.nytimes.com/crosswords" };
+
 describe("nyt-crossword listItems", () => {
   it("throws a FeedError with missing_credential when no apiKey in options", async () => {
     const fetchFn = vi.fn();
@@ -52,6 +54,7 @@ describe("nyt-crossword listItems", () => {
     const error = await nytCrosswordPlugin.listItems(
       "https://www.nytimes.com/crosswords",
       fetchFn,
+      mockContext,
       { apiKey: "bad-key" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -63,6 +66,7 @@ describe("nyt-crossword listItems", () => {
     const error = await nytCrosswordPlugin.listItems(
       "https://www.nytimes.com/crosswords",
       fetchFn,
+      mockContext,
       { apiKey: "test-key" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -76,6 +80,7 @@ describe("nyt-crossword listItems", () => {
     const error = await nytCrosswordPlugin.listItems(
       "https://www.nytimes.com/crosswords",
       fetchFn,
+      mockContext,
       { apiKey: "test-key" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -87,6 +92,7 @@ describe("nyt-crossword listItems", () => {
     const error = await nytCrosswordPlugin.listItems(
       "https://www.nytimes.com/crosswords",
       fetchFn,
+      mockContext,
       { apiKey: "test-key" }
     ).catch((e) => e);
     expect(error).toBeInstanceOf(FeedError);
@@ -102,6 +108,7 @@ describe("nyt-crossword listItems", () => {
     const items = await nytCrosswordPlugin.listItems(
       "https://www.nytimes.com/crosswords",
       fetchFn,
+      mockContext,
       { apiKey: "test-key" }
     );
 
@@ -109,16 +116,13 @@ describe("nyt-crossword listItems", () => {
 
     const first = items[0]!;
     // puzzle with null title should fall back to "NYT Crossword - {print_date}"
-    expect(first.title).toBe("NYT Crossword - 2024-01-15");
+    expect(first.name).toBe("NYT Crossword - 2024-01-15");
     expect(first.url).toBe(
       "https://www.nytimes.com/crosswords/game/daily/2024-01-15"
     );
-    expect(first.renderData).toMatchObject({
-      richText: { text: "NYT Crossword - 2024-01-15" },
-    });
 
     const second = items[1]!;
-    expect(second.title).toBe("Monday Puzzle");
+    expect(second.name).toBe("Monday Puzzle");
     expect(second.url).toBe(
       "https://www.nytimes.com/crosswords/game/daily/2024-01-14"
     );

@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { BookmarkSimple } from "@phosphor-icons/react";
-import { fetchItems, updateItemStatus } from "../apiClient";
-import type { ApiFeedItem } from "connectors/types";
-import type { RenderMethodKey } from "../state/feedState";
+import { fetchObjects, createActivity } from "../apiClient";
+import type { AS2Object } from "connectors/types";
+import type { RendererKey } from "../state/feedState";
 import { EmptyState, ErrorState, PageSpinner, toast } from "../ui_components";
 import { FeedPostCard } from "../components/FeedPostCard";
 import styles from "./SavedPage.module.css";
 
 export const SavedPage = () => {
-  const [items, setItems] = useState<ApiFeedItem[]>([]);
+  const [items, setItems] = useState<AS2Object[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<RenderMethodKey | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<RendererKey | null>(null);
 
   console.log(`🔖 SavedPage render — items=${items.length} isLoading=${isLoading}`);
 
@@ -19,7 +19,7 @@ export const SavedPage = () => {
     console.log("🔖 SavedPage effect — fetching saved items");
     setIsLoading(true);
     setError(null);
-    fetchItems("read-later")
+    fetchObjects("saved")
       .then((response) => {
         console.log(`🔖 SavedPage fetch complete — ${response.items.length} items`);
         setItems(response.items);
@@ -33,11 +33,11 @@ export const SavedPage = () => {
 
   const handleUnsave = useCallback(async (id: string) => {
     console.log(`🔖 SavedPage handleUnsave — id=${id}`);
-    await updateItemStatus(id, "archived").catch(() => {});
+    await createActivity("Read", id).catch(() => {});
     setItems((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  const handleShare = useCallback(async (item: ApiFeedItem) => {
+  const handleShare = useCallback(async (item: AS2Object) => {
     try {
       await navigator.clipboard.writeText(item.url);
       toast("Link copied");

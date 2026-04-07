@@ -4,12 +4,12 @@ import { fetchAndParseRss } from "../rssParser.js";
 const plugin: BackendFeedPlugin = {
   name: "reuters",
   canHandle: (url) => url.includes("reuters.com"),
-  listItems: async (sourceUrl, fetchFn, options = {}) => {
+  listItems: async (sourceUrl, fetchFn, _context, options = {}) => {
     const feedUrl =
       typeof options.feed === "string"
         ? options.feed
         : "https://feeds.reuters.com/reuters/topNews";
-    return fetchAndParseRss(feedUrl, sourceUrl, fetchFn, "Reuters");
+    return fetchAndParseRss(feedUrl, sourceUrl, fetchFn);
   },
 };
 

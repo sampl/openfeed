@@ -1,21 +1,50 @@
 import Database from "better-sqlite3";
-import type { FeedItem, FeedItemRenderData } from "../../connectors/types.js";
-import type { DbInterface, NewDbItem, NewRun, NewTimeSession, PaginatedItems, Run, SourceResult, TimeUsage } from "./interface.js";
+import type { AS2ActivityType } from "../../connectors/types.js";
+import type {
+  DbInterface,
+  DbObject,
+  NewDbObject,
+  NewActivity,
+  NewRun,
+  NewTimeSession,
+  PaginatedObjects,
+  Run,
+  SourceResult,
+  TimeUsage,
+} from "./interface.js";
 import { runMigrations } from "./migrations.js";
+import { randomUUID } from "crypto";
 
-const rowToFeedItem = (row: Record<string, unknown>): FeedItem => ({
-  id: row.id as string,
-  sourceName: row.source_name as string,
-  sourceUrl: row.source_url as string,
-  feedName: row.feed_name as string | undefined,
-  title: row.title as string,
-  description: row.description as string | undefined,
-  url: row.url as string,
-  publishedAt: new Date(row.published_at as number),
-  renderData: JSON.parse(row.render_data as string) as FeedItemRenderData,
-  status: row.status as "unread" | "archived" | "read-later",
-  createdAt: new Date(row.created_at as number),
-});
+// ---------------------------------------------------------------------------
+// Row mapping helpers
+// ---------------------------------------------------------------------------
+
+const rowToDbObject = (row: Record<string, unknown>): DbObject => {
+  const obj: DbObject = {
+    id: row.id as string,
+    type: row.type as DbObject["type"],
+    url: row.url as string,
+    sourceName: row.source_name as string,
+    sourceUrl: row.source_url as string,
+    feedName: row.feed_name as string | undefined,
+    createdAt: new Date(row.created_at as number),
+  };
+
+  if (row.name != null) (obj as Record<string, unknown>).name = row.name as string;
+  if (row.summary != null) (obj as Record<string, unknown>).summary = row.summary as string;
+  if (row.content != null) (obj as Record<string, unknown>).content = row.content as string;
+  if (row.media_type != null) (obj as Record<string, unknown>).mediaType = row.media_type as string;
+  if (row.published != null) (obj as Record<string, unknown>).published = new Date(row.published as number);
+
+  if (row.attachment != null) {
+    (obj as Record<string, unknown>).attachment = JSON.parse(row.attachment as string);
+  }
+  if (row.extras != null) {
+    (obj as Record<string, unknown>).extras = JSON.parse(row.extras as string);
+  }
+
+  return obj;
+};
 
 const rowToRun = (row: Record<string, unknown>): Run => ({
   id: row.id as string,
@@ -29,81 +58,203 @@ const rowToRun = (row: Record<string, unknown>): Run => ({
     : [],
 });
 
+// ---------------------------------------------------------------------------
+// Factory
+// ---------------------------------------------------------------------------
+
 export const createSqliteDb = (dbPath: string): DbInterface => {
   const db = new Database(dbPath);
 
-  // WAL mode improves concurrent read/write performance
   db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON");
 
   runMigrations(db);
 
-  const getItems = (
-    status: "unread" | "archived" | "read-later",
-    feedName?: string,
-    limit = 30,
-    offset = 0,
-  ): PaginatedItems => {
-    if (feedName != null) {
-      const total = (
-        db.prepare("SELECT COUNT(*) as count FROM items WHERE status = ? AND feed_name = ?")
-          .get(status, feedName) as { count: number }
-      ).count;
-      const rows = db
-        .prepare("SELECT * FROM items WHERE status = ? AND feed_name = ? ORDER BY published_at DESC LIMIT ? OFFSET ?")
-        .all(status, feedName, limit, offset) as Record<string, unknown>[];
-      return { items: rows.map(rowToFeedItem), hasMore: offset + rows.length < total, total };
-    }
-    const total = (
-      db.prepare("SELECT COUNT(*) as count FROM items WHERE status = ?")
-        .get(status) as { count: number }
-    ).count;
-    const rows = db
-      .prepare("SELECT * FROM items WHERE status = ? ORDER BY published_at DESC LIMIT ? OFFSET ?")
-      .all(status, limit, offset) as Record<string, unknown>[];
-    return { items: rows.map(rowToFeedItem), hasMore: offset + rows.length < total, total };
-  };
+  // -------------------------------------------------------------------------
+  // Objects
+  // -------------------------------------------------------------------------
 
-  const upsertItems = (items: NewDbItem[]): number => {
+  const upsertObjects = (objects: NewDbObject[]): number => {
     const insert = db.prepare(`
-      INSERT OR IGNORE INTO items
-        (id, source_name, source_url, feed_name, title, description, url, published_at, render_data, status, created_at)
+      INSERT OR IGNORE INTO objects
+        (id, type, name, summary, content, media_type, url, attachment, extras,
+         published, source_name, source_url, feed_name, created_at)
       VALUES
-        (@id, @sourceName, @sourceUrl, @feedName, @title, @description, @url, @publishedAt, @renderData, 'unread', @createdAt)
+        (@id, @type, @name, @summary, @content, @mediaType, @url, @attachment, @extras,
+         @published, @sourceName, @sourceUrl, @feedName, @createdAt)
     `);
 
-    const insertMany = db.transaction((rows: NewDbItem[]) => {
+    const insertActivity = db.prepare(`
+      INSERT OR IGNORE INTO activities (id, type, object_id, published, created_at)
+      VALUES (@id, 'Create', @objectId, @published, @createdAt)
+    `);
+
+    const insertMany = db.transaction((rows: NewDbObject[]) => {
       let inserted = 0;
-      for (const item of rows) {
+      for (const obj of rows) {
         const result = insert.run({
-          id: item.id,
-          sourceName: item.sourceName,
-          sourceUrl: item.sourceUrl,
-          feedName: item.feedName ?? null,
-          title: item.title,
-          description: item.description ?? null,
-          url: item.url,
-          publishedAt: item.publishedAt.getTime(),
-          renderData: JSON.stringify(item.renderData),
-          createdAt: item.createdAt.getTime(),
+          id: obj.id,
+          type: obj.type,
+          name: obj.name ?? null,
+          summary: obj.summary ?? null,
+          content: obj.content ?? null,
+          mediaType: obj.mediaType ?? null,
+          url: obj.url,
+          attachment: obj.attachment != null ? JSON.stringify(obj.attachment) : null,
+          extras: obj.extras != null ? JSON.stringify(obj.extras) : null,
+          published: obj.published != null ? obj.published.getTime() : null,
+          sourceName: obj.sourceName,
+          sourceUrl: obj.sourceUrl,
+          feedName: obj.feedName ?? null,
+          createdAt: obj.createdAt.getTime(),
         });
-        inserted += result.changes;
+        if (result.changes > 0) {
+          // New object inserted — create the corresponding Create activity
+          const now = Date.now();
+          insertActivity.run({
+            id: randomUUID(),
+            objectId: obj.id,
+            published: obj.published != null ? obj.published.getTime() : now,
+            createdAt: now,
+          });
+          inserted++;
+        }
       }
       return inserted;
     });
 
-    return insertMany(items) as number;
+    return insertMany(objects) as number;
   };
 
-  const updateItemStatus = (id: string, status: "unread" | "archived" | "read-later"): void => {
-    db.prepare("UPDATE items SET status = ? WHERE id = ?").run(status, id);
+  // Objects with a Create activity and no Read activity — "unread"
+  const getUnreadObjects = (
+    feedName?: string,
+    limit = 30,
+    offset = 0,
+  ): PaginatedObjects => {
+    const feedFilter = feedName != null ? "AND o.feed_name = ?" : "";
+    const countSql = `
+      SELECT COUNT(*) as count FROM objects o
+      INNER JOIN activities ca ON ca.object_id = o.id AND ca.type = 'Create'
+      LEFT  JOIN activities ra ON ra.object_id = o.id AND ra.type = 'Read'
+      WHERE ra.id IS NULL ${feedFilter}
+    `;
+    const rowsSql = `
+      SELECT o.* FROM objects o
+      INNER JOIN activities ca ON ca.object_id = o.id AND ca.type = 'Create'
+      LEFT  JOIN activities ra ON ra.object_id = o.id AND ra.type = 'Read'
+      WHERE ra.id IS NULL ${feedFilter}
+      ORDER BY o.published DESC LIMIT ? OFFSET ?
+    `;
+
+    const args = feedName != null ? [feedName] : [];
+    const total = (db.prepare(countSql).get(...args) as { count: number }).count;
+    const rows = db.prepare(rowsSql).all(...args, limit, offset) as Record<string, unknown>[];
+    const objects = rows.map(rowToDbObject);
+    return { objects, hasMore: offset + objects.length < total, total };
   };
 
-  const expireItems = (sourceUrl: string, olderThan: Date): number => {
-    const result = db.prepare(
-      "UPDATE items SET status = 'expired' WHERE source_url = ? AND status = 'unread' AND created_at < ?"
-    ).run(sourceUrl, olderThan.getTime());
-    return result.changes;
+  // Objects with an Add activity and no Read activity — "saved for later"
+  const getSavedObjects = (limit = 30, offset = 0): PaginatedObjects => {
+    const total = (db.prepare(`
+      SELECT COUNT(*) as count FROM objects o
+      INNER JOIN activities aa ON aa.object_id = o.id AND aa.type = 'Add'
+      LEFT  JOIN activities ra ON ra.object_id = o.id AND ra.type = 'Read'
+      WHERE ra.id IS NULL
+    `).get() as { count: number }).count;
+
+    const rows = db.prepare(`
+      SELECT o.* FROM objects o
+      INNER JOIN activities aa ON aa.object_id = o.id AND aa.type = 'Add'
+      LEFT  JOIN activities ra ON ra.object_id = o.id AND ra.type = 'Read'
+      WHERE ra.id IS NULL
+      ORDER BY aa.published DESC LIMIT ? OFFSET ?
+    `).all(limit, offset) as Record<string, unknown>[];
+
+    const objects = rows.map(rowToDbObject);
+    return { objects, hasMore: offset + objects.length < total, total };
   };
+
+  // All objects regardless of activity state
+  const getAllObjects = (
+    feedName?: string,
+    limit = 30,
+    offset = 0,
+  ): PaginatedObjects => {
+    const feedFilter = feedName != null ? "WHERE o.feed_name = ?" : "";
+    const countSql = `SELECT COUNT(*) as count FROM objects o ${feedFilter}`;
+    const rowsSql = `SELECT * FROM objects o ${feedFilter} ORDER BY published DESC LIMIT ? OFFSET ?`;
+
+    const args = feedName != null ? [feedName] : [];
+    const total = (db.prepare(countSql).get(...args) as { count: number }).count;
+    const rows = db.prepare(rowsSql).all(...args, limit, offset) as Record<string, unknown>[];
+    const objects = rows.map(rowToDbObject);
+    return { objects, hasMore: offset + objects.length < total, total };
+  };
+
+  // Expire old objects by creating Read activities for them
+  const expireObjects = (sourceUrl: string, olderThan: Date): number => {
+    const candidates = db.prepare(`
+      SELECT o.id FROM objects o
+      INNER JOIN activities ca ON ca.object_id = o.id AND ca.type = 'Create'
+      LEFT  JOIN activities ra ON ra.object_id = o.id AND ra.type = 'Read'
+      WHERE ra.id IS NULL
+        AND o.source_url = ?
+        AND o.created_at < ?
+    `).all(sourceUrl, olderThan.getTime()) as { id: string }[];
+
+    if (candidates.length === 0) return 0;
+
+    const insert = db.prepare(`
+      INSERT OR IGNORE INTO activities (id, type, object_id, published, created_at)
+      VALUES (?, 'Read', ?, ?, ?)
+    `);
+
+    const now = Date.now();
+    const bulkExpire = db.transaction(() => {
+      for (const row of candidates) {
+        insert.run(randomUUID(), row.id, now, now);
+      }
+      return candidates.length;
+    });
+
+    return bulkExpire() as number;
+  };
+
+  // -------------------------------------------------------------------------
+  // Activities
+  // -------------------------------------------------------------------------
+
+  const createActivity = (activity: NewActivity): string => {
+    db.prepare(`
+      INSERT INTO activities (id, type, object_id, target, published, created_at)
+      VALUES (@id, @type, @objectId, @target, @published, @createdAt)
+    `).run({
+      id: activity.id,
+      type: activity.type,
+      objectId: activity.objectId,
+      target: activity.target != null ? JSON.stringify(activity.target) : null,
+      published: activity.published.getTime(),
+      createdAt: activity.createdAt.getTime(),
+    });
+    return activity.id;
+  };
+
+  const hasActivity = (objectId: string, type: AS2ActivityType): boolean => {
+    const row = db.prepare(
+      "SELECT id FROM activities WHERE object_id = ? AND type = ? LIMIT 1"
+    ).get(objectId, type);
+    return row != null;
+  };
+
+  const objectExists = (id: string): boolean => {
+    const row = db.prepare("SELECT id FROM objects WHERE id = ? LIMIT 1").get(id);
+    return row != null;
+  };
+
+  // -------------------------------------------------------------------------
+  // Runs
+  // -------------------------------------------------------------------------
 
   const createRun = (run: NewRun): string => {
     db.prepare(`
@@ -142,7 +293,6 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
     }
 
     if (fields.length === 0) return;
-
     db.prepare(`UPDATE runs SET ${fields.join(", ")} WHERE id = @id`).run(values);
   };
 
@@ -152,6 +302,10 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
       .all(limit) as Record<string, unknown>[];
     return rows.map(rowToRun);
   };
+
+  // -------------------------------------------------------------------------
+  // Time tracking
+  // -------------------------------------------------------------------------
 
   const recordTimeSession = (session: NewTimeSession): void => {
     db.prepare(`
@@ -184,16 +338,24 @@ export const createSqliteDb = (dbPath: string): DbInterface => {
     return { byFeed, total };
   };
 
+  // -------------------------------------------------------------------------
+  // Versioning
+  // -------------------------------------------------------------------------
+
   const getDbVersion = (): number => {
     const row = db.prepare("SELECT MAX(version) as v FROM schema_migrations").get() as { v: number | null };
     return row.v ?? 0;
   };
 
   return {
-    getItems,
-    upsertItems,
-    updateItemStatus,
-    expireItems,
+    upsertObjects,
+    getUnreadObjects,
+    getSavedObjects,
+    getAllObjects,
+    expireObjects,
+    createActivity,
+    hasActivity,
+    objectExists,
     createRun,
     updateRun,
     getRuns,
