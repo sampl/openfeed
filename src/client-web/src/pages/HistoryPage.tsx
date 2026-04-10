@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "@phosphor-icons/react";
-import { fetchItems } from "../apiClient";
-import type { ApiFeedItem } from "connectors/types";
+import { fetchObjects, type PaginatedObjectsResponse } from "../apiClient";
+import type { AS2Object } from "connectors/types";
 import { EmptyState, ErrorState, PageSpinner } from "../ui_components";
 import { CompactFeedList } from "../components/CompactFeedList";
 import styles from "./HistoryPage.module.css";
 
 export const HistoryPage = () => {
-  const [items, setItems] = useState<ApiFeedItem[]>([]);
+  const [items, setItems] = useState<AS2Object[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -19,8 +19,8 @@ export const HistoryPage = () => {
     console.log("📚 HistoryPage effect — fetching archived items");
     setIsLoading(true);
     setError(null);
-    fetchItems("archived")
-      .then((response) => {
+    fetchObjects()
+      .then((response: PaginatedObjectsResponse) => {
         console.log(`📚 HistoryPage fetch complete — ${response.items.length} items`);
         setItems(response.items);
       })
@@ -31,7 +31,7 @@ export const HistoryPage = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const handleSelectItem = (item: ApiFeedItem) => {
+  const handleSelectItem = (item: AS2Object) => {
     navigate(`/item/${item.id}`, { state: { item } });
   };
 

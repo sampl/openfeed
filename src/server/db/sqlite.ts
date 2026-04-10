@@ -30,17 +30,17 @@ const rowToDbObject = (row: Record<string, unknown>): DbObject => {
     createdAt: new Date(row.created_at as number),
   };
 
-  if (row.name != null) (obj as Record<string, unknown>).name = row.name as string;
-  if (row.summary != null) (obj as Record<string, unknown>).summary = row.summary as string;
-  if (row.content != null) (obj as Record<string, unknown>).content = row.content as string;
-  if (row.media_type != null) (obj as Record<string, unknown>).mediaType = row.media_type as string;
-  if (row.published != null) (obj as Record<string, unknown>).published = new Date(row.published as number);
+  if (row.name != null) (obj as unknown as Record<string, unknown>).name = row.name as string;
+  if (row.summary != null) (obj as unknown as Record<string, unknown>).summary = row.summary as string;
+  if (row.content != null) (obj as unknown as Record<string, unknown>).content = row.content as string;
+  if (row.media_type != null) (obj as unknown as Record<string, unknown>).mediaType = row.media_type as string;
+  if (row.published != null) (obj as unknown as Record<string, unknown>).published = new Date(row.published as number);
 
   if (row.attachment != null) {
-    (obj as Record<string, unknown>).attachment = JSON.parse(row.attachment as string);
+    (obj as unknown as Record<string, unknown>).attachment = JSON.parse(row.attachment as string);
   }
   if (row.extras != null) {
-    (obj as Record<string, unknown>).extras = JSON.parse(row.extras as string);
+    (obj as unknown as Record<string, unknown>).extras = JSON.parse(row.extras as string);
   }
 
   return obj;
