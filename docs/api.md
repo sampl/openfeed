@@ -40,12 +40,12 @@ Returns a paginated list of feed objects (articles, posts, videos, etc.).
 
 **Query parameters:**
 
-| Parameter | Type                        | Description                    |
-| --------- | --------------------------- | ------------------------------ |
+| Parameter | Type                         | Description                      |
+| --------- | ---------------------------- | -------------------------------- |
 | `view`    | `unread` \| `saved` \| `all` | Filter by view (default: unread) |
-| `feed`    | string                      | Filter by feed name            |
-| `limit`   | number                      | Items per page (default: 30)   |
-| `offset`  | number                      | Pagination offset (default: 0) |
+| `feed`    | string                       | Filter by feed name              |
+| `limit`   | number                       | Items per page (default: 30)     |
+| `offset`  | number                       | Pagination offset (default: 0)   |
 
 **Response:**
 
@@ -89,11 +89,11 @@ Records an action taken on an object (marking as read, saving for later, etc.).
 }
 ```
 
-| Field      | Type                  | Description                                |
-| ---------- | --------------------- | ------------------------------------------ |
-| `type`     | `"Read"` \| `"Add"`   | Action type                                |
-| `objectId` | string                | ID of the object                           |
-| `target`   | object (optional)     | For `Add` type: save to read-later         |
+| Field      | Type                | Description                        |
+| ---------- | ------------------- | ---------------------------------- |
+| `type`     | `"Read"` \| `"Add"` | Action type                        |
+| `objectId` | string              | ID of the object                   |
+| `target`   | object (optional)   | For `Add` type: save to read-later |
 
 ## Fetching
 
@@ -155,15 +155,15 @@ Returns all configured sources and their last fetch status.
 ]
 ```
 
-| Field                | Type      | Description                                            |
-| -------------------- | --------- | ------------------------------------------------------ |
-| `name`               | string    | Display name from config                               |
-| `url`                | string    | Source URL from config                                 |
-| `feedName`           | string    | Feed this source belongs to                            |
-| `connector`          | string    | Connector name (optional)                              |
-| `lastStatus`         | string    | Status of last fetch: `success`, `error`, `skipped`    |
-| `lastErrorMessage`   | string    | Error message from last failed fetch (if any)          |
-| `lastErrorCode`      | string    | Structured error code from last fetch (if any)         |
+| Field              | Type   | Description                                         |
+| ------------------ | ------ | --------------------------------------------------- |
+| `name`             | string | Display name from config                            |
+| `url`              | string | Source URL from config                              |
+| `feedName`         | string | Feed this source belongs to                         |
+| `connector`        | string | Connector name (optional)                           |
+| `lastStatus`       | string | Status of last fetch: `success`, `error`, `skipped` |
+| `lastErrorMessage` | string | Error message from last failed fetch (if any)       |
+| `lastErrorCode`    | string | Structured error code from last fetch (if any)      |
 
 ## Fetch history
 

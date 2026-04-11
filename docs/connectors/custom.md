@@ -46,14 +46,14 @@ export default myConnector;
 
 Each item must include the required fields `type` and `url`. The `type` field determines how the content is displayed:
 
-| Type      | Description                                                    | Common fields          |
-| --------- | -------------------------------------------------------------- | ---------------------- |
-| `Article` | Long-form content with a headline (RSS, blog posts, news)      | `name`, `content`      |
-| `Note`    | Short-form text without a standalone title (social posts)      | `content`              |
-| `Video`   | Video content with embed link                                  | `url`, `attachment`    |
-| `Audio`   | Audio content with enclosure URL                               | `url`, `attachment`    |
-| `Event`   | Calendar event                                                 | `name`, `published`    |
-| `Page`    | Generic web page best shown in an iframe                       | `url`                  |
+| Type      | Description                                               | Common fields       |
+| --------- | --------------------------------------------------------- | ------------------- |
+| `Article` | Long-form content with a headline (RSS, blog posts, news) | `name`, `content`   |
+| `Note`    | Short-form text without a standalone title (social posts) | `content`           |
+| `Video`   | Video content with embed link                             | `url`, `attachment` |
+| `Audio`   | Audio content with enclosure URL                          | `url`, `attachment` |
+| `Event`   | Calendar event                                            | `name`, `published` |
+| `Page`    | Generic web page best shown in an iframe                  | `url`               |
 
 ## Error handling
 
@@ -137,7 +137,11 @@ describe("myConnector", () => {
         }),
     });
     const context = { sourceName: "Test", sourceUrl: "https://mysite.com" };
-    const items = await myConnector.listItems("https://mysite.com", mockFetch, context);
+    const items = await myConnector.listItems(
+      "https://mysite.com",
+      mockFetch,
+      context,
+    );
     expect(items).toHaveLength(1);
     expect(items[0].name).toBe("Test");
   });
