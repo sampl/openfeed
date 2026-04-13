@@ -74,10 +74,18 @@ fly deploy
 4. For persistent SQLite storage, create a volume:
 
 ```bash
-fly volumes create open_feed_data --size 1
+fly volumes create openfeed_data --size 1
 ```
 
-Then use `openfeed --db /data/openfeed.db` and mount the volume at `/data`.
+Then add this to your `fly.toml` file:
+
+```toml
+[[mounts]]
+source = "openfeed_data"
+destination = "/data"
+```
+
+And use the command: `openfeed --db /data/openfeed.db`
 
 ### DigitalOcean App Platform
 

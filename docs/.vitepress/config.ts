@@ -21,6 +21,7 @@ export default defineConfig({
         ],
       },
       { text: "API", link: "/api" },
+      { text: "Versioning", link: "/versioning" },
     ],
     socialLinks: [
       { icon: "github", link: "https://github.com/sampl/openfeed" },
