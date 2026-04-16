@@ -5,7 +5,7 @@ OpenFeed is a self-hosted news and social media aggregator.
 Things you can do with OpenFeed:
 
 - See events from local businesses on your phone
-- Get the top [HackerNews](https://news.ycombinator.com) stories every Saturday
+- Get the top [Hacker News](https://news.ycombinator.com) stories every Saturday
 - Print the [NYT crossword](https://www.nytimes.com/crosswords) every day at 8am
 - Watch a stream of all videos posted to [kottke.org](https://kottke.org)
 - See a list of all [YouTube](https://www.youtube.com) videos only from channels you subscribe to
