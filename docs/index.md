@@ -45,7 +45,7 @@ Ideas for OpenFeed clients:
 - Native mobile - native iOS and Android apps for browsing your OpenFeed
 - Print - automatically print the news each day
 - CLI - browse your feed from the terminal
-- GoogleTV
+- Google TV
 - SMS - Get breaking news by text
 
 You can create your own clients by hitting the OpenFeed API. If you do, [let me know](https://directedworks.com) so I can add it here!
